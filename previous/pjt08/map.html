@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>은행 찾기</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+</head>
+<body>
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+        <!-- 페이지 타이틀 -->
+        <div class="page-header">
+            <h2 class="page-title">은행 찾기</h2>
+        </div>
+
+        <!-- 지도 컨테이너 -->
+        <div id="map" class="map-container">
+            <!-- 지도 내부 검색 박스 -->
+            <div class="search-box">
+                <div class="search-header">
+                    <h3>Tosu Bank<br>가까운 은행 찾기</h3>
+                </div>
+
+                <!-- 드롭다운 검색 영역 -->
+                <div class="dropdown-search">
+                    <select id="sido" class="search-select">
+                        <option value="">시/도 선택</option>
+                    </select>
+                    <select id="sigungu" class="search-select" disabled>
+                        <option value="">시/군/구 선택</option>
+                    </select>
+                    <select id="bank" class="search-select" disabled>
+                        <option value="">은행 선택</option>
+                    </select>
+                    <button id="searchBtn" class="search-btn">검색</button>
+                </div>
+            </div>
+
+            <!-- 지도 컨트롤 버튼 (우측) -->
+            <div class="map-controls">
+                <button class="control-btn zoom-in">+</button>
+                <button class="control-btn zoom-out">-</button>
+                <button class="control-btn location">📍</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="apikey.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
