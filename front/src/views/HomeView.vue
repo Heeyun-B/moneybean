@@ -46,7 +46,9 @@
           
           <div class="login-footer">
             <div class="google-btn">
-              <span class="google-icon">G</span> 구글 계정 로그인
+              <span class="google-icon">
+                <img src="@/assets/logo_google.png" alt="Google Logo" class="google-logo-img">
+              </span> 구글 계정 로그인
             </div>
             <div class="find-join">
               <span @click="$router.push('/find-account')">찾기</span> |
@@ -145,7 +147,7 @@ export default {
 .navbar { background: white; border-bottom: 1px solid #eee; height: 80px; position: sticky; top: 0; z-index: 100; }
 .nav-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; height: 100%; padding: 0 20px; }
 .logo-area { display: flex; align-items: center; cursor: pointer; margin-right: 50px; }
-.bean-logo { width: 40px; height: 40px; margin-right: 10px; }
+.bean-logo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-right: 15px; }
 .logo-text { font-size: 24px; font-weight: bold; color: #00a651; }
 
 .menu-list { display: flex; gap: 20px; height: 100%; }
@@ -162,7 +164,7 @@ export default {
 .submenu li { padding: 10px 20px; font-size: 14px; cursor: pointer; }
 .submenu li:hover { background: #f1fcf4; color: #00a651; }
 
-/* 배너 슬라이드 스타일 */
+/* 배너 슬라이드 */
 .hero-section { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 20px; }
 .banner-box { 
   background: #00a651; border-radius: 20px; color: white; padding: 40px;
@@ -189,14 +191,17 @@ export default {
 }
 .login-footer { display: flex; flex-direction: column; gap: 15px; align-items: center; font-size: 13px; }
 .google-btn { cursor: pointer; color: #666; display: flex; align-items: center; gap: 5px; }
+.google-btn:hover { background-color: #f5f5f5; }
+.google-icon { display: flex; align-items: center; }
+.google-logo-img { width: 15px; height: 15px; }
 .find-join { color: #999; }
 .join-link { color: #00a651; font-weight: bold; cursor: pointer; margin-left: 5px; }
 
-/* 머니빈 Pick! 섹션 타이틀 수정 */
+/* 머니빈 Pick! */
 .pick-section { margin-top: 60px; }
 .section-title-container { display: flex; align-items: center; margin-bottom: 20px; gap: 10px; }
-.section-logo { width: 30px; height: 30px; }
-.section-title { font-size: 22px; margin: 0; } /* margin 제거하여 로고와 높이 맞춤 */
+.section-logo { width: 30px; height: 30px; border-radius: 50%; object-fit: cover;}
+.section-title { font-size: 22px; margin: 0; }
 
 .pick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .pick-card { 
@@ -206,7 +211,7 @@ export default {
 .pick-card:hover { transform: translateY(-5px); border-color: #00a651; }
 .pick-icon { font-size: 30px; margin-bottom: 10px; }
 
-/* 게시판 스타일 */
+/* 게시판 */
 .board-section { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 60px; }
 .board-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
 .board-list { list-style: none; padding: 0; background: white; border-radius: 15px; border: 1px solid #eee; }
