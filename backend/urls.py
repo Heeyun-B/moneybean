@@ -1,5 +1,5 @@
 """
-URL configuration for tosu_bank project.
+URL configuration for backend project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.2/topics/http/urls/
@@ -20,8 +20,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("accounts/", include("accounts.urls")),
-    path("posts/", include("posts.urls")),
-    path("finances/", include("finances.urls")),
-    path("news/", include("news.urls")),
+    path('api/accounts/', include('accounts.urls')),
 ]

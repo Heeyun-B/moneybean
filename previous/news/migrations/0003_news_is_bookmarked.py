@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('news', '0002_news_created_at'),
+        ("news", "0002_news_created_at"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='news',
-            name='is_bookmarked',
+            model_name="news",
+            name="is_bookmarked",
             field=models.BooleanField(default=False),
         ),
     ]
