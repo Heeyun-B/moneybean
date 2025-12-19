@@ -39,19 +39,17 @@
         </div>
 
         <div class="login-box">
-          <h3>로그인</h3>
-          <input type="text" placeholder="ID" class="login-input">
-          <input type="password" placeholder="PW" class="login-input">
-          <button class="login-submit-btn">로그인</button>
+          <div class="login-intro">
+            <p class="intro-text">머니빈을 더 안전하고<br>편리하게 이용하세요.</p>
+            <button class="login-move-btn" @click="$router.push('/login')">
+              <strong>머니빈 로그인</strong>
+            </button>
+          </div>
           
           <div class="login-footer">
-            <div class="google-btn">
-              <span class="google-icon">
-                <img src="@/assets/logo_google.png" alt="Google Logo" class="google-logo-img">
-              </span> 구글 계정 로그인
-            </div>
             <div class="find-join">
-              <span @click="$router.push('/find-account')">찾기</span> |
+              <span @click="$router.push('/find-account')">아이디 찾기</span> |
+              <span @click="$router.push('/find-account')">비밀번호 찾기</span> |
               <span class="join-link" @click="$router.push('/signup')">회원가입</span>
             </div>
           </div>
@@ -182,20 +180,15 @@ export default {
 /* 로그인 박스 */
 .login-box { 
   background: white; border: 1px solid #eee; border-radius: 20px; padding: 30px;
-  display: flex; flex-direction: column;
+  display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
 }
-.login-input { padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; }
-.login-submit-btn { 
-  background: #00a651; color: white; border: none; padding: 14px; 
-  border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 15px;
-}
-.login-footer { display: flex; flex-direction: column; gap: 15px; align-items: center; font-size: 13px; }
-.google-btn { cursor: pointer; color: #666; display: flex; align-items: center; gap: 5px; }
-.google-btn:hover { background-color: #f5f5f5; }
-.google-icon { display: flex; align-items: center; }
-.google-logo-img { width: 15px; height: 15px; }
-.find-join { color: #999; }
-.join-link { color: #00a651; font-weight: bold; cursor: pointer; margin-left: 5px; }
+.login-intro { width: 100%; margin-bottom: 25px; }
+.intro-text { font-size: 15px; line-height: 1.5; color: #666; margin-bottom: 20px; }
+.login-move-btn { width: 100%; max-width: 250px; background: #00a651; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 16px; cursor: pointer; transition: all 0.2s; }
+.login-move-btn:hover { background: #008e45; }
+.find-join { font-size: 12px; color: #888; }
+.find-join span { cursor: pointer; margin: 0 5px; }
+.find-join span:hover { text-decoration: underline; color: #666; }
 
 /* 머니빈 Pick! */
 .pick-section { margin-top: 60px; }
