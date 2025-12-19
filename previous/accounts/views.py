@@ -7,78 +7,83 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm
 from .forms import CustomUserChangeForm
+
 # Create your views here.
+
 
 def login(request):
     if request.user.is_authenticated:
-        return redirect('articles:index')
-    
-    if request.method == 'POST':
+        return redirect("articles:index")
+
+    if request.method == "POST":
         form = AuthenticationForm(request, request.POST)
 
         if form.is_valid():
             auth_login(request, form.get_user())
-            return redirect('posts:index')
+            return redirect("posts:index")
     else:
-        form = AuthenticationForm() 
+        form = AuthenticationForm()
 
     context = {
-        'form': form,
+        "form": form,
     }
-    return render(request, 'accounts/login.html', context)
+    return render(request, "accounts/login.html", context)
+
 
 @login_required
 def logout(request):
     auth_logout(request)
-    return redirect('posts:index')
+    return redirect("posts:index")
+
 
 def signup(request):
     if request.user.is_authenticated:
-        return redirect('articles:index')
-    
-    if request.method == 'POST':
+        return redirect("articles:index")
+
+    if request.method == "POST":
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            auth_login(request, user) # 자동 로그인 
-            return redirect('posts:index')
+            auth_login(request, user)  # 자동 로그인
+            return redirect("posts:index")
     else:
         form = CustomUserCreationForm()
     context = {
-        'form' : form, 
+        "form": form,
     }
-    return render(request, 'accounts/signup.html', context)
+    return render(request, "accounts/signup.html", context)
+
 
 @login_required
 def delete(request):
     request.user.delete()
-    return redirect('posts:index')
+    return redirect("posts:index")
+
 
 @login_required
 def update(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = CustomUserChangeForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
-            return redirect('posts:index')
+            return redirect("posts:index")
     else:
         form = CustomUserChangeForm(instance=request.user)
     context = {
-        'form' : form,
+        "form": form,
     }
-    return render(request, 'accounts/update.html', context)
+    return render(request, "accounts/update.html", context)
+
 
 @login_required
 def change_password(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = PasswordChangeForm(user=request.user, data=request.POST)
         if form.is_valid():
             user = form.save()
-            update_session_auth_hash(request, user) # 암호 변경 시 세션 무효화 방지
-            return redirect('posts:index')
+            update_session_auth_hash(request, user)  # 암호 변경 시 세션 무효화 방지
+            return redirect("posts:index")
     else:
         form = PasswordChangeForm(request.user)
-    context = {
-        'form' : form
-    }
-    return render(request, 'accounts/password.html', context)
+    context = {"form": form}
+    return render(request, "accounts/password.html", context)
