@@ -5,6 +5,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from .serializers import SignupSerializer, LoginSerializer, UserSerializer
+from django.contrib.auth import get_user_model
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -72,3 +73,21 @@ def user_info(request):
     """현재 로그인한 사용자 정보"""
     serializer = UserSerializer(request.user)
     return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def check_id(request, username):
+    """아이디 중복 확인"""
+    User = get_user_model()
+    if User.objects.filter(username=username).exists():
+        return Response({'is_exist': True}, status=status.HTTP_200_OK)
+    return Response({'is_exist': False}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def check_nickname(request, nickname):
+    """닉네임 중복 확인"""
+    User = get_user_model()
+    if User.objects.filter(nickname=nickname).exists():
+        return Response({'is_exist': True}, status=status.HTTP_200_OK)
+    return Response({'is_exist': False}, status=status.HTTP_200_OK)
