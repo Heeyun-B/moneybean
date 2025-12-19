@@ -3,5 +3,8 @@ from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 
-class User(AbstractUser): # 내장 user 모델 상속
-		pass
+class User(AbstractUser):
+    nickname = models.CharField(max_length=50, unique=True)
+    
+    def __str__(self):
+        return self.username

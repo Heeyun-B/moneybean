@@ -15,7 +15,7 @@ class SignupSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ('username', 'password', 'password2', 'email')
+        fields = ('username', 'password', 'password2', 'email', 'nickname')
     
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
@@ -42,4 +42,4 @@ class LoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email')
+        fields = ('id', 'username', 'email', 'nickname')
