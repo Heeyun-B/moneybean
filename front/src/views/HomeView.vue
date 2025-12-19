@@ -11,7 +11,7 @@
           <div v-for="menu in menus" :key="menu.title" class="menu-item">
             <button class="menu-btn">{{ menu.title }}</button>
             <ul class="submenu">
-              <li v-for="sub in menu.subs" :key="sub">{{ sub }}</li>
+              <li v-for="sub in menu.subs" :key="sub" @click="handleSubMenu(sub)">{{ sub }}</li>
             </ul>
           </div>
         </nav>
@@ -132,6 +132,11 @@ export default {
       this.slideInterval = setInterval(() => {
         this.currentSlide = (this.currentSlide + 1) % this.banners.length;
       }, 4000);
+    },
+    handleSubMenu(sub) {
+    if (sub === '유튜브 찾기') {
+      this.$router.push('/youtube');
+      }
     }
   }
 };
@@ -153,10 +158,10 @@ export default {
 .menu-btn { background: none; border: none; font-size: 16px; font-weight: 600; cursor: pointer; padding: 10px; }
 
 .submenu {
-  display: none; position: absolute; top: 70px; left: 0; 
+  display: none; position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
   background: white; border: 1px solid #eee; list-style: none;
   padding: 10px 0; width: 160px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-  border-radius: 8px;
+  border-radius: 8px; border-top: 15px solid transparent; background-clip: padding-box;
 }
 .menu-item:hover .submenu { display: block; }
 .submenu li { padding: 10px 20px; font-size: 14px; cursor: pointer; }
