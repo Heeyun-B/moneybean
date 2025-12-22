@@ -39,18 +39,36 @@
         </div>
 
         <div class="login-box">
-          <div class="login-intro">
-            <p class="intro-text">머니빈을 더 안전하고<br>편리하게 이용하세요.</p>
-            <button class="login-move-btn" @click="$router.push('/login')">
-              <strong>머니빈 로그인</strong>
-            </button>
+          <div v-if="!authStore.token" class="login-not-yet">
+            <div class="login-intro">
+              <p class="intro-text">머니빈을 더 안전하고<br>편리하게 이용하세요.</p>
+              <button class="login-move-btn" @click="$router.push('/login')">
+                <strong>머니빈 로그인</strong>
+              </button>
+            </div>
+            <div class="login-footer">
+              <div class="find-join">
+                <span @click="$router.push('/find-account')">아이디 찾기</span> |
+                <span @click="$router.push('/find-account')">비밀번호 찾기</span> |
+                <span class="join-link" @click="$router.push('/signup')">회원가입</span>
+              </div>
+            </div>
           </div>
-          
-          <div class="login-footer">
-            <div class="find-join">
-              <span @click="$router.push('/find-account')">아이디 찾기</span> |
-              <span @click="$router.push('/find-account')">비밀번호 찾기</span> |
-              <span class="join-link" @click="$router.push('/signup')">회원가입</span>
+
+          <div v-else class="login-success">
+            <div class="user-profile">
+              <div class="welcome-msg">
+                <h3 style="color: #00a651; margin-bottom: 10px;">반가워요! {{ authStore.nickname }}님 🌱</h3>
+                <p style="font-size: 13px; color: #666; margin-bottom: 25px;">오늘도 스마트한 자산 관리를 시작해보세요.</p>
+              </div>
+              <div class="user-actions" style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                <button class="login-move-btn" @click="$router.push({ name: 'assets' })">
+                  <strong>내 자산 관리</strong>
+                </button>
+                <button @click="handleLogout" style="background: none; border: none; color: #999; font-size: 12px; cursor: pointer; text-decoration: underline; margin-top: 5px;">
+                  로그아웃
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -98,6 +116,7 @@
 </template>
 
 <script>
+import { useAuthStore } from '@/stores/auth'
 export default {
   data: () => ({
     currentSlide: 0,
@@ -121,6 +140,10 @@ export default {
       { title: '투자', icon: '📈' },
     ]
   }),
+  setup() {
+    const authStore = useAuthStore()
+    return { authStore }
+  },
   mounted() {
     this.startSlide();
   },
@@ -137,6 +160,14 @@ export default {
     if (sub === '유튜브 찾기') {
       this.$router.push('/youtube');
       }
+    },
+    handleLogout() {
+      this.authStore.token = null;
+      this.authStore.nickname = null;
+      localStorage.removeItem('token');
+      localStorage.removeItem('nickname');
+      this.$router.push('/');
+      alert('로그아웃 되었습니다.');
     }
   }
 };
