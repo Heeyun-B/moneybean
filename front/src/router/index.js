@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import HomeView from '../views/HomeView.vue'
 import SignUpView from '@/views/SignUpView.vue'
-import LogInView from '@/views/LogInView.vue'
+import LoginView from '@/views/LoginView.vue'
 import AssetView from '@/views/AssetView.vue' 
 
 // 유튜브 관련 뷰
@@ -34,7 +34,7 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: LogInView
+      component: LoginView
     },
 
     // 유튜브 관련
