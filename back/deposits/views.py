@@ -133,8 +133,16 @@ def save_deposit_products(request):
 def deposit_products(request):
     """
     전체 정기예금 상품 목록 출력
+    - 은행별 필터 기능 제공
+    - 옵션 정보 포함
     """
     products = DepositProducts.objects.all()
+    
+    # 은행별 필터링
+    bank = request.GET.get('bank')  # ?bank=우리은행
+    if bank:
+        products = products.filter(kor_co_nm__icontains=bank)
+    
     serializer = DepositProductsSerializer(products, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
