@@ -33,6 +33,7 @@
 </template>
 
 <script setup>
+
 import { onMounted } from 'vue'
 import { useAssetStore } from '@/stores/assetStore'
 import { useRouter } from 'vue-router' // 1. 라우터 import
@@ -53,6 +54,7 @@ onMounted(async () => {
     router.push({ name: 'LogInView' }) 
   }
 })
+
 </script>
 
 <style scoped>
@@ -139,4 +141,5 @@ onMounted(async () => {
   margin-top: 20px;
   cursor: pointer;
 }
+
 </style>
