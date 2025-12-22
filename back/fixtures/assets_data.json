@@ -1,0 +1,565 @@
+[
+{
+    "model": "assets.assetcategory",
+    "pk": 1,
+    "fields": {
+        "name": "입출금 통장",
+        "group": "CASH",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 2,
+    "fields": {
+        "name": "정기 예금",
+        "group": "CASH",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 3,
+    "fields": {
+        "name": "정기 적금",
+        "group": "CASH",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 4,
+    "fields": {
+        "name": "파킹통장/CMA",
+        "group": "CASH",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 5,
+    "fields": {
+        "name": "현금 (비상금)",
+        "group": "CASH",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 7,
+    "fields": {
+        "name": "청약 통장",
+        "group": "CASH",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 8,
+    "fields": {
+        "name": "기타 현금 자산",
+        "group": "CASH",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 9,
+    "fields": {
+        "name": "국내 주식",
+        "group": "INVEST",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 10,
+    "fields": {
+        "name": "해외 주식",
+        "group": "INVEST",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 11,
+    "fields": {
+        "name": "가상화폐 (코인)",
+        "group": "INVEST",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 12,
+    "fields": {
+        "name": "펀드/ETF",
+        "group": "INVEST",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 13,
+    "fields": {
+        "name": "부동산 (거주목적)",
+        "group": "INVEST",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 14,
+    "fields": {
+        "name": "부동산 (투자목적)",
+        "group": "INVEST",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 15,
+    "fields": {
+        "name": "연금 저축/IRP",
+        "group": "INVEST",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 16,
+    "fields": {
+        "name": "금/은 (원자재)",
+        "group": "INVEST",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 17,
+    "fields": {
+        "name": "기타 투자 자산",
+        "group": "INVEST",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 18,
+    "fields": {
+        "name": "전세 자금 대출",
+        "group": "DEBT",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 19,
+    "fields": {
+        "name": "주택 담보 대출",
+        "group": "DEBT",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 20,
+    "fields": {
+        "name": "신용 대출",
+        "group": "DEBT",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 21,
+    "fields": {
+        "name": "마이너스 통장",
+        "group": "DEBT",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 22,
+    "fields": {
+        "name": "학자금 대출",
+        "group": "DEBT",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 23,
+    "fields": {
+        "name": "할부금",
+        "group": "DEBT",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 24,
+    "fields": {
+        "name": "빌린 돈",
+        "group": "DEBT",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.assetcategory",
+    "pk": 25,
+    "fields": {
+        "name": "기타 대출",
+        "group": "DEBT",
+        "description": "",
+        "icon_name": ""
+    }
+},
+{
+    "model": "assets.asset",
+    "pk": 5,
+    "fields": {
+        "user": 1,
+        "category": 1,
+        "name": "신한은행",
+        "current_value": "50000000",
+        "order": 5,
+        "created_at": "2025-12-22T05:20:39.308Z",
+        "updated_at": "2025-12-22T06:41:32.508Z"
+    }
+},
+{
+    "model": "assets.asset",
+    "pk": 6,
+    "fields": {
+        "user": 1,
+        "category": 9,
+        "name": "삼성전자",
+        "current_value": "3000000",
+        "order": 4,
+        "created_at": "2025-12-22T05:29:18.232Z",
+        "updated_at": "2025-12-22T06:41:32.474Z"
+    }
+},
+{
+    "model": "assets.asset",
+    "pk": 7,
+    "fields": {
+        "user": 1,
+        "category": 22,
+        "name": "학자금 대출",
+        "current_value": "1000000",
+        "order": 1,
+        "created_at": "2025-12-22T05:29:18.237Z",
+        "updated_at": "2025-12-22T06:41:32.466Z"
+    }
+},
+{
+    "model": "assets.asset",
+    "pk": 8,
+    "fields": {
+        "user": 1,
+        "category": 1,
+        "name": "국민은행",
+        "current_value": "30000000",
+        "order": 6,
+        "created_at": "2025-12-22T05:55:27.284Z",
+        "updated_at": "2025-12-22T06:41:32.542Z"
+    }
+},
+{
+    "model": "assets.asset",
+    "pk": 9,
+    "fields": {
+        "user": 1,
+        "category": 18,
+        "name": "전세 자금 대출",
+        "current_value": "50000000",
+        "order": 2,
+        "created_at": "2025-12-22T05:55:27.288Z",
+        "updated_at": "2025-12-22T06:41:32.471Z"
+    }
+},
+{
+    "model": "assets.asset",
+    "pk": 10,
+    "fields": {
+        "user": 1,
+        "category": 10,
+        "name": "엔비디아",
+        "current_value": "50000000",
+        "order": 3,
+        "created_at": "2025-12-22T05:55:27.297Z",
+        "updated_at": "2025-12-22T06:41:32.473Z"
+    }
+},
+{
+    "model": "assets.asset",
+    "pk": 11,
+    "fields": {
+        "user": 3,
+        "category": 1,
+        "name": "카카오뱅크(주거래)",
+        "current_value": "2300000",
+        "order": 13,
+        "created_at": "2025-12-22T06:53:51.923Z",
+        "updated_at": "2025-12-22T07:37:31.145Z"
+    }
+},
+{
+    "model": "assets.asset",
+    "pk": 12,
+    "fields": {
+        "user": 3,
+        "category": 10,
+        "name": "Apple",
+        "current_value": "8200000",
+        "order": 3,
+        "created_at": "2025-12-22T06:53:51.952Z",
+        "updated_at": "2025-12-22T07:37:31.039Z"
+    }
+},
+{
+    "model": "assets.asset",
+    "pk": 13,
+    "fields": {
+        "user": 3,
+        "category": 10,
+        "name": "Tesla",
+        "current_value": "5100000",
+        "order": 4,
+        "created_at": "2025-12-22T06:53:51.965Z",
+        "updated_at": "2025-12-22T07:37:31.034Z"
+    }
+},
+{
+    "model": "assets.asset",
+    "pk": 14,
+    "fields": {
+        "user": 3,
+        "category": 12,
+        "name": "TIGER 미국테크TOP10",
+        "current_value": "4500000",
+        "order": 5,
+        "created_at": "2025-12-22T06:53:51.979Z",
+        "updated_at": "2025-12-22T07:37:31.035Z"
+    }
+},
+{
+    "model": "assets.asset",
+    "pk": 15,
+    "fields": {
+        "user": 3,
+        "category": 11,
+        "name": "비트코인(BTC)",
+        "current_value": "2100000",
+        "order": 6,
+        "created_at": "2025-12-22T06:53:51.994Z",
+        "updated_at": "2025-12-22T07:37:31.184Z"
+    }
+},
+{
+    "model": "assets.asset",
+    "pk": 16,
+    "fields": {
+        "user": 3,
+        "category": 9,
+        "name": "네이버",
+        "current_value": "4500000",
+        "order": 2,
+        "created_at": "2025-12-22T06:53:52.009Z",
+        "updated_at": "2025-12-22T07:37:31.039Z"
+    }
+},
+{
+    "model": "assets.asset",
+    "pk": 17,
+    "fields": {
+        "user": 3,
+        "category": 18,
+        "name": "카카오뱅크 전월세보증금 대출",
+        "current_value": "100000000",
+        "order": 8,
+        "created_at": "2025-12-22T06:53:52.028Z",
+        "updated_at": "2025-12-22T07:37:31.067Z"
+    }
+},
+{
+    "model": "assets.asset",
+    "pk": 18,
+    "fields": {
+        "user": 3,
+        "category": 21,
+        "name": "마이너스 통장(비상금)",
+        "current_value": "8500000",
+        "order": 9,
+        "created_at": "2025-12-22T06:53:52.042Z",
+        "updated_at": "2025-12-22T07:37:31.083Z"
+    }
+},
+{
+    "model": "assets.asset",
+    "pk": 19,
+    "fields": {
+        "user": 3,
+        "category": 9,
+        "name": "삼성전자",
+        "current_value": "20000000",
+        "order": 1,
+        "created_at": "2025-12-22T06:53:52.010Z",
+        "updated_at": "2025-12-22T07:37:31.038Z"
+    }
+},
+{
+    "model": "assets.asset",
+    "pk": 20,
+    "fields": {
+        "user": 3,
+        "category": 22,
+        "name": "학자금 대출 잔액",
+        "current_value": "1200000",
+        "order": 11,
+        "created_at": "2025-12-22T06:53:52.077Z",
+        "updated_at": "2025-12-22T07:37:31.114Z"
+    }
+},
+{
+    "model": "assets.asset",
+    "pk": 21,
+    "fields": {
+        "user": 3,
+        "category": 4,
+        "name": "토스뱅크 모으기 통장",
+        "current_value": "5000000",
+        "order": 14,
+        "created_at": "2025-12-22T06:53:52.099Z",
+        "updated_at": "2025-12-22T07:37:31.160Z"
+    }
+},
+{
+    "model": "assets.asset",
+    "pk": 22,
+    "fields": {
+        "user": 3,
+        "category": 3,
+        "name": "청년희망적금",
+        "current_value": "11200000",
+        "order": 12,
+        "created_at": "2025-12-22T06:53:52.010Z",
+        "updated_at": "2025-12-22T07:37:31.129Z"
+    }
+},
+{
+    "model": "assets.asset",
+    "pk": 23,
+    "fields": {
+        "user": 3,
+        "category": 8,
+        "name": "서울 오피스텔 전세 보증금",
+        "current_value": "150000000",
+        "order": 15,
+        "created_at": "2025-12-22T06:53:52.052Z",
+        "updated_at": "2025-12-22T07:37:31.174Z"
+    }
+},
+{
+    "model": "assets.asset",
+    "pk": 24,
+    "fields": {
+        "user": 3,
+        "category": 23,
+        "name": "현대카드 할부잔액",
+        "current_value": "2800000",
+        "order": 10,
+        "created_at": "2025-12-22T06:53:52.102Z",
+        "updated_at": "2025-12-22T07:37:31.098Z"
+    }
+},
+{
+    "model": "assets.asset",
+    "pk": 25,
+    "fields": {
+        "user": 3,
+        "category": 11,
+        "name": "이더리움(ETH)",
+        "current_value": "1100000",
+        "order": 7,
+        "created_at": "2025-12-22T06:53:52.099Z",
+        "updated_at": "2025-12-22T07:37:31.052Z"
+    }
+},
+{
+    "model": "assets.userfinancialinfo",
+    "pk": 1,
+    "fields": {
+        "user": 1,
+        "monthly_income": "5000000",
+        "monthly_expense": "3000000",
+        "updated_at": "2025-12-22T06:41:32.487Z"
+    }
+},
+{
+    "model": "assets.userfinancialinfo",
+    "pk": 2,
+    "fields": {
+        "user": 3,
+        "monthly_income": "0",
+        "monthly_expense": "0",
+        "updated_at": "2025-12-22T07:37:31.216Z"
+    }
+},
+{
+    "model": "assets.userfinancialinfo",
+    "pk": 3,
+    "fields": {
+        "user": 5,
+        "monthly_income": "0",
+        "monthly_expense": "0",
+        "updated_at": "2025-12-22T07:07:05.013Z"
+    }
+},
+{
+    "model": "assets.userfinancialinfo",
+    "pk": 4,
+    "fields": {
+        "user": 6,
+        "monthly_income": "0",
+        "monthly_expense": "0",
+        "updated_at": "2025-12-22T07:10:38.598Z"
+    }
+},
+{
+    "model": "assets.userfinancialinfo",
+    "pk": 5,
+    "fields": {
+        "user": 7,
+        "monthly_income": "0",
+        "monthly_expense": "0",
+        "updated_at": "2025-12-22T07:38:29.649Z"
+    }
+}
+]

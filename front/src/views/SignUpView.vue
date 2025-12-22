@@ -4,7 +4,7 @@
       <h1>Money Bean</h1>
       <p class="subtitle">새로운 자산 관리의 시작</p>
       
-      <SignupForm @success="goLogin" />
+      <SignupForm @success="handleSignupSuccess" />
       
       <div class="login-link">
         이미 계정이 있으신가요? 
@@ -20,9 +20,14 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
+const handleSignupSuccess = () => {
+  const isWantInput = window.confirm('회원가입을 환영합니다! 🎉\n바로 "내 자산"을 입력하시겠습니까?');
 
-const goLogin = () => {
-  router.push('/login');
+  if (isWantInput) {
+    router.push({ name: 'asset-create' });
+  } else {
+    router.push({ name: 'home' });
+  }
 };
 </script>
 

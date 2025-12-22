@@ -8,8 +8,8 @@
 
       <div class="login-form">
         <div class="input-group">
-          <input type="text" v-model="userId" placeholder="아이디" class="input-field">
-          <input type="password" v-model="userPw" placeholder="비밀번호" class="input-field">
+          <input type="text" v-model="userId" placeholder="아이디" class="input-field" @keyup.enter="handleLogin">
+          <input type="password" v-model="userPw" placeholder="비밀번호" class="input-field" @keyup.enter="handleLogin">
         </div>
 
         <div class="login-options">
@@ -38,13 +38,11 @@
 </template>
 
 <script>
-import { useAuthStore } from '@/stores/auth'
+import axios from 'axios'
+
 export default {
   data() {
-    return {
-      userId: '',
-      userPw: ''
-    }
+    return { userId: '', userPw: '' }
   },
 
   setup() {
@@ -53,25 +51,44 @@ export default {
   },
 
   methods: {
-    handleLogin() {
-      if (!this.userId || !this.userPw) {
+    async handleLogin() {
+      if(!this.userId || !this.userPw) {
         alert('아이디와 비밀번호를 입력해주세요.');
         return;
       }
-
-      const payload = {
-        username: this.userId,
-        password: this.userPw
-      };
-
-      this.authStore.logIn(payload)
-        .then(() => {
-          this.$router.push({ name: 'home' }); 
+      
+      try {
+        const response = await axios.post('http://127.0.0.1:8000/api/accounts/login/', {
+          username: this.userId,
+          password: this.userPw
         })
-        .catch((err) => {
-          console.log(err);
-          alert('로그인에 실패했습니다.');
-        });
+
+        // 토큰 저장
+        const token = response.data.token || response.data.key
+        if (!token) {
+            alert("로그인 처리에 실패했습니다. (토큰 없음)");
+            return;
+        }
+        localStorage.setItem('token', token)
+
+        // 닉네임 저장
+        const nickname = response.data.user?.nickname || response.data.nickname || this.userId
+        localStorage.setItem('nickname', nickname)
+
+        // [중요] 리다이렉트 처리 로직
+        // URL에 ?redirect=... 가 있으면 그곳으로 이동, 없으면 홈으로 이동
+        const redirectPath = this.$route.query.redirect;
+        
+        if (redirectPath) {
+          this.$router.push({ name: redirectPath });
+        } else {
+          this.$router.push({ name: 'home' });
+        }
+
+      } catch (error) {
+        console.error(error)
+        alert('아이디 또는 비밀번호를 확인해주세요.')
+      }
     }
   }
 }

@@ -76,9 +76,11 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue';
+import { reactive, defineEmits } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import axios from 'axios';
+
+const emit = defineEmits(['success']);
 
 const store = useAuthStore();
 const API_URL = store.API_URL;
@@ -104,7 +106,7 @@ const checks = reactive({
   nickname: false
 });
 
-// 초기화 로직 (입력값이 변하면 다시 검사받게 함)
+// 초기화 로직
 const resetIdCheck = () => {
   checks.username = false;
   errors.username = '';
@@ -114,21 +116,19 @@ const resetNicknameCheck = () => {
   errors.nickname = '';
 };
 
+// 중복 확인 로직
 const checkIdDuplicate = () => {
   if (!form.username) {
     errors.username = '아이디를 입력해주세요.';
     return;
   }
   
-  // 백엔드로 요청 보내기
   axios.get(`${API_URL}/api/accounts/check-id/${form.username}/`)
     .then((res) => {
       if (res.data.is_exist) {
-        // DB에 존재하면 (중복)
         errors.username = '이미 사용 중인 아이디입니다.';
         checks.username = false;
       } else {
-        // DB에 없으면 (사용 가능)
         errors.username = '';
         checks.username = true;
       }
@@ -145,7 +145,6 @@ const checkNicknameDuplicate = () => {
     return;
   }
 
-  // 백엔드로 요청 보내기
   axios.get(`${API_URL}/api/accounts/check-nickname/${form.nickname}/`)
     .then((res) => {
       if (res.data.is_exist) {
@@ -162,8 +161,9 @@ const checkNicknameDuplicate = () => {
     });
 };
 
-// 회원가입 제출
-const submitForm = () => {
+// 회원가입 제출 함수
+const submitForm = async () => {
+  // 에러 초기화
   errors.username = '';
   errors.password = '';
   errors.passwordConfirm = '';
@@ -171,6 +171,7 @@ const submitForm = () => {
 
   let isValid = true;
 
+  // 유효성 검사
   if (!form.username) { errors.username = '필수 입력값입니다.'; isValid = false; }
   if (!form.password) { errors.password = '필수 입력값입니다.'; isValid = false; }
   if (!form.passwordConfirm) { errors.passwordConfirm = '필수 입력값입니다.'; isValid = false; }
@@ -200,7 +201,16 @@ const submitForm = () => {
     email: form.email
   };
   
-  store.signUp(payload);
+  try {
+    await store.signUp(payload);
+    
+    emit('success');
+    
+  } catch (error) {
+    console.error(error);
+    const msg = error.response?.data ? JSON.stringify(error.response.data) : '입력을 확인해주세요.';
+    alert(`회원가입 실패!\n${msg}`);
+  }
 };
 </script>
 
