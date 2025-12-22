@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import SignupForm from '@/components/SignupForm.vue';
+import SignupForm from '@/components/auth/SignupForm.vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();

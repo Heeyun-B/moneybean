@@ -56,7 +56,7 @@
 <script>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import YoutubeNavBar from '@/components/YoutubeNavBar.vue'
+import YoutubeNavBar from '@/components/youtube/YoutubeNavBar.vue'
 import { getVideoDetails } from '@/api/youtube.js'
 
 export default {

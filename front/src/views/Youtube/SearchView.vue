@@ -53,8 +53,8 @@
 <script>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import VideoCard from '@/components/VideoCard.vue'
-import YoutubeNavBar from '@/components/YoutubeNavBar.vue'
+import VideoCard from '@/components/youtube/VideoCard.vue'
+import YoutubeNavBar from '@/components/youtube/YoutubeNavBar.vue'
 import { searchVideos } from '@/api/youtube.js'
 
 export default {
