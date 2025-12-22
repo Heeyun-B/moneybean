@@ -1,10 +1,13 @@
 import requests
 from django.conf import settings
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .models import DepositProducts, DepositOptions
-from .serializers import DepositProductsSerializer, DepositOptionsSerializer
+from .models import DepositProducts, DepositOptions, DepositSubscription
+from .serializers import DepositProductsSerializer, DepositOptionsSerializer, DepositSubscriptionSerializer
+
+
 
 API_URL = "http://finlife.fss.or.kr/finlifeapi/depositProductsSearch.json"
 
@@ -133,4 +136,99 @@ def deposit_products(request):
     """
     products = DepositProducts.objects.all()
     serializer = DepositProductsSerializer(products, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+def deposit_product_detail(request, fin_prdt_cd):
+    """
+    특정 정기예금 상품의 상세 정보 출력
+    상품 기본 정보 + 해당 상품의 모든 옵션 정보 반환
+    """
+    try:
+        # 상품 조회
+        product = DepositProducts.objects.get(fin_prdt_cd=fin_prdt_cd)
+        
+        # 해당 상품의 옵션들 조회
+        options = DepositOptions.objects.filter(product=product)
+        
+        # 직렬화
+        product_serializer = DepositProductsSerializer(product)
+        options_serializer = DepositOptionsSerializer(options, many=True)
+        
+        return Response({
+            'product': product_serializer.data,
+            'options': options_serializer.data
+        }, status=status.HTTP_200_OK)
+        
+    except DepositProducts.DoesNotExist:
+        return Response(
+            {'error': '해당 상품을 찾을 수 없습니다.'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def subscribe_product(request, fin_prdt_cd):
+    """
+    특정 정기예금 상품에 가입
+    """
+    try:
+        product = DepositProducts.objects.get(fin_prdt_cd=fin_prdt_cd)
+        
+        # 이미 가입했는지 확인
+        if DepositSubscription.objects.filter(user=request.user, product=product).exists():
+            return Response(
+                {'error': '이미 가입한 상품입니다.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # 가입 처리
+        subscription = DepositSubscription.objects.create(
+            user=request.user,
+            product=product,
+            selected_option_id=request.data.get('selected_option')
+        )
+        
+        serializer = DepositSubscriptionSerializer(subscription)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+    except DepositProducts.DoesNotExist:
+        return Response(
+            {'error': '상품을 찾을 수 없습니다.'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def unsubscribe_product(request, fin_prdt_cd):
+    """
+    특정 정기예금 상품 가입 취소
+    """
+    try:
+        product = DepositProducts.objects.get(fin_prdt_cd=fin_prdt_cd)
+        subscription = DepositSubscription.objects.get(user=request.user, product=product)
+        subscription.delete()
+        
+        return Response(
+            {'message': '가입이 취소되었습니다.'},
+            status=status.HTTP_200_OK
+        )
+        
+    except (DepositProducts.DoesNotExist, DepositSubscription.DoesNotExist):
+        return Response(
+            {'error': '가입 정보를 찾을 수 없습니다.'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def my_subscriptions(request):
+    """
+    로그인한 사용자가 가입한 모든 상품 조회
+    """
+    subscriptions = DepositSubscription.objects.filter(user=request.user)
+    serializer = DepositSubscriptionSerializer(subscriptions, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)

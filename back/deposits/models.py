@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.conf import settings
 
 # Create your models here.
 class DepositProducts(models.Model):
@@ -53,3 +53,31 @@ class DepositOptions(models.Model):
 
     def __str__(self):
         return f"{self.product.fin_prdt_nm} - {self.save_trm}개월 ({self.intr_rate_type_nm})"
+
+class DepositSubscription(models.Model):
+    """사용자의 정기예금 상품 가입 정보"""
+    
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,  # ← User 대신 이렇게 변경
+        on_delete=models.CASCADE,
+        related_name='deposit_subscriptions'
+    )
+    product = models.ForeignKey(
+        DepositProducts,
+        on_delete=models.CASCADE,
+        to_field='fin_prdt_cd'
+    )
+    selected_option = models.ForeignKey(
+        DepositOptions,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('user', 'product')
+        ordering = ['-subscribed_at']
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.product.fin_prdt_nm}"
