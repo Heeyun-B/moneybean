@@ -122,6 +122,7 @@ export default {
   data: () => ({
     currentSlide: 0,
     slideInterval: null,
+    // 메뉴 구조를 통일성 있게 유지합니다.
     menus: [
       { title: '내 자산 보기', subs: ['내 자산 입력하기', '내 자산 한눈에 보기', 'AI 진단·추천받기'] },
       { title: '예·적금', subs: ['예적금 상품조회'] },
