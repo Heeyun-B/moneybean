@@ -52,33 +52,32 @@ export default {
       }
       
       try {
-        // 백엔드 로그인 요청
         const response = await axios.post('http://127.0.0.1:8000/api/accounts/login/', {
           username: this.userId,
           password: this.userPw
         })
 
-        // [1] 토큰 확인 및 저장
+        // 토큰 저장
         const token = response.data.token || response.data.key
-        
         if (!token) {
-            console.error("토큰이 없습니다! 응답 데이터 확인:", response.data);
             alert("로그인 처리에 실패했습니다. (토큰 없음)");
             return;
         }
         localStorage.setItem('token', token)
 
-        // [2] 닉네임 저장 (홈 화면 표시용)
-        // 응답 구조에 따라 user.nickname 혹은 nickname, 없으면 아이디 사용
+        // 닉네임 저장
         const nickname = response.data.user?.nickname || response.data.nickname || this.userId
         localStorage.setItem('nickname', nickname)
 
-        alert('로그인 성공!')
+        // [중요] 리다이렉트 처리 로직
+        // URL에 ?redirect=... 가 있으면 그곳으로 이동, 없으면 홈으로 이동
+        const redirectPath = this.$route.query.redirect;
         
-        // [3] 홈으로 이동
-        this.$router.push({ name: 'home' }).then(() => {
-          window.location.reload()
-        })
+        if (redirectPath) {
+          this.$router.push({ name: redirectPath });
+        } else {
+          this.$router.push({ name: 'home' });
+        }
 
       } catch (error) {
         console.error(error)
