@@ -117,10 +117,12 @@
 
 <script>
 import { useAuthStore } from '@/stores/auth'
+
 export default {
   data: () => ({
     currentSlide: 0,
     slideInterval: null,
+    // 메뉴 구조를 통일성 있게 유지합니다.
     menus: [
       { title: '내 자산 보기', subs: ['내 자산 입력하기', '내 자산 한눈에 보기', 'AI 진단·추천받기'] },
       { title: '예·적금', subs: ['예금', '적금'] },
@@ -156,9 +158,15 @@ export default {
         this.currentSlide = (this.currentSlide + 1) % this.banners.length;
       }, 4000);
     },
+
     handleSubMenu(sub) {
-    if (sub === '유튜브 찾기') {
-      this.$router.push('/youtube');
+      if (sub === '주변은행찾기') {
+        this.$router.push('/map');
+      } else if (sub === '유튜브 찾기') {
+        this.$router.push('/youtube');
+      } else {
+
+        console.log(sub + " 메뉴로 이동합니다.");
       }
     },
     handleLogout() {

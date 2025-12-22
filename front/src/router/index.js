@@ -11,6 +11,8 @@ import SearchView from '@/views/SearchView.vue'
 import VideoDetailView from '@/views/VideoDetailView.vue'
 import LaterView from '@/views/LaterView.vue'
 
+import MapView from '@/views/MapView.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -59,6 +61,12 @@ const router = createRouter({
       path: '/later',
       name: 'later-videos',
       component: LaterView,
+    },
+
+    {
+      path: '/map',
+      name: 'map',
+      component: MapView
     },
 
   ],
