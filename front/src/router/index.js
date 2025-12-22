@@ -12,6 +12,13 @@ import SearchView from '@/views/SearchView.vue'
 import VideoDetailView from '@/views/VideoDetailView.vue'
 import LaterView from '@/views/LaterView.vue'
 
+// 예적금 관련 뷰
+import DepositListView from '@/views/DepositListView.vue'
+import DepositDetailView from '@/views/DepositDetailView.vue'
+
+// 카카오맵 관련 뷰
+import MapView from '@/views/MapView.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -83,6 +90,24 @@ const router = createRouter({
       path: '/later',
       name: 'later-videos',
       component: LaterView,
+    },
+
+    {
+      path: '/deposits',
+      name: 'deposit-list',
+      component: DepositListView
+    },
+
+    {
+      path: '/deposits/:id',
+      name: 'deposit-detail',
+      component: DepositDetailView
+    },
+
+    {
+      path: '/map',
+      name: 'map',
+      component: MapView
     },
 
   ],
