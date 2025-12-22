@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '@/views/HomeView.vue'
-import LoginView from '@/views/LoginView.vue'
+
+import HomeView from '../views/HomeView.vue'
+import SignUpView from '@/views/SignUpView.vue'
+import LogInView from '@/views/LogInView.vue'
+import AssetView from '@/views/AssetView.vue' 
 
 // 유튜브 관련 뷰
 import YoutubeMainView from '@/views/YoutubeMainView.vue'
@@ -18,9 +21,20 @@ const router = createRouter({
     },
 
     {
+
+      path: '/signup',
+      name: 'signup',
+      component: SignUpView
+    },
+    {
       path: '/login',
       name: 'login',
-      component: LoginView
+      component: LogInView
+    },
+    {
+      path: '/asset',
+      name: 'asset',
+      component: AssetView
     },
 
     // 유튜브 관련
