@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import HomeView from '../views/HomeView.vue'
 import SignUpView from '@/views/SignUpView.vue'
-import LogInView from '@/views/LogInView.vue'
+import LoginView from '@/views/LoginView.vue'
 import AssetView from '@/views/AssetView.vue' 
 
 // 유튜브 관련 뷰
@@ -10,6 +10,10 @@ import YoutubeMainView from '@/views/YoutubeMainView.vue'
 import SearchView from '@/views/SearchView.vue'
 import VideoDetailView from '@/views/VideoDetailView.vue'
 import LaterView from '@/views/LaterView.vue'
+
+// 예적금 관련 뷰
+import DepositListView from '@/views/DepositListView.vue'
+import DepositDetailView from '@/views/DepositDetailView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,7 +38,7 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: LogInView
+      component: LoginView
     },
 
     // 유튜브 관련
@@ -59,6 +63,18 @@ const router = createRouter({
       path: '/later',
       name: 'later-videos',
       component: LaterView,
+    },
+
+    {
+      path: '/deposits',
+      name: 'deposit-list',
+      component: DepositListView
+    },
+
+    {
+      path: '/deposits/:id',
+      name: 'deposit-detail',
+      component: DepositDetailView
     },
 
   ],

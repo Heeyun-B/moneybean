@@ -39,18 +39,36 @@
         </div>
 
         <div class="login-box">
-          <div class="login-intro">
-            <p class="intro-text">머니빈을 더 안전하고<br>편리하게 이용하세요.</p>
-            <button class="login-move-btn" @click="$router.push('/login')">
-              <strong>머니빈 로그인</strong>
-            </button>
+          <div v-if="!authStore.token" class="login-not-yet">
+            <div class="login-intro">
+              <p class="intro-text">머니빈을 더 안전하고<br>편리하게 이용하세요.</p>
+              <button class="login-move-btn" @click="$router.push('/login')">
+                <strong>머니빈 로그인</strong>
+              </button>
+            </div>
+            <div class="login-footer">
+              <div class="find-join">
+                <span @click="$router.push('/find-account')">아이디 찾기</span> |
+                <span @click="$router.push('/find-account')">비밀번호 찾기</span> |
+                <span class="join-link" @click="$router.push('/signup')">회원가입</span>
+              </div>
+            </div>
           </div>
-          
-          <div class="login-footer">
-            <div class="find-join">
-              <span @click="$router.push('/find-account')">아이디 찾기</span> |
-              <span @click="$router.push('/find-account')">비밀번호 찾기</span> |
-              <span class="join-link" @click="$router.push('/signup')">회원가입</span>
+
+          <div v-else class="login-success">
+            <div class="user-profile">
+              <div class="welcome-msg">
+                <h3 style="color: #00a651; margin-bottom: 10px;">반가워요! {{ authStore.nickname }}님 🌱</h3>
+                <p style="font-size: 13px; color: #666; margin-bottom: 25px;">오늘도 스마트한 자산 관리를 시작해보세요.</p>
+              </div>
+              <div class="user-actions" style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                <button class="login-move-btn" @click="$router.push({ name: 'assets' })">
+                  <strong>내 자산 관리</strong>
+                </button>
+                <button @click="handleLogout" style="background: none; border: none; color: #999; font-size: 12px; cursor: pointer; text-decoration: underline; margin-top: 5px;">
+                  로그아웃
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -62,7 +80,7 @@
           <h2 class="section-title">머니빈 Pick!</h2>
         </div>
         <div class="pick-grid">
-          <div v-for="pick in picks" :key="pick.title" class="pick-card">
+          <div v-for="pick in picks" :key="pick.title" class="pick-card" @click="handlePickClick(pick.title)">
             <div class="pick-icon">{{ pick.icon }}</div>
             <div class="pick-name">{{ pick.title }}</div>
           </div>
@@ -98,13 +116,15 @@
 </template>
 
 <script>
+import { useAuthStore } from '@/stores/auth'
+
 export default {
   data: () => ({
     currentSlide: 0,
     slideInterval: null,
     menus: [
       { title: '내 자산 보기', subs: ['내 자산 입력하기', '내 자산 한눈에 보기', 'AI 진단·추천받기'] },
-      { title: '예·적금', subs: ['예금', '적금'] },
+      { title: '예·적금', subs: ['예적금 상품조회'] },
       { title: '금/은/달러', subs: ['국내 시세', '해외 시세'] },
       { title: '게시판', subs: ['자유게시판', '금융정보(꿀팁)', '금융기사'] },
       { title: '기타 편의', subs: ['주변은행찾기', '유튜브 찾기', '오늘의 금전운'] },
@@ -115,12 +135,16 @@ export default {
       { tag: 'QUIZ', title: '자산 관리 MBTI', desc: '당신의 투자 성향은 어떤 콩인가요?' },
     ],
     picks: [
+      { title: '자산관리', icon: '🏦' },
       { title: '카드', icon: '💳' },
-      { title: '예금', icon: '🐷' },
-      { title: '적금', icon: '🏦' },
+      { title: '예적금', icon: '🐷' },
       { title: '투자', icon: '📈' },
     ]
   }),
+  setup() {
+    const authStore = useAuthStore()
+    return { authStore }
+  },
   mounted() {
     this.startSlide();
   },
@@ -133,10 +157,47 @@ export default {
         this.currentSlide = (this.currentSlide + 1) % this.banners.length;
       }, 4000);
     },
+
     handleSubMenu(sub) {
-    if (sub === '유튜브 찾기') {
-      this.$router.push('/youtube');
+      if (sub === '주변은행찾기') {
+        this.$router.push('/map');
+      } else if (sub === '유튜브 찾기') {
+        this.$router.push('/youtube');
+      } else if (sub === '예적금 상품조회') {
+        this.$router.push('/deposits');
+      } else {
+        console.log(sub + " 메뉴로 이동합니다.");
       }
+    },
+    handlePickClick(title) {
+    if (title === '예적금') {
+      this.goToDeposit();
+    } else if (title === '투자' || title === '자산관리') {
+      this.goToAssets();
+    }
+    },
+
+    goToDeposit() {
+      if (!this.authStore.token) {
+        alert('로그인이 필요한 서비스입니다.');
+        this.$router.push('/login');
+      } else {
+        this.$router.push('/deposits');
+      }
+    },
+
+    goToAssets() {
+      if (!this.authStore.token) {
+        alert('로그인이 필요한 서비스입니다.');
+        this.$router.push('/login');
+      } else {
+        this.$router.push({ name: 'assets' });
+      }
+    },
+    handleLogout() {
+      this.authStore.logOut(); 
+      this.$router.push('/');
+      alert('로그아웃 되었습니다.');
     }
   }
 };

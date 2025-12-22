@@ -18,7 +18,7 @@
           </label>
         </div>
 
-        <button class="submit-btn" @click="handleLogin">로그인</button>
+        <button class="submit-btn" @click.prevent="handleLogin">로그인</button>
       </div>
 
       <div class="social-login">
@@ -38,6 +38,7 @@
 </template>
 
 <script>
+import { useAuthStore } from '@/stores/auth'
 export default {
   data() {
     return {
@@ -45,13 +46,32 @@ export default {
       userPw: ''
     }
   },
+
+  setup() {
+    const authStore = useAuthStore()
+    return { authStore }
+  },
+
   methods: {
     handleLogin() {
-      if(!this.userId || !this.userPw) {
+      if (!this.userId || !this.userPw) {
         alert('아이디와 비밀번호를 입력해주세요.');
         return;
       }
-      console.log('로그인 시도:', this.userId);
+
+      const payload = {
+        username: this.userId,
+        password: this.userPw
+      };
+
+      this.authStore.logIn(payload)
+        .then(() => {
+          this.$router.push({ name: 'home' }); 
+        })
+        .catch((err) => {
+          console.log(err);
+          alert('로그인에 실패했습니다.');
+        });
     }
   }
 }
