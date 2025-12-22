@@ -18,7 +18,7 @@
           </label>
         </div>
 
-        <button class="submit-btn" @click="handleLogin">로그인</button>
+        <button class="submit-btn" @click.prevent="handleLogin">로그인</button>
       </div>
 
       <div class="social-login">

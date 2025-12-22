@@ -40,22 +40,29 @@ export const useAuthStore = defineStore('auth', () => {
 
   // 로그인
   const logIn = function (payload) {
-    return axios({
-      method: 'post',
-      url: `${API_URL}/api/accounts/login/`,
-      data: payload
-    })
-      .then((res) => {
-        const newToken = res.data.key || res.data.token
-        const newNickname = res.data.user.nickname
-        token.value = newToken
-        nickname.value = newNickname
-        localStorage.setItem('token', newToken)
-        localStorage.setItem('nickname', newNickname)
-        console.log('로그인 성공!')
-      })
-  }
+  return axios({
+    method: 'post',
+    url: `${API_URL}/api/accounts/login/`,
+    data: payload
+  })
+    .then((res) => {
+      const newToken = res.data.key || res.data.token
+      const newNickname = res.data.user?.nickname || res.data.nickname || '사용자'
 
+      token.value = newToken
+      nickname.value = newNickname
+      
+      localStorage.setItem('token', newToken)
+      localStorage.setItem('nickname', newNickname)
+      
+      console.log('로그인 성공! 닉네임:', newNickname)
+    })
+    .catch((err) => {
+      console.error('로그인 실패 사유:', err.response?.data)
+      throw err
+    })
+}
+  // 로그아웃
   const logOut = function () {
     token.value = null
     nickname.value = null
