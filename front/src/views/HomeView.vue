@@ -1,23 +1,5 @@
 <template>
   <div class="moneybean-container">
-    <header class="navbar">
-      <div class="nav-content">
-        <div class="logo-area" @click="$router.push('/')">
-          <img src="@/assets/logo_moneybean.png" alt="로고" class="bean-logo">
-          <span class="logo-text">머니빈</span>
-        </div>
-        
-        <nav class="menu-list">
-          <div v-for="menu in menus" :key="menu.title" class="menu-item">
-            <button class="menu-btn">{{ menu.title }}</button>
-            <ul class="submenu">
-              <li v-for="sub in menu.subs" :key="sub" @click="handleSubMenu(sub)">{{ sub }}</li>
-            </ul>
-          </div>
-        </nav>
-      </div>
-    </header>
-
     <main class="content-wrapper">
       <div class="hero-section">
         <div class="banner-box">
@@ -38,19 +20,38 @@
           </div>
         </div>
 
-        <div class="login-box">
+        <div class="login-box" v-if="!isLoggedIn">
           <div class="login-intro">
             <p class="intro-text">머니빈을 더 안전하고<br>편리하게 이용하세요.</p>
-            <button class="login-move-btn" @click="$router.push('/login')">
+            <button class="login-move-btn" @click="$router.push({ name: 'login' })">
               <strong>머니빈 로그인</strong>
             </button>
           </div>
-          
           <div class="login-footer">
             <div class="find-join">
               <span @click="$router.push('/find-account')">아이디 찾기</span> |
               <span @click="$router.push('/find-account')">비밀번호 찾기</span> |
               <span class="join-link" @click="$router.push('/signup')">회원가입</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="login-box profile-box" v-else>
+          <div class="profile-content">
+            <div class="profile-img-wrapper">
+              <img src="@/assets/logo_bean.png" alt="프로필" class="profile-img">
+            </div>
+            <div class="welcome-text">
+              <h3 class="user-name">{{ nickname }}님</h3>
+              <p class="greeting">오늘도 부자 되세요! 🌱</p>
+            </div>
+            <div class="profile-actions">
+              <button class="action-btn primary" @click="$router.push({ name: 'assets' })">
+                내 자산 보러가기
+              </button>
+              <button class="action-btn secondary" @click="handleLogout">
+                로그아웃
+              </button>
             </div>
           </div>
         </div>
@@ -100,15 +101,11 @@
 <script>
 export default {
   data: () => ({
+    isLoggedIn: false,
+    nickname: '',
     currentSlide: 0,
     slideInterval: null,
-    menus: [
-      { title: '내 자산 보기', subs: ['내 자산 입력하기', '내 자산 한눈에 보기', 'AI 진단·추천받기'] },
-      { title: '예·적금', subs: ['예금', '적금'] },
-      { title: '금/은/달러', subs: ['국내 시세', '해외 시세'] },
-      { title: '게시판', subs: ['자유게시판', '금융정보(꿀팁)', '금융기사'] },
-      { title: '기타 편의', subs: ['주변은행찾기', '유튜브 찾기', '오늘의 금전운'] },
-    ],
+    
     banners: [
       { tag: 'EVENT', title: '금융 퀴즈 챌린지!', desc: '매일 퀴즈 풀고 자산 나무에 물을 주세요.' },
       { tag: 'NEWS', title: '금리 인상 소식', desc: '나에게 유리한 예적금 상품을 찾아보세요.' },
@@ -123,6 +120,7 @@ export default {
   }),
   mounted() {
     this.startSlide();
+    this.checkLogin(); 
   },
   beforeUnmount() {
     clearInterval(this.slideInterval);
@@ -133,9 +131,24 @@ export default {
         this.currentSlide = (this.currentSlide + 1) % this.banners.length;
       }, 4000);
     },
-    handleSubMenu(sub) {
-    if (sub === '유튜브 찾기') {
-      this.$router.push('/youtube');
+    
+    checkLogin() {
+      const token = localStorage.getItem('token');
+      if (token) {
+        this.isLoggedIn = true;
+        this.nickname = localStorage.getItem('nickname') || '머니빈 회원'; 
+      } else {
+        this.isLoggedIn = false;
+      }
+    },
+    handleLogout() {
+      if (confirm('로그아웃 하시겠습니까?')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('nickname');
+        this.isLoggedIn = false;
+        this.nickname = '';
+        alert('로그아웃 되었습니다.');
+        window.location.reload(); 
       }
     }
   }
@@ -146,28 +159,7 @@ export default {
 .moneybean-container { background-color: #f8faf9; min-height: 100vh; color: #333; }
 .content-wrapper { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
 
-/* Navbar 스타일 */
-.navbar { background: white; border-bottom: 1px solid #eee; height: 80px; position: sticky; top: 0; z-index: 100; }
-.nav-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; height: 100%; padding: 0 20px; }
-.logo-area { display: flex; align-items: center; cursor: pointer; margin-right: 50px; }
-.bean-logo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-right: 15px; }
-.logo-text { font-size: 24px; font-weight: bold; color: #00a651; }
-
-.menu-list { display: flex; gap: 20px; height: 100%; }
-.menu-item { position: relative; height: 100%; display: flex; align-items: center; }
-.menu-btn { background: none; border: none; font-size: 16px; font-weight: 600; cursor: pointer; padding: 10px; }
-
-.submenu {
-  display: none; position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
-  background: white; border: 1px solid #eee; list-style: none;
-  padding: 10px 0; width: 160px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-  border-radius: 8px; border-top: 15px solid transparent; background-clip: padding-box;
-}
-.menu-item:hover .submenu { display: block; }
-.submenu li { padding: 10px 20px; font-size: 14px; cursor: pointer; }
-.submenu li:hover { background: #f1fcf4; color: #00a651; }
-
-/* 배너 슬라이드 */
+/* 배너 섹션 */
 .hero-section { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 20px; }
 .banner-box { 
   background: #00a651; border-radius: 20px; color: white; padding: 40px;
@@ -182,10 +174,11 @@ export default {
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* 로그인 박스 */
+/* 로그인/프로필 박스 */
 .login-box { 
   background: white; border: 1px solid #eee; border-radius: 20px; padding: 30px;
   display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+  min-height: 350px; 
 }
 .login-intro { width: 100%; margin-bottom: 25px; }
 .intro-text { font-size: 15px; line-height: 1.5; color: #666; margin-bottom: 20px; }
@@ -195,26 +188,31 @@ export default {
 .find-join span { cursor: pointer; margin: 0 5px; }
 .find-join span:hover { text-decoration: underline; color: #666; }
 
-/* 머니빈 Pick! */
+.profile-content { width: 100%; display: flex; flex-direction: column; align-items: center; }
+.profile-img-wrapper { margin-bottom: 15px; }
+.profile-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #f0f0f0; }
+.welcome-text { margin-bottom: 30px; }
+.user-name { font-size: 22px; color: #00a651; margin-bottom: 5px; font-weight: bold; }
+.greeting { color: #666; font-size: 14px; margin: 0; }
+.profile-actions { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+.action-btn { width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; border: none; font-size: 15px; }
+.action-btn.primary { background-color: #00a651; color: white; }
+.action-btn.primary:hover { background-color: #008e45; }
+.action-btn.secondary { background-color: #f5f5f5; color: #555; }
+.action-btn.secondary:hover { background-color: #e0e0e0; }
+
 .pick-section { margin-top: 60px; }
 .section-title-container { display: flex; align-items: center; margin-bottom: 20px; gap: 10px; }
 .section-logo { width: 30px; height: 30px; border-radius: 50%; object-fit: cover;}
 .section-title { font-size: 22px; margin: 0; }
-
 .pick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-.pick-card { 
-  background: white; border: 1px solid #eee; border-radius: 20px; padding: 30px;
-  text-align: center; cursor: pointer; transition: 0.3s;
-}
+.pick-card { background: white; border: 1px solid #eee; border-radius: 20px; padding: 30px; text-align: center; cursor: pointer; transition: 0.3s; }
 .pick-card:hover { transform: translateY(-5px); border-color: #00a651; }
 .pick-icon { font-size: 30px; margin-bottom: 10px; }
-
-/* 게시판 */
 .board-section { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 60px; }
 .board-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
 .board-list { list-style: none; padding: 0; background: white; border-radius: 15px; border: 1px solid #eee; }
 .board-list li { padding: 15px 20px; border-bottom: 1px solid #f5f5f5; font-size: 14px; cursor: pointer; }
 .board-list li:hover { background: #fafafa; color: #00a651; }
-
 .main-footer { text-align: center; padding: 40px; color: #999; font-size: 12px; }
 </style>

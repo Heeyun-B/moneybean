@@ -10,4 +10,6 @@ urlpatterns = [
     
     # 특정 자산 수정 및 삭제 (PUT, DELETE)
     path('my-assets/<int:pk>/', views.AssetDetailView.as_view(), name='asset-detail'),
+
+    path('financial-info/', views.UserFinancialInfoView.as_view(), name='financial-info'),
 ]

@@ -1,10 +1,10 @@
 from rest_framework import serializers
-from .models import Asset, AssetCategory
+from .models import Asset, AssetCategory, UserFinancialInfo
 
 class AssetCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = AssetCategory
-        fields = '__all__'
+        fields = ['id', 'name', 'group', 'icon_name']
 
 class AssetSerializer(serializers.ModelSerializer):
     category_name = serializers.ReadOnlyField(source='category.name')
@@ -17,7 +17,13 @@ class AssetSerializer(serializers.ModelSerializer):
             'category_name',  # 보여줄 때 쓰는 카테고리 이름 (ex: 현금성 자산)
             'name',           # 자산명 (ex: 카카오뱅크)
             'current_value',  # 현재 가치
+            'order',          # 정렬순서
             'created_at',     # 생성일
             'updated_at',     # 수정일
         ]
         read_only_fields = ('user',)
+
+class UserFinancialInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserFinancialInfo
+        fields = ['monthly_income', 'monthly_expense']

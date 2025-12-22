@@ -2,8 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import HomeView from '../views/HomeView.vue'
 import SignUpView from '@/views/SignUpView.vue'
-import LogInView from '@/views/LogInView.vue'
+import LoginView from '@/views/LoginView.vue'
 import AssetView from '@/views/AssetView.vue' 
+import AssetCreateView from '@/views/AssetCreateView.vue'
 
 // 유튜브 관련 뷰
 import YoutubeMainView from '@/views/YoutubeMainView.vue'
@@ -19,22 +20,45 @@ const router = createRouter({
       name: 'home',
       component: HomeView,
     },
-
     {
-
       path: '/signup',
       name: 'signup',
-      component: SignUpView
+      component: SignUpView,
+      beforeEnter: (to, from, next) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+          alert("이미 로그인 되어 있습니다.");
+          next({ name: 'home' }); 
+        } else {
+          next();
+        }
+      }
     },
+    {
+      path: '/login',
+      name: 'login',
+      component: LoginView,
+      beforeEnter: (to, from, next) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+          alert("이미 로그인 되어 있습니다.");
+          next({ name: 'home' }); 
+        } else {
+          next();
+        }
+      }
+    },
+
+    // 자산 관련
     {
       path: '/assets',
       name: 'assets',
       component: AssetView
     },
     {
-      path: '/login',
-      name: 'login',
-      component: LogInView
+      path: '/assets/create',
+      name: 'asset-create',
+      component: AssetCreateView
     },
 
     // 유튜브 관련

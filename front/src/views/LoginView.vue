@@ -8,8 +8,8 @@
 
       <div class="login-form">
         <div class="input-group">
-          <input type="text" v-model="userId" placeholder="아이디" class="input-field">
-          <input type="password" v-model="userPw" placeholder="비밀번호" class="input-field">
+          <input type="text" v-model="userId" placeholder="아이디" class="input-field" @keyup.enter="handleLogin">
+          <input type="password" v-model="userPw" placeholder="비밀번호" class="input-field" @keyup.enter="handleLogin">
         </div>
 
         <div class="login-options">
@@ -38,20 +38,52 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   data() {
-    return {
-      userId: '',
-      userPw: ''
-    }
+    return { userId: '', userPw: '' }
   },
   methods: {
-    handleLogin() {
+    async handleLogin() {
       if(!this.userId || !this.userPw) {
         alert('아이디와 비밀번호를 입력해주세요.');
         return;
       }
-      console.log('로그인 시도:', this.userId);
+      
+      try {
+        // 백엔드 로그인 요청
+        const response = await axios.post('http://127.0.0.1:8000/api/accounts/login/', {
+          username: this.userId,
+          password: this.userPw
+        })
+
+        // [1] 토큰 확인 및 저장
+        const token = response.data.token || response.data.key
+        
+        if (!token) {
+            console.error("토큰이 없습니다! 응답 데이터 확인:", response.data);
+            alert("로그인 처리에 실패했습니다. (토큰 없음)");
+            return;
+        }
+        localStorage.setItem('token', token)
+
+        // [2] 닉네임 저장 (홈 화면 표시용)
+        // 응답 구조에 따라 user.nickname 혹은 nickname, 없으면 아이디 사용
+        const nickname = response.data.user?.nickname || response.data.nickname || this.userId
+        localStorage.setItem('nickname', nickname)
+
+        alert('로그인 성공!')
+        
+        // [3] 홈으로 이동
+        this.$router.push({ name: 'home' }).then(() => {
+          window.location.reload()
+        })
+
+      } catch (error) {
+        console.error(error)
+        alert('아이디 또는 비밀번호를 확인해주세요.')
+      }
     }
   }
 }
