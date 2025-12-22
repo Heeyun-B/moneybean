@@ -1,12 +1,13 @@
 <template>
   <div class="asset-container">
-    <h1>💰 내 자산 대시보드</h1>
+    <h1>💰 내 자산 관리</h1>
 
     <div v-if="!store.isDataExists" class="empty-state">
       <div class="mascot-wrapper">
         <img src="@/assets/logo_bean.png" alt="머니빈" class="mascot-img">
       </div>
       <p class="empty-msg">아직 등록된 자산이 없네요!</p>
+      <p class="sub-msg">내 자산을 입력하면 한눈에 볼 수 있어요.</p>
       <button @click="goToCreatePage" class="primary-btn">내 자산 입력하러 가기</button>
     </div>
 
@@ -19,12 +20,12 @@
         </div>
         
         <div class="summary-card clickable-card" @click="scrollToSection('cash')">
-          <h3>총 자산</h3>
+          <h3>총 자산 <span>(▼ 목록 보기)</span></h3>
           <p class="amount asset-color">{{ store.totalAssets.toLocaleString() }}원</p>
         </div>
 
         <div class="summary-card clickable-card" @click="scrollToSection('debt')">
-          <h3>총 부채</h3>
+          <h3>총 부채 <span>(▼ 목록 보기)</span></h3>
           <p class="amount debt-color">{{ store.totalDebt.toLocaleString() }}원</p>
         </div>
       </div>
@@ -55,7 +56,14 @@
             <h4>🤖 AI 금융 비서에게 진단받기</h4>
             <p>내 자산 포트폴리오를 분석하고 맞춤형 조언을 받아보세요.</p>
           </div>
-          <button class="ai-btn" @click="openAiDiagnosis">진단 시작하기 🚀</button>
+          <button class="ai-btn" @click="handleAiDiagnosis" :disabled="isLoading">
+            {{ isLoading ? '분석 중입니다... ⏳' : '진단 시작하기 🚀' }}
+          </button>
+        </div>
+
+        <div v-if="aiReport" class="ai-result-card">
+          <div class="markdown-body" v-html="renderedReport"></div>
+          <button class="close-report" @click="aiReport = ''">접기</button>
         </div>
       </div>
 
@@ -109,12 +117,22 @@ import { useAssetStore } from '@/stores/assetStore'
 import { useRouter } from 'vue-router'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
 import { Doughnut, Bar } from 'vue-chartjs'
+// [NEW] 마크다운 렌더러
+import MarkdownIt from 'markdown-it'
 
 ChartJS.register(ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
 const store = useAssetStore()
 const router = useRouter()
 const isReady = ref(false)
+const md = new MarkdownIt()
+
+// [NEW] AI UI 상태 관리
+const isLoading = ref(false)
+const aiReport = ref('')
+
+// [NEW] 마크다운 -> HTML 변환
+const renderedReport = computed(() => md.render(aiReport.value))
 
 onMounted(async () => {
   await store.getCategories()
@@ -132,18 +150,30 @@ const goToCreatePage = () => {
   router.push({ name: 'asset-create' })
 }
 
-const openAiDiagnosis = () => {
-  alert('AI 진단 기능은 준비 중입니다! 😅')
+// [NEW] AI 진단 핸들러
+const handleAiDiagnosis = async () => {
+  if (!confirm('AI 진단을 시작하시겠습니까? (약 3초 소요)')) return
+
+  isLoading.value = true
+  aiReport.value = '' // 이전 결과 초기화
+
+  try {
+    // 스토어의 가짜(Mock) API 호출
+    const result = await store.getAiDiagnosis()
+    aiReport.value = result // 결과 저장
+  } catch (error) {
+    alert('AI 서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.')
+  } finally {
+    isLoading.value = false // 로딩 종료
+  }
 }
 
-// [기능추가] 스크롤 이동 함수
+// 스크롤 이동 함수
 const scrollToSection = (key) => {
   const element = document.getElementById(`section-${key}`)
   if (element) {
-    // 헤더 등에 가려지지 않도록 여유 공간(offsetTop) 고려 (필요시 조정)
     const yOffset = -20 
     const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset
-    
     window.scrollTo({ top: y, behavior: 'smooth' })
   }
 }
@@ -281,7 +311,6 @@ h1 { text-align: center; margin-bottom: 40px; font-size: 26px; font-weight: 800;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* [기능추가] 클릭 가능한 카드 스타일 */
 .clickable-card { cursor: pointer; }
 .clickable-card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
 .clickable-card h3 span { font-size: 11px; color: #999; margin-left: 5px; font-weight: normal; }
@@ -325,7 +354,7 @@ h1 { text-align: center; margin-bottom: 40px; font-size: 26px; font-weight: 800;
   100% { transform: translateY(0px); }
 }
 
-/* AI Section */
+/* [NEW] AI Section 스타일 */
 .ai-section { margin-bottom: 40px; }
 .ai-banner {
   background: linear-gradient(95deg, #E3F2FD 0%, #BBDEFB 100%);
@@ -340,7 +369,46 @@ h1 { text-align: center; margin-bottom: 40px; font-size: 26px; font-weight: 800;
   border: none; border-radius: 8px; font-weight: bold; cursor: pointer;
   transition: transform 0.2s, background-color 0.2s; box-shadow: 0 4px 10px rgba(25, 118, 210, 0.2);
 }
-.ai-btn:hover { background-color: #1565C0; transform: translateY(-2px); }
+.ai-btn:hover:not(:disabled) { background-color: #1565C0; transform: translateY(-2px); }
+.ai-btn:disabled { background-color: #90CAF9; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* [NEW] AI 결과 카드 스타일 */
+.ai-result-card {
+  margin-top: 20px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  text-align: left;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.close-report {
+  margin-top: 20px;
+  background: #f5f5f5;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #666;
+  width: 100%;
+  transition: background 0.2s;
+}
+.close-report:hover { background: #e0e0e0; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 마크다운 렌더링 스타일 */
+:deep(.markdown-body h1) { font-size: 22px; color: #00a651; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+:deep(.markdown-body h2) { font-size: 18px; color: #333; margin-top: 20px; margin-bottom: 10px; }
+:deep(.markdown-body p) { line-height: 1.6; color: #555; margin-bottom: 10px; }
+:deep(.markdown-body li) { margin-bottom: 5px; color: #444; }
+:deep(.markdown-body strong) { color: #00a651; }
 
 /* List Section */
 .list-section { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
@@ -348,7 +416,7 @@ h1 { text-align: center; margin-bottom: 40px; font-size: 26px; font-weight: 800;
 .edit-btn { background: white; border: 1px solid #ddd; padding: 6px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; color: #555; }
 .edit-btn:hover { background: #f5f5f5; color: #111; }
 
-.major-section { margin-bottom: 40px; scroll-margin-top: 20px; } /* scroll-margin-top으로 스크롤 시 여백 확보 */
+.major-section { margin-bottom: 40px; scroll-margin-top: 20px; }
 .major-section:last-child { margin-bottom: 0; }
 .major-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 2px solid #333; margin-bottom: 15px; }
 .major-header.cash { border-bottom-color: #00a651; color: #00695C; }
