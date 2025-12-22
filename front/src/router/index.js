@@ -27,14 +27,14 @@ const router = createRouter({
       component: SignUpView
     },
     {
+      path: '/assets',
+      name: 'assets',
+      component: AssetView
+    },
+    {
       path: '/login',
       name: 'login',
       component: LogInView
-    },
-    {
-      path: '/asset',
-      name: 'asset',
-      component: AssetView
     },
 
     // 유튜브 관련

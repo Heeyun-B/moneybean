@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     "finances",
     "accounts",
+    "assets",
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
