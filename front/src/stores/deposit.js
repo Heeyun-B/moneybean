@@ -15,9 +15,7 @@ export const useDepositStore = defineStore('deposit', () => {
     axios({
       method: 'get',
       url: `${API_URL}/deposit-products/`,
-      params: {
-        bank: bankName
-      },
+      params: { bank: bankName },
       headers: {
         Authorization: authStore.token ? `Token ${authStore.token}` : ''
       }
@@ -25,12 +23,7 @@ export const useDepositStore = defineStore('deposit', () => {
       .then((res) => {
         depositProducts.value = res.data
       })
-      .catch((err) => {
-        console.log('상품 로드 실패:', err)
-        if (err.response?.status === 401) {
-          console.log('인증 실패: 토큰이 없거나 만료되었습니다.')
-        }
-      })
+      .catch((err) => console.log('상품 로드 실패:', err))
   }
 
   // 2. 특정 상품 상세 정보 가져오기
@@ -53,12 +46,8 @@ export const useDepositStore = defineStore('deposit', () => {
     return axios({
       method: 'post',
       url: `${API_URL}/deposit-products/${finPrdtCd}/subscribe/`,
-      data: {
-        selected_option: optionId
-      },
-      headers: {
-        Authorization: `Token ${token}`
-      }
+      data: { selected_option: optionId },
+      headers: { Authorization: `Token ${token}` }
     })
   }
 
@@ -67,10 +56,21 @@ export const useDepositStore = defineStore('deposit', () => {
     return axios({
       method: 'delete',
       url: `${API_URL}/deposit-products/${finPrdtCd}/unsubscribe/`,
-      headers: {
-        Authorization: `Token ${token}`
-      }
+      headers: { Authorization: `Token ${token}` }
     })
+  }
+
+  // 5. 내 가입 목록 가져오기
+  const getMySubscriptions = function (token) {
+    return axios({
+      method: 'get',
+      url: `${API_URL}/my-subscriptions/`,
+      headers: { Authorization: `Token ${token}` }
+    })
+      .then((res) => {
+        mySubscriptions.value = res.data
+      })
+      .catch((err) => console.log('가입 목록 로드 실패:', err))
   }
 
   return { 
@@ -80,6 +80,7 @@ export const useDepositStore = defineStore('deposit', () => {
     getDepositProducts, 
     getDepositDetail,
     subscribeProduct,
-    unsubscribeProduct
+    unsubscribeProduct,
+    getMySubscriptions
   }
 })

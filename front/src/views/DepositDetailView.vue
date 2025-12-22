@@ -28,7 +28,6 @@
         </div>
       </section>
 
-      
       <section class="rate-section">
         <h3 class="sub-title">기간별 금리 안내</h3>
         <div class="table-container">
@@ -54,7 +53,12 @@
       </section>
 
       <div class="action-section">
-        <button @click="handleSubscribe" class="subscribe-btn">이 상품 가입하기</button>
+        <button v-if="isSubscribed" @click="handleUnsubscribe" class="unsubscribe-btn">
+          이 상품 가입 해제하기
+        </button>
+        <button v-else @click="handleSubscribe" class="subscribe-btn">
+          이 상품 가입하기
+        </button>
       </div>
     </div>
   </main>
@@ -65,7 +69,7 @@
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue';
+import { onMounted, computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useDepositStore } from '@/stores/deposit';
 import { useAuthStore } from '@/stores/auth';
@@ -77,42 +81,67 @@ const authStore = useAuthStore();
 
 const depositDetail = computed(() => store.depositDetail);
 
-onMounted(() => {
+const isSubscribed = ref(false);
+
+// 가입 여부 확인 로직
+const checkSubscriptionStatus = async () => {
+  if (authStore.token) {
+    await store.getMySubscriptions(authStore.token);
+    const prdtCd = route.params.id;
+    
+    isSubscribed.value = store.mySubscriptions.some((sub) => {
+      return String(sub.product).trim() === String(prdtCd).trim();
+    });
+    
+    console.log("가입 목록 데이터 확인:", store.mySubscriptions);
+    console.log("현재 상품 코드:", prdtCd);
+    console.log("가입 여부:", isSubscribed.value);
+  }
+};
+
+onMounted(async () => {
   const prdtCd = route.params.id;
-  store.getDepositDetail(prdtCd);
+  await store.getDepositDetail(prdtCd);
+  await checkSubscriptionStatus();
 });
 
+// 가입하기
 const handleSubscribe = () => {
-  // 1. 로그인 여부 확인
   if (!authStore.token) {
     alert('로그인이 필요한 서비스입니다.');
     router.push('/login');
     return;
   }
 
-  // 2. 가입 확인창
-  if (!confirm('이 상품에 가입하시겠습니까?')) {
-    return;
-  }
+  if (!confirm('이 상품에 가입하시겠습니까?')) return;
 
-  // 3. 데이터 준비
   const finPrdtCd = depositDetail.value.product.fin_prdt_cd;
   const firstOptionId = depositDetail.value.options[0]?.id;
 
-  if (!firstOptionId) {
-    alert('상품 옵션 정보를 찾을 수 없습니다.');
-    return;
-  }
-  
-  // 4. 스토어의 가입 함수 호출
   store.subscribeProduct(finPrdtCd, firstOptionId, authStore.token)
     .then(() => {
-      alert('상품 가입이 완료되었습니다! 내 자산 페이지에서 확인하세요.');
-      router.push({ name: 'assets' });
+      alert('상품 가입이 완료되었습니다!');
+      isSubscribed.value = true;
     })
     .catch((err) => {
-      console.error('가입 에러:', err);
-      const msg = err.response?.data?.detail || '이미 가입된 상품이거나 가입 중 오류가 발생했습니다.';
+      const msg = err.response?.data?.error || '가입 중 오류가 발생했습니다.';
+      alert(msg);
+    });
+};
+
+// 가입 해제하기
+const handleUnsubscribe = () => {
+  if (!confirm('정말 가입을 해제하시겠습니까?')) return;
+
+  const finPrdtCd = depositDetail.value.product.fin_prdt_cd;
+
+  store.unsubscribeProduct(finPrdtCd, authStore.token)
+    .then(() => {
+      alert('가입 해제가 완료되었습니다.');
+      isSubscribed.value = false;
+    })
+    .catch((err) => {
+      const msg = err.response?.data?.error || '해제 중 오류가 발생했습니다.';
       alert(msg);
     });
 };
@@ -123,26 +152,32 @@ const handleSubscribe = () => {
 .back-btn { background: none; border: none; color: #888; cursor: pointer; margin-bottom: 20px; }
 .bank-name { color: #00a651; font-weight: 600; margin-bottom: 5px; }
 .product-title { font-size: 32px; font-weight: 700; margin-bottom: 40px; }
-
 .info-card { background: #f9f9f9; border-radius: 12px; padding: 30px; margin-bottom: 40px; }
 .info-item { margin-bottom: 20px; }
-.info-item:last-child { margin-bottom: 0; }
 .label { display: block; font-weight: 600; color: #333; margin-bottom: 8px; font-size: 15px; }
 .text-block { white-space: pre-wrap; line-height: 1.6; color: #666; font-size: 14px; }
-
 .sub-title { font-size: 20px; font-weight: 600; margin-bottom: 20px; }
 .table-container { overflow-x: auto; }
 .rate-table { width: 100%; border-collapse: collapse; text-align: center; }
 .rate-table th { border-bottom: 2px solid #eee; padding: 15px; color: #888; font-size: 14px; }
 .rate-table td { padding: 15px; border-bottom: 1px solid #f2f2f2; }
 .bold-rate { color: #00a651; font-weight: 700; font-size: 18px; }
-
 .action-section { display: flex; justify-content: center; margin-top: 50px; }
-.subscribe-btn { 
-  background: #00a651; color: white; border: none; padding: 15px 60px; 
+
+/* 공통 버튼 스타일 */
+.subscribe-btn, .unsubscribe-btn { 
+  border: none; padding: 15px 60px; 
   border-radius: 30px; font-size: 18px; font-weight: 600; cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s; color: white;
 }
+
+/* 가입 버튼 */
+.subscribe-btn { background: #00a651; }
 .subscribe-btn:hover { background: #008541; }
+
+/* 해제 버튼 */
+.unsubscribe-btn { background: #ffeed4; color: #333; }
+.unsubscribe-btn:hover { background: #473417; color: white; }
+
 .loading { text-align: center; margin-top: 100px; color: #888; }
 </style>
