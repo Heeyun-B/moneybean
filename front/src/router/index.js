@@ -113,6 +113,11 @@ const router = createRouter({
       name: 'map',
       component: MapView
     },
+    {
+      path: '/saving-detail/:id',
+      name: 'saving-detail',
+      component: () => import('@/views/Deposit/SavingDetailView.vue')
+    },
   ],
 })
 
