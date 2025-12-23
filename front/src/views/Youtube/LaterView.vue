@@ -3,7 +3,7 @@
   <div class="later-container">
     
     <div v-if="savedVideos.length === 0" class="no-videos">
-      <img :src="emptyImage" alt="등록된 비디오가 없어요" class="empty-img" />
+      <img :src="emptyImage" alt="비디오 없음" class="empty-img" />
     </div>
     
     <div v-else class="video-grid">
@@ -23,58 +23,37 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import emptyImage from '@/assets/novideo.png'
 import YoutubeNavBar from '@/components/youtube/YoutubeNavBar.vue'
+import emptyImage from '@/assets/novideo.png'
 
-export default {
-  name: 'LaterView',
-  components: {
-    YoutubeNavBar
-  },
-  setup() {
-    const router = useRouter()
-    const savedVideos = ref([])
+const router = useRouter()
+const savedVideos = ref([])
 
-    const loadSavedVideos = () => {
-      const saved = localStorage.getItem('savedVideos')
-      if (saved) {
-        savedVideos.value = JSON.parse(saved)
-      }
-    }
+const loadSavedVideos = () => {
+  const saved = localStorage.getItem('savedVideos')
+  if (saved) savedVideos.value = JSON.parse(saved)
+}
 
-    const removeVideo = (videoId) => {
-      if (confirm('이 영상을 삭제하시겠습니까?')) {
-        savedVideos.value = savedVideos.value.filter(v => v.id !== videoId)
-        localStorage.setItem('savedVideos', JSON.stringify(savedVideos.value))
-      }
-    }
-
-    const goToDetail = (videoId) => {
-      router.push(`/video/${videoId}`)
-    }
-
-    onMounted(() => {
-      loadSavedVideos()
-    })
-
-    return {
-      savedVideos,
-      removeVideo,
-      goToDetail,
-      emptyImage
-    }
+const removeVideo = (videoId) => {
+  if (confirm('삭제하시겠습니까?')) {
+    savedVideos.value = savedVideos.value.filter(v => v.id !== videoId)
+    localStorage.setItem('savedVideos', JSON.stringify(savedVideos.value))
   }
 }
+
+const goToDetail = (videoId) => { router.push(`/video/${videoId}`) }
+
+onMounted(loadSavedVideos)
 </script>
 
 <style scoped>
 .later-container {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 40px 20px;
 }
 
 .page-title {

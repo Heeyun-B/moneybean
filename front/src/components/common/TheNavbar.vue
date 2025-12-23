@@ -69,7 +69,7 @@ const handleSubMenu = (sub) => {
 </script>
 
 <style scoped>
-.navbar { background: white; border-bottom: 1px solid #eee; height: 80px; position: sticky; top: 0; z-index: 100; }
+.navbar { background: white; border-bottom: 1px solid #eee; height: 80px; position: sticky; top: 0; z-index: 10000; }
 .nav-content { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 100%; padding: 0 20px; }
 .logo-area { display: flex; align-items: center; cursor: pointer; }
 .bean-logo { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-right: 10px; }
@@ -81,10 +81,10 @@ const handleSubMenu = (sub) => {
 .menu-btn:hover { color: #00a651; }
 
 .submenu {
-  display: none; position: absolute; top: 70px; left: 50%; transform: translateX(-50%);
+  display: none; position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
   background: white; border: 1px solid #eee; list-style: none;
-  padding: 10px 0; width: 160px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-  border-radius: 8px; z-index: 101;
+  padding: 10px 0; width: 160px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  border-radius: 8px; z-index: 10001;
 }
 .menu-item:hover .submenu { display: block; }
 .submenu li { padding: 10px 20px; font-size: 14px; cursor: pointer; color: #555; transition: 0.2s; }

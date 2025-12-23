@@ -123,6 +123,12 @@ const router = createRouter({
       name: 'exchange',
       component: ExchangeView
     },
+
+    {
+      path: '/saving-detail/:id',
+      name: 'saving-detail',
+      component: () => import('@/views/Deposit/SavingDetailView.vue')
+    },
   ],
 })
 
