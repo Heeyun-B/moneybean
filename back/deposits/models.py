@@ -6,6 +6,7 @@ class DepositProducts(models.Model):
     """정기예금 상품 기본 정보"""
 
     fin_prdt_cd = models.CharField(max_length=100, primary_key=True)  # 금융상품 코드
+    fin_co_no = models.TextField()  # 금융회사 코드
     kor_co_nm = models.CharField(max_length=100)  # 금융회사명
     fin_prdt_nm = models.CharField(max_length=200)  # 금융상품명
     etc_note = models.TextField(blank=True, null=True)  # 기타 유의사항
@@ -79,5 +80,62 @@ class DepositSubscription(models.Model):
         unique_together = ('user', 'product')
         ordering = ['-subscribed_at']
     
+    def __str__(self):
+        return f"{self.user.username} - {self.product.fin_prdt_nm}"
+    
+    # 기존 DepositProducts, DepositOptions, DepositSubscription 아래에 추가
+
+class SavingProducts(models.Model):
+    """적금 상품 정보"""
+    fin_prdt_cd = models.TextField(unique=True)  # 금융상품코드
+    fin_co_no = models.TextField()  # 금융회사 코드
+    kor_co_nm = models.TextField()  # 금융회사명
+    fin_prdt_nm = models.TextField()  # 금융상품명
+    etc_note = models.TextField()  # 금융상품설명
+    join_deny = models.IntegerField()  # 가입제한 (1:제한없음, 2:서민전용, 3:일부제한)
+    join_member = models.TextField()  # 가입대상
+    join_way = models.TextField()  # 가입방법
+    spcl_cnd = models.TextField()  # 우대조건
+    mtrt_int = models.TextField()  # 만기 후 이자율
+    max_limit = models.IntegerField(null=True, blank=True)  # 최고한도
+    dcls_month = models.TextField()  # 공시 제출월
+    dcls_strt_day = models.TextField()  # 공시 시작일
+    dcls_end_day = models.TextField(null=True, blank=True)  # 공시 종료일
+    fin_co_subm_day = models.TextField()  # 금융회사 제출일
+
+    def __str__(self):
+        return f"{self.kor_co_nm} - {self.fin_prdt_nm}"
+
+
+class SavingOptions(models.Model):
+    """적금 옵션 정보"""
+    product = models.ForeignKey(
+        SavingProducts, on_delete=models.CASCADE, related_name='options'
+    )
+    intr_rate_type = models.CharField(max_length=10)  # 저축금리유형 (S:단리, M:복리)
+    intr_rate_type_nm = models.CharField(max_length=20)  # 저축금리유형명
+    save_trm = models.IntegerField()  # 저축기간(개월)
+    intr_rate = models.FloatField(default=-1)  # 기본금리
+    intr_rate2 = models.FloatField(default=-1)  # 최고우대금리
+
+    class Meta:
+        unique_together = ('product', 'intr_rate_type', 'save_trm')
+
+    def __str__(self):
+        return f"{self.product.fin_prdt_nm} - {self.save_trm}개월"
+
+
+class SavingSubscription(models.Model):
+    """적금 가입 정보"""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    product = models.ForeignKey(SavingProducts, on_delete=models.CASCADE)
+    selected_option = models.ForeignKey(
+        SavingOptions, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'product')
+
     def __str__(self):
         return f"{self.user.username} - {self.product.fin_prdt_nm}"
