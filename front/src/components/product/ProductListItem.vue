@@ -1,5 +1,11 @@
 <template>
-  <div class="product-item" @click="$emit('click')">
+  <div class="product-item" :class="{ subscribed: isSubscribed }" @click="$emit('click')">
+    <!-- 순위 메달 -->
+    <div v-if="rank && rank <= 3" class="rank-medal" :class="`rank-${rank}`">
+      {{ rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉' }}
+    </div>
+    <div v-else-if="rank" class="rank-number">{{ rank }}</div>
+
     <div class="left-section">
       <BankLogo :bankName="product.kor_co_nm" class="item-logo" />
       
@@ -12,6 +18,7 @@
           <span class="tag highlight" v-if="product.join_way?.includes('스마트폰') || product.join_way?.includes('인터넷')">
             비대면
           </span>
+          <span class="tag subscribed-tag" v-if="isSubscribed">가입중</span>
         </div>
       </div>
     </div>
@@ -26,6 +33,7 @@
         <p class="base-rate">{{ baseRate }}%</p>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -37,6 +45,14 @@ const props = defineProps({
   product: {
     type: Object,
     required: true
+  },
+  rank: {
+    type: Number,
+    default: null
+  },
+  isSubscribed: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -49,10 +65,9 @@ const maxRate = computed(() => {
   return Math.max(...rates).toFixed(2);
 });
 
-// 기본 금리 (가장 높은 기본 금리 혹은 첫 번째 옵션)
+// 기본 금리
 const baseRate = computed(() => {
   if (!props.product.options?.length) return '-';
-  // 보통 최고 우대금리와 짝이 맞는 기본금리를 보여주거나, 가장 높은 기본금리를 보여줍니다.
   const rates = props.product.options.map(o => o.intr_rate || 0);
   return Math.max(...rates).toFixed(2);
 });
@@ -67,10 +82,31 @@ const baseRate = computed(() => {
   border-bottom: 1px solid #f0f0f0;
   cursor: pointer;
   transition: background-color 0.2s;
+  position: relative;
 }
 
 .product-item:hover {
   background-color: #f9fbfb;
+}
+
+.product-item.subscribed {
+  background-color: #f0fdf4;
+  border-left: 3px solid #00a651;
+}
+
+/* 순위 메달 */
+.rank-medal {
+  font-size: 24px;
+  min-width: 36px;
+  text-align: center;
+}
+
+.rank-number {
+  font-size: 14px;
+  font-weight: 600;
+  color: #888;
+  min-width: 36px;
+  text-align: center;
 }
 
 .left-section {
@@ -117,6 +153,12 @@ const baseRate = computed(() => {
   color: #00a651;
 }
 
+.tag.subscribed-tag {
+  background-color: #00a651;
+  color: white;
+  font-weight: 600;
+}
+
 .right-section {
   text-align: right;
   min-width: 100px;
@@ -144,4 +186,5 @@ const baseRate = computed(() => {
   color: #888;
   margin: 0;
 }
+
 </style>
