@@ -26,4 +26,5 @@ urlpatterns = [
     path('api/finances/', include('finances.urls')),
     path('api/deposits/', include('deposits.urls')),
     path('api/ais/', include('ais.urls')),
+    path('api/finance_infos/', include('finance_infos.urls')),
 ]
