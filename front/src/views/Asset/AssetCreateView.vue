@@ -179,11 +179,12 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useAssetStore } from '@/stores/asset'
-import { useRouter } from 'vue-router'
-import draggable from 'vuedraggable' // [추가] 라이브러리 임포트
+import { useRoute, useRouter } from 'vue-router'
+import draggable from 'vuedraggable'
 
 const store = useAssetStore()
 const router = useRouter()
+const route = useRoute()
 
 // 1. 설정 및 상태
 const majorTypes = [
@@ -221,6 +222,16 @@ onMounted(async () => {
   financialData.value.income = store.financialInfo.income
   financialData.value.expense = store.financialInfo.expense
   
+  // 금/은 시세
+  const { asset_type, amount, price } = route.query
+  if (asset_type && amount && price) {
+    selectedMajor.value = 'invest'
+    
+    formData.value.name = `${asset_type === 'gold' ? '금' : '은'} (${amount}oz)`
+    formData.value.current_value = Math.floor(Number(amount) * Number(price))
+    alert('시세 정보가 연동되었습니다. 상세 종류를 선택하고 반영하기를 눌러주세요!')
+  }
+
   isLoading.value = false
 })
 

@@ -30,7 +30,7 @@ const router = useRouter()
 const menus = ref([
   { title: '내 자산 보기', subs: ['내 자산 입력하기', '내 자산 한눈에 보기', 'AI 진단·추천받기'] },
   { title: '예·적금', subs: ['예적금 상품조회'] },
-  { title: '금/은/달러', subs: ['국내 시세', '해외 시세'] },
+  { title: '현물 자산', subs: ['금 시세 조회', '은 시세 조회'] },
   { title: '게시판', subs: ['자유게시판', '금융정보(꿀팁)', '금융기사'] },
   { title: '기타 편의', subs: ['주변은행찾기', '유튜브 찾기', '오늘의 금전운'] },
 ])
@@ -55,6 +55,12 @@ const handleSubMenu = (sub) => {
       break
     case '주변은행찾기':
       router.push({ name: 'map' })
+      break
+    case '금 시세 조회':
+      router.push({ name: 'exchange', query: { asset: 'gold' } })
+      break
+    case '은 시세 조회':
+      router.push({ name: 'exchange', query: { asset: 'silver' } })
       break
     default:
       alert(`${sub} 메뉴는 준비 중입니다.`)

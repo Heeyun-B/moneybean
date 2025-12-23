@@ -86,7 +86,12 @@
       <div class="list-section">
         <div class="list-header-row">
           <h3>상세 자산 목록</h3>
-          <button @click="goToCreatePage" class="edit-btn">목록 편집</button>
+          <div class="header-action-btns">
+            <button @click="router.push({ name: 'Exchange' })" class="exchange-btn">
+              🪙 금/은 시세 확인
+            </button>
+            <button @click="goToCreatePage" class="edit-btn">목록 편집</button>
+          </div>
         </div>
 
         <div class="hierarchical-list">
@@ -433,6 +438,10 @@ h1 { text-align: center; margin-bottom: 40px; font-size: 26px; font-weight: 800;
 /* List Section */
 .list-section { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
 .list-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+.header-action-btns { display: flex; gap: 10px; }
+.exchange-btn { background: #fff; border: 1px solid #D4AF37; padding: 6px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; color: #B8860B; font-weight: bold; transition: 0.2s; }
+.exchange-btn:hover { background: #FFFDE7; transform: translateY(-1px); }
+.edit-btn { background: white; border: 1px solid #ddd; padding: 6px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; color: #555; }
 .edit-btn { background: white; border: 1px solid #ddd; padding: 6px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; color: #555; }
 .edit-btn:hover { background: #f5f5f5; color: #111; }
 
