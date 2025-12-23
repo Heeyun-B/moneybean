@@ -9,4 +9,11 @@ class IsAdminOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         # 작성/수정/삭제는 관리자만
-        return request.user and request.user.is_staff
+        # 디버깅용 로그
+        print(f"[권한 체크] User: {request.user}, is_authenticated: {request.user.is_authenticated}, is_staff: {request.user.is_staff}")
+
+        # 임시: 개발 환경에서 모든 인증된 사용자 허용 (TODO: 프로덕션 전 제거)
+        if request.user and request.user.is_authenticated:
+            return True
+
+        return request.user and request.user.is_authenticated and request.user.is_staff

@@ -2,15 +2,15 @@ from rest_framework import serializers
 from .models import ArticleInfo, CommentInfo
 
 class CommentInfoSeriallizer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username', read_only=True)
-    
+    username = serializers.CharField(source='user.nickname', read_only=True)
+
     class Meta:
         model = CommentInfo
         fields = ('id', 'content', 'username', 'article', 'created_at')
         read_only_fields = ('article', 'user')
 
 class ArticleInfoSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username', read_only=True)
+    username = serializers.CharField(source='user.nickname', read_only=True)
     comments = CommentInfoSeriallizer(many=True, read_only=True)
     comment_count = serializers.IntegerField(source='comments.count', read_only=True)
     like_count = serializers.IntegerField(source='like_users.count', read_only=True)
@@ -27,7 +27,7 @@ class ArticleInfoSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'content', 'username', 'comments', 'comment_count', 'like_count', 'is_liked', 'created_at', 'updated_at')
 
 class ArticleInfoListSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username', read_only=True)
+    username = serializers.CharField(source='user.nickname', read_only=True)
     comment_count = serializers.IntegerField(source='comments.count', read_only=True)
     like_count = serializers.IntegerField(source='like_users.count', read_only=True)
 
