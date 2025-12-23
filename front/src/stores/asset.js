@@ -64,49 +64,25 @@ export const useAssetStore = defineStore('asset', () => {
   }
 
   // 4. [AI] 진단 요청 Action
-  const getAiDiagnosis = async () => {
+  const getAiDiagnosis = async (diagnosisData) => { // diagnosisData 인자 추가
     try {
-      // 백엔드 전송용 페이로드 구성
-      const payload = {
-        financialInfo: financialInfo.value,
-        totalAssets: totalAssets.value,
-        totalDebt: totalDebt.value,
-        netWorth: netWorth.value,
-        // 상세 자산 리스트 포함 (분석 정확도 향상)
-        assets: assets.value.map(a => ({ 
-           name: a.name, 
-           amount: a.current_value, 
-           category: a.category 
-        }))
-      }
+      // 1. 헤더 설정
+      const headers = getHeaders()
 
-      console.log("🤖 [AI Request Payload]:", payload)
+      // 2. 백엔드 API 호출 (주석 해제 및 데이터 전달)
+      // URL은 작성하신 Django urls.py 설정에 맞춰 확인하세요 (예: /api/v1/assets/ai-diagnosis/)
+      const response = await axios.post(
+        `${API_URL}/api/ais/diagnosis/`, 
+        diagnosisData, 
+        { headers }
+      )
 
-      // [TODO: Backend 연동 시 아래 주석 해제 및 Mocking 제거]
-      // const response = await axios.post(`${API_URL}/api/v1/assets/ai-diagnosis/`, payload, { headers: getHeaders() })
-      // return response.data.report 
-
-      // --- Mocking Start (테스트용 가짜 응답) ---
-      await new Promise(resolve => setTimeout(resolve, 3000)) // 3초 대기
-      
-      return `
-# 🤖 머니빈 AI 분석 리포트
-
-## 📊 자산 포트폴리오 진단
-회원님의 총 자산은 **${totalAssets.value.toLocaleString()}원**이며, 
-순자산은 **${netWorth.value.toLocaleString()}원** 입니다.
-
-## 💡 맞춤형 조언
-1. **유동성 관리**: 현금성 자산 비중이 **${((totalCash.value / totalAssets.value) * 100).toFixed(1)}%**로 적절합니다.
-2. **부채 관리**: 부채 비율이 다소 높다면 고금리 대출부터 상환 계획을 세워보세요.
-3. **투자 제안**: 포트폴리오 다각화를 통해 리스크를 관리하세요.
-
-*이 기능은 현재 테스트 모드입니다.*
-      `
-      // --- Mocking End ---
+      // 3. 백엔드에서 보낸 'report' 필드 반환
+      return response.data.report
 
     } catch (error) {
       console.error("AI 진단 실패:", error)
+      // 에러 발생 시 사용자에게 알리기 위해 throw
       throw error
     }
   }
