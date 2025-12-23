@@ -129,6 +129,13 @@ const router = createRouter({
       name: 'saving-detail',
       component: () => import('@/views/Deposit/SavingDetailView.vue')
     },
+
+    // 퀴즈 관련
+    {
+      path: '/quiz',
+      name: 'quiz',
+      component: () => import('@/views/Quiz/QuizView.vue')
+    },
   ],
 })
 

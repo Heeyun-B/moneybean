@@ -41,6 +41,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "quizzes",
     "ais",
     "gold_prices",
     "deposits",
