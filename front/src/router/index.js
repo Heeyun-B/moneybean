@@ -1,23 +1,28 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import HomeView from '../views/HomeView.vue'
-import SignUpView from '@/views/SignUpView.vue'
-import LoginView from '@/views/LoginView.vue'
-import AssetView from '@/views/AssetView.vue' 
-import AssetCreateView from '@/views/AssetCreateView.vue'
+// 1. 메인 (Main)
+import HomeView from '@/views/Main/HomeView.vue'
 
-// 유튜브 관련 뷰
-import YoutubeMainView from '@/views/YoutubeMainView.vue'
-import SearchView from '@/views/SearchView.vue'
-import VideoDetailView from '@/views/VideoDetailView.vue'
-import LaterView from '@/views/LaterView.vue'
+// 2. 인증 (Auth)
+import SignUpView from '@/views/Auth/SignUpView.vue'
+import LoginView from '@/views/Auth/LoginView.vue'
 
-// 예적금 관련 뷰
-import DepositListView from '@/views/DepositListView.vue'
-import DepositDetailView from '@/views/DepositDetailView.vue'
+// 3. 자산 (Asset)
+import AssetView from '@/views/Asset/AssetView.vue'
+import AssetCreateView from '@/views/Asset/AssetCreateView.vue'
 
-// 카카오맵 관련 뷰
-import MapView from '@/views/MapView.vue'
+// 4. 유튜브 (Youtube)
+import YoutubeMainView from '@/views/Youtube/YoutubeMainView.vue'
+import SearchView from '@/views/Youtube/SearchView.vue'
+import VideoDetailView from '@/views/Youtube/VideoDetailView.vue'
+import LaterView from '@/views/Youtube/LaterView.vue'
+
+// 5. 예적금 (Deposit)
+import DepositListView from '@/views/Deposit/DepositListView.vue'
+import DepositDetailView from '@/views/Deposit/DepositDetailView.vue'
+
+// 6. 지도 (Map)
+import MapView from '@/views/Map/MapView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -74,7 +79,6 @@ const router = createRouter({
       name: 'youtube-home',
       component: YoutubeMainView,
     },
-
     {
       path: '/youtube/search',
       name: 'search',
@@ -85,31 +89,30 @@ const router = createRouter({
       name: 'video-detail',
       component: VideoDetailView,
     },
-
     {
       path: '/later',
       name: 'later-videos',
       component: LaterView,
     },
 
+    // 예적금 관련
     {
       path: '/deposits',
       name: 'deposit-list',
       component: DepositListView
     },
-
     {
       path: '/deposits/:id',
       name: 'deposit-detail',
       component: DepositDetailView
     },
 
+    // 지도 관련
     {
       path: '/map',
       name: 'map',
       component: MapView
     },
-
   ],
 })
 

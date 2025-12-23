@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import YoutubeNavBar from '@/components/YoutubeNavBar.vue'
+import YoutubeNavBar from '@/components/youtube/YoutubeNavBar.vue'
 export default {
   name: 'YoutubeMainView',
   components: {

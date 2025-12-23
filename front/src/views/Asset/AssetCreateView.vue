@@ -178,7 +178,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useAssetStore } from '@/stores/assetStore'
+import { useAssetStore } from '@/stores/asset'
 import { useRouter } from 'vue-router'
 import draggable from 'vuedraggable' // [추가] 라이브러리 임포트
 

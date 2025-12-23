@@ -2,14 +2,21 @@
   <div class="moneybean-container">
     <main class="content-wrapper">
       <div class="hero-section">
+        
         <div class="banner-box">
-          <div v-for="(banner, i) in banners" :key="i" v-show="currentSlide === i" class="banner-slide">
+          <div 
+            v-for="(banner, i) in banners" 
+            :key="i" 
+            v-show="currentSlide === i" 
+            class="banner-slide"
+          >
             <div class="banner-content">
               <span class="banner-tag">{{ banner.tag }}</span>
               <h2>{{ banner.title }}</h2>
               <p>{{ banner.desc }}</p>
             </div>
           </div>
+          
           <div class="banner-dots">
             <span 
               v-for="(banner, i) in banners" 
@@ -20,37 +27,18 @@
           </div>
         </div>
 
-        <div class="login-box">
-          <div v-if="!authStore.token" class="login-not-yet">
-            <div class="login-intro">
-              <p class="intro-text">머니빈을 더 안전하고<br>편리하게 이용하세요.</p>
-              <button class="login-move-btn" @click="$router.push('/login')">
-                <strong>머니빈 로그인</strong>
-              </button>
-            </div>
-            <div class="login-footer">
-              <div class="find-join">
-                <span @click="$router.push('/find-account')">아이디 찾기</span> |
-                <span @click="$router.push('/find-account')">비밀번호 찾기</span> |
-                <span class="join-link" @click="$router.push('/signup')">회원가입</span>
-              </div>
-            </div>
+        <div class="login-box" v-if="!store.isAuthenticated">
+          <div class="login-intro">
+            <p class="intro-text">머니빈을 더 안전하고<br>편리하게 이용하세요.</p>
+            <button class="login-move-btn" @click="router.push('/login')">
+              <strong>머니빈 로그인</strong>
+            </button>
           </div>
-
-          <div v-else class="login-success">
-            <div class="user-profile">
-              <div class="welcome-msg">
-                <h3 style="color: #00a651; margin-bottom: 10px;">반가워요! {{ authStore.nickname }}님 🌱</h3>
-                <p style="font-size: 13px; color: #666; margin-bottom: 25px;">오늘도 스마트한 자산 관리를 시작해보세요.</p>
-              </div>
-              <div class="user-actions" style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
-                <button class="login-move-btn" @click="$router.push({ name: 'assets' })">
-                  <strong>내 자산 관리</strong>
-                </button>
-                <button @click="handleLogout" style="background: none; border: none; color: #999; font-size: 12px; cursor: pointer; text-decoration: underline; margin-top: 5px;">
-                  로그아웃
-                </button>
-              </div>
+          <div class="login-footer">
+            <div class="find-join">
+              <span @click="router.push('/find-account')">아이디 찾기</span> |
+              <span @click="router.push('/find-account')">비밀번호 찾기</span> |
+              <span class="join-link" @click="router.push('/signup')">회원가입</span>
             </div>
           </div>
         </div>
@@ -61,11 +49,11 @@
               <img src="@/assets/logo_bean.png" alt="프로필" class="profile-img">
             </div>
             <div class="welcome-text">
-              <h3 class="user-name">{{ nickname }}님</h3>
+              <h3 class="user-name">{{ store.userNickname }}님</h3>
               <p class="greeting">오늘도 부자 되세요! 🌱</p>
             </div>
             <div class="profile-actions">
-              <button class="action-btn primary" @click="$router.push({ name: 'assets' })">
+              <button class="action-btn primary" @click="router.push({ name: 'assets' })">
                 내 자산 보러가기
               </button>
               <button class="action-btn secondary" @click="handleLogout">
@@ -74,6 +62,7 @@
             </div>
           </div>
         </div>
+
       </div>
 
       <section class="pick-section">
@@ -117,96 +106,73 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
-export default {
-  data: () => ({
-    isLoggedIn: false,
-    nickname: '',
-    currentSlide: 0,
-    slideInterval: null,
-    // 메뉴 구조를 통일성 있게 유지합니다.
-    menus: [
-      { title: '내 자산 보기', subs: ['내 자산 입력하기', '내 자산 한눈에 보기', 'AI 진단·추천받기'] },
-      { title: '예·적금', subs: ['예적금 상품조회'] },
-      { title: '금/은/달러', subs: ['국내 시세', '해외 시세'] },
-      { title: '게시판', subs: ['자유게시판', '금융정보(꿀팁)', '금융기사'] },
-      { title: '기타 편의', subs: ['주변은행찾기', '유튜브 찾기', '오늘의 금전운'] },
-    ],
-    banners: [
-      { tag: 'EVENT', title: '금융 퀴즈 챌린지!', desc: '매일 퀴즈 풀고 자산 나무에 물을 주세요.' },
-      { tag: 'NEWS', title: '금리 인상 소식', desc: '나에게 유리한 예적금 상품을 찾아보세요.' },
-      { tag: 'QUIZ', title: '자산 관리 MBTI', desc: '당신의 투자 성향은 어떤 콩인가요?' },
-    ],
-    picks: [
-      { title: '자산관리', icon: '🏦' },
-      { title: '카드', icon: '💳' },
-      { title: '예적금', icon: '🐷' },
-      { title: '투자', icon: '📈' },
-    ]
-  }),
-  setup() {
-    const authStore = useAuthStore()
-    return { authStore }
-  },
-  mounted() {
-    this.startSlide();
-    this.checkLogin(); 
-  },
-  beforeUnmount() {
-    clearInterval(this.slideInterval);
-  },
-  methods: {
-    startSlide() {
-      this.slideInterval = setInterval(() => {
-        this.currentSlide = (this.currentSlide + 1) % this.banners.length;
-      }, 4000);
-    },
+const router = useRouter()
+const store = useAuthStore()
 
-    handleSubMenu(sub) {
-      if (sub === '주변은행찾기') {
-        this.$router.push('/map');
-      } else if (sub === '유튜브 찾기') {
-        this.$router.push('/youtube');
-      } else if (sub === '예적금 상품조회') {
-        this.$router.push('/deposits');
-      } else {
-        console.log(sub + " 메뉴로 이동합니다.");
-      }
-    },
-    handlePickClick(title) {
-    if (title === '예적금') {
-      this.goToDeposit();
-    } else if (title === '투자' || title === '자산관리') {
-      this.goToAssets();
-    }
-    },
+// --- 데이터 ---
+const currentSlide = ref(0)
+let slideInterval = null
 
-    goToDeposit() {
-      if (!this.authStore.token) {
-        alert('로그인이 필요한 서비스입니다.');
-        this.$router.push('/login');
-      } else {
-        this.$router.push('/deposits');
-      }
-    },
+const banners = [
+  { tag: 'EVENT', title: '금융 퀴즈 챌린지!', desc: '매일 퀴즈 풀고 자산 나무에 물을 주세요.' },
+  { tag: 'NEWS', title: '금리 인상 소식', desc: '나에게 유리한 예적금 상품을 찾아보세요.' },
+  { tag: 'QUIZ', title: '자산 관리 MBTI', desc: '당신의 투자 성향은 어떤 콩인가요?' },
+]
 
-    goToAssets() {
-      if (!this.authStore.token) {
-        alert('로그인이 필요한 서비스입니다.');
-        this.$router.push('/login');
-      } else {
-        this.$router.push({ name: 'assets' });
-      }
-    },
-    handleLogout() {
-      this.authStore.logOut(); 
-      this.$router.push('/');
-      alert('로그아웃 되었습니다.');
-    }
+const picks = [
+  { title: '자산관리', icon: '🏦' },
+  { title: '카드', icon: '💳' },
+  { title: '예적금', icon: '🐷' },
+  { title: '투자', icon: '📈' },
+]
+
+// --- 메서드 ---
+const startSlide = () => {
+  slideInterval = setInterval(() => {
+    currentSlide.value = (currentSlide.value + 1) % banners.length
+  }, 4000)
+}
+
+const handleLogout = () => {
+  store.logOut()
+  alert('로그아웃 되었습니다.')
+  // 홈 화면에 있으므로 리다이렉트는 불필요하지만, 상태 갱신을 위해 필요한 경우 처리
+}
+
+const handlePickClick = (title) => {
+  // 로그인 체크가 필요한 서비스들
+  if (!store.isAuthenticated) {
+    alert('로그인이 필요한 서비스입니다.')
+    router.push('/login')
+    return
   }
-};
+
+  switch (title) {
+    case '예적금':
+      router.push({ name: 'deposit-list' })
+      break
+    case '자산관리':
+    case '투자':
+      router.push({ name: 'assets' })
+      break
+    default:
+      alert('준비 중인 서비스입니다.')
+  }
+}
+
+// --- 라이프사이클 훅 ---
+onMounted(() => {
+  startSlide()
+})
+
+onUnmounted(() => {
+  if (slideInterval) clearInterval(slideInterval)
+})
 </script>
 
 <style scoped>
@@ -242,6 +208,7 @@ export default {
 .find-join span { cursor: pointer; margin: 0 5px; }
 .find-join span:hover { text-decoration: underline; color: #666; }
 
+/* 프로필 박스 전용 스타일 */
 .profile-content { width: 100%; display: flex; flex-direction: column; align-items: center; }
 .profile-img-wrapper { margin-bottom: 15px; }
 .profile-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #f0f0f0; }
@@ -263,6 +230,7 @@ export default {
 .pick-card { background: white; border: 1px solid #eee; border-radius: 20px; padding: 30px; text-align: center; cursor: pointer; transition: 0.3s; }
 .pick-card:hover { transform: translateY(-5px); border-color: #00a651; }
 .pick-icon { font-size: 30px; margin-bottom: 10px; }
+
 .board-section { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 60px; }
 .board-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
 .board-list { list-style: none; padding: 0; background: white; border-radius: 15px; border: 1px solid #eee; }

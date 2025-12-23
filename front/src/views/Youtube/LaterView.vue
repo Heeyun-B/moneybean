@@ -27,7 +27,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import emptyImage from '@/assets/novideo.png'
-import YoutubeNavBar from '@/components/YoutubeNavBar.vue'
+import YoutubeNavBar from '@/components/youtube/YoutubeNavBar.vue'
 
 export default {
   name: 'LaterView',
