@@ -1,15 +1,16 @@
 <template>
   <YoutubeNavBar />
+  
   <div class="search-container">
-    <div class="search-header">
-      <button class="back-button" @click="$router.push('/')" title="뒤로가기">
+    <div class="search-header" @click="$router.push({ name: 'youtube-home' })" title="뒤로가기">
+      <button class="back-button">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M15 18l-6-6 6-6"/>
         </svg>
       </button>
-      
-      <h1 class="page-title">유튜브 검색</h1>
+      <h2 class="page-title">유튜브 검색</h2>
     </div>
+
     
     <div class="search-wrapper">
       <div class="search-box">
@@ -20,7 +21,7 @@
           placeholder="유튜브에서 영상 찾기"
           class="search-input"
         >
-        <button @click="handleSearch" class="search-button" title="검색">
+        <button @click="handleSearch" class="search-button">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -29,10 +30,7 @@
       </div>
     </div>
 
-    <div v-if="loading" class="loading">
-       <span class="bean-spinner">🫛</span> 열심히 찾는 중...
-    </div>
-    
+    <div v-if="loading" class="loading">🫛 열심히 찾는 중...</div>
     <div v-if="error" class="error">{{ error }}</div>
 
     <div v-if="videos.length > 0" class="video-grid">
@@ -50,74 +48,54 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import VideoCard from '@/components/youtube/VideoCard.vue'
 import YoutubeNavBar from '@/components/youtube/YoutubeNavBar.vue'
+import VideoCard from '@/components/youtube/VideoCard.vue'
 import { searchVideos } from '@/api/youtube.js'
 
-export default {
-  name: 'SearchView',
-  components: {
-    VideoCard,
-    YoutubeNavBar
-  },
-  setup() {
-    const router = useRouter()
-    const searchQuery = ref('')
-    const videos = ref([])
-    const loading = ref(false)
-    const error = ref('')
+const router = useRouter()
+const searchQuery = ref('')
+const videos = ref([])
+const loading = ref(false)
+const error = ref('')
 
-    const handleSearch = async () => {
-      if (!searchQuery.value.trim()) {
-        alert('검색어를 입력해주세요')
-        return
-      }
-
-      loading.value = true
-      error.value = ''
-      
-      try {
-        const results = await searchVideos(searchQuery.value)
-        videos.value = results
-      } catch (err) {
-        error.value = 'API 호출에 실패했습니다. API Key를 확인해주세요.'
-        console.error(err)
-      } finally {
-        loading.value = false
-      }
-    }
-
-    const goToDetail = (video) => {
-      router.push(`/video/${video.id.videoId}`)
-    }
-
-    return {
-      searchQuery,
-      videos,
-      loading,
-      error,
-      handleSearch,
-      goToDetail
-    }
+const handleSearch = async () => {
+  if (!searchQuery.value.trim()) return
+  loading.value = true
+  try {
+    videos.value = await searchVideos(searchQuery.value)
+  } catch (err) {
+    error.value = '데이터를 불러오는데 실패했습니다.'
+  } finally {
+    loading.value = false
   }
+}
+
+const goToDetail = (video) => {
+  router.push(`/video/${video.id.videoId}`)
 }
 </script>
 
 <style scoped>
 .search-container {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 40px 20px;
 }
 
 .search-header {
-  display: flex;
+  display: inline-flex;;
   align-items: center;
   margin-bottom: 40px;
-  gap: 15px;
+  gap: 1px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.search-header:hover {
+  opacity: 0.7;
 }
 
 .back-button {
@@ -129,12 +107,11 @@ export default {
   background: transparent;
   border: none;
   border-radius: 50%;
-  cursor: pointer;
   color: #00a651;
-  transition: all 0.2s;
+  pointer-events: none;
 }
 
-.back-button:hover {
+.search-header:hover .back-button {
   background-color: rgba(139, 195, 74, 0.2);
   transform: translateX(-3px);
 }
@@ -144,6 +121,7 @@ export default {
   margin: 0;
   color: #00a651;
   font-weight: bold;
+  user-select: none;
 }
 
 .search-wrapper {
