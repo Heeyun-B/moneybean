@@ -12,18 +12,33 @@
       <div class="left-section">
         <div class="chart-card">
           <div class="filter-container">
-            <div class="date-inputs">
-              <input type="date" v-model="startDate" @change="applyFilter" class="date-field">
-              <span class="swash">~</span>
-              <input type="date" v-model="endDate" @change="applyFilter" class="date-field">
+            <div class="date-group">
+              <select v-model="startYear" @change="updateDateAndFilter" class="picker-select">
+                <option v-for="y in years" :key="y" :value="y">{{ y }}년</option>
+              </select>
+              <select v-model="startMonth" @change="updateDateAndFilter" class="picker-select">
+                <option v-for="m in months" :key="m" :value="m">{{ m }}월</option>
+              </select>
+              <select v-model="startDay" @change="updateDateAndFilter" class="picker-select">
+                <option v-for="d in startDays" :key="d" :value="d">{{ d }}일</option>
+              </select>
+              <span class="sep">~</span>
+              <select v-model="endYear" @change="updateDateAndFilter" class="picker-select">
+                <option v-for="y in years" :key="y" :value="y">{{ y }}년</option>
+              </select>
+              <select v-model="endMonth" @change="updateDateAndFilter" class="picker-select">
+                <option v-for="m in months" :key="m" :value="m">{{ m }}월</option>
+              </select>
+              <select v-model="endDay" @change="updateDateAndFilter" class="picker-select">
+                <option v-for="d in endDays" :key="d" :value="d">{{ d }}일</option>
+              </select>
             </div>
-            <button @click="resetFilter" class="reset-btn">전체 기간</button>
-            <p v-if="dateError" class="date-error-text">{{ dateError }}</p>
+            <button @click="resetFilter" class="reset-mini-btn">초기화</button>
           </div>
 
           <div class="card-title">
-            <span>📈 {{ chartPeriodText }} 원화 시세 추이</span>
-            <div class="price-badge">{{ currentPrice.toLocaleString() }} 원 / g</div>
+            <span>{{ chartPeriodText }} 원화 시세 추이</span>
+            <div class="price-badge">기간 평균: {{ averagePrice.toLocaleString() }} 원 / g</div>
           </div>
           <div class="chart-wrapper" v-if="chartData">
             <Line :data="chartData" :options="chartOptions" :key="chartKey" />
@@ -35,26 +50,14 @@
       <div class="right-section">
         <div class="input-card">
           <h3 class="card-title">💰 {{ asset === 'gold' ? '금' : '은' }} 가치 계산기</h3>
-          
           <div class="form-group">
             <label>보유 수량 (그램/g)</label>
-            <input 
-              type="number" 
-              v-model="amount" 
-              @input="handleAmountInput" 
-              class="custom-input amount-input"
-              placeholder="0" 
-              max="1000000000"
-            />
+            <input type="number" v-model="amount" @input="handleAmountInput" class="custom-input amount-input" placeholder="0" />
           </div>
-
-          <div class="form-group mb-large">
+          <div class="form-group">
             <label>현재 1g당 원화 시세</label>
-            <div class="custom-input readonly-input">
-              {{ currentPrice.toLocaleString() }} 원
-            </div>
+            <div class="custom-input readonly-input">{{ currentPrice.toLocaleString() }} 원</div>
           </div>
-
           <div class="result-area">
             <label>예상 총 자산 가치</label>
             <div class="total-value-container">
@@ -62,15 +65,12 @@
                 <span class="amount-text">{{ totalPrice }}</span>
                 <span class="currency">원</span>
               </div>
-              <div v-if="koreanValue" class="korean-summary">
-                  약 {{ koreanValue }}원
-                </div>
-              </div>
+              <div v-if="koreanValue" class="korean-summary">약 {{ koreanValue }}원</div>
+            </div>
           </div>
-
           <div class="info-footer">
             <span class="wood-badge" @click="linkToMyAsset" style="cursor: pointer;">내 자산 연동</span>
-            <p>보유하신 수량에 따른 현재 원화 가치입니다.</p>
+            <p>보유하신 수량에 따른 현재 시점 원화 가치입니다.</p>
           </div>
         </div>
       </div>
@@ -87,144 +87,105 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
-const route = useRoute()
-const router = useRouter()
+const route = useRoute(); const router = useRouter()
+const asset = ref('gold'); const allRawData = ref([]); const chartData = ref(null); const chartKey = ref(0) 
+const currentPrice = ref(0); const averagePrice = ref(0); const amount = ref(1); const totalPrice = ref("0")
+const startYear = ref('2024'); const startMonth = ref('01'); const startDay = ref('01')
+const endYear = ref('2024'); const endMonth = ref('12'); const endDay = ref('31')
+const startDate = ref(''); const endDate = ref(''); const koreanValue = ref("")
 
-const asset = ref('gold')
-const allRawData = ref([])
-const chartData = ref(null)
-const chartKey = ref(0) 
-const currentPrice = ref(0)
-const amount = ref(1)
-const totalPrice = ref("0")
+const years = ['2023', '2024', '2025', '2026']
+const months = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'))
+const getDaysInMonth = (year, month) => new Date(year, month, 0).getDate()
 
-const startDate = ref('')
-const endDate = ref('')
-const dateError = ref('')
-const koreanValue = ref("");
-
+const startDays = computed(() => Array.from({ length: getDaysInMonth(startYear.value, startMonth.value) }, (_, i) => String(i + 1).padStart(2, '0')))
+const endDays = computed(() => Array.from({ length: getDaysInMonth(endYear.value, endMonth.value) }, (_, i) => String(i + 1).padStart(2, '0')))
 const assetTheme = computed(() => asset.value === 'gold' ? 'theme-gold' : 'theme-silver')
 const chartPeriodText = computed(() => (startDate.value || endDate.value) ? '선택 기간' : '전체 기간')
 
-const linkToMyAsset = () => {
-  router.push({
-    name: 'asset-create',
-    query: { asset_type: asset.value, amount: amount.value, price: currentPrice.value }
-  })
-}
-
-
-const handleAmountInput = () => {
-  const maxAmount = 1000000000;
-  if (amount.value > maxAmount) {
-    amount.value = maxAmount;
-    alert("최대 입력 가능한 수량은 10억g입니다.");
-  }
-  calculate();
-}
-
-const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: { 
-    legend: { display: false },
-    tooltip: {
-      callbacks: {
-        label: (context) => `${context.parsed.y.toLocaleString()} 원/g`
-      }
-    }
-  },
-  scales: {
-    y: { beginAtZero: false, grid: { color: '#f0f0f0' } },
-    x: { grid: { display: false } }
-  }
-}
-
 const fetchData = async (type) => {
-  asset.value = type
-  chartData.value = null 
+  asset.value = type; chartData.value = null 
   try {
     const token = localStorage.getItem('token')
     const response = await axios.get(`http://127.0.0.1:8000/api/gold_prices/prices/`, {
       params: { asset: type },
       headers: { Authorization: token ? `Token ${token}` : '' }
     })
-    
-    allRawData.value = response.data.data.sort((a, b) => new Date(a.Date) - new Date(b.Date))
-    applyFilter()
-
-    const lastItem = allRawData.value[allRawData.value.length - 1]
-    currentPrice.value = lastItem.price_krw_g || 0
-    calculate()
-  } catch (error) {
-    console.error('데이터 로드 실패:', error)
-  }
+    const data = response.data.data.sort((a, b) => new Date(a.Date) - new Date(b.Date))
+    allRawData.value = data
+    if (data.length > 0) {
+      currentPrice.value = data[data.length - 1].price_krw_g
+    }
+    updateDateAndFilter(); calculate()
+  } catch (error) { console.error('데이터 로드 실패:', error) }
 }
 
 const applyFilter = () => {
-  dateError.value = ''
   let filtered = [...allRawData.value]
-  if (startDate.value && endDate.value && new Date(startDate.value) > new Date(endDate.value)) {
-    dateError.value = '시작일이 종료일보다 늦습니다.'
-    return
+  if (startDate.value && endDate.value && new Date(startDate.value) > new Date(endDate.value)) return
+  if (startDate.value) filtered = filtered.filter(item => new Date(item.Date) >= new Date(startDate.value))
+  if (endDate.value) filtered = filtered.filter(item => new Date(item.Date) <= new Date(endDate.value))
+  if (filtered.length > 0) {
+    renderChart(filtered)
+    const sum = filtered.reduce((acc, item) => acc + (item.price_krw_g || 0), 0)
+    averagePrice.value = Math.floor(sum / filtered.length)
   }
-  if (startDate.value) {
-    filtered = filtered.filter(item => new Date(item.Date) >= new Date(startDate.value))
-  }
-  if (endDate.value) {
-    filtered = filtered.filter(item => new Date(item.Date) <= new Date(endDate.value))
-  }
-  renderChart(filtered)
 }
 
-const resetFilter = () => {
-  startDate.value = ''; endDate.value = ''; applyFilter()
+const updateDateAndFilter = () => {
+  startDate.value = `${startYear.value}-${startMonth.value}-${startDay.value}`
+  endDate.value = `${endYear.value}-${endMonth.value}-${endDay.value}`
+  applyFilter()
 }
 
 const renderChart = (data) => {
-  const brandColor = asset.value === 'gold' ? '#D4AF37' : '#9ea7ad'
+  const color = asset.value === 'gold' ? '#D4AF37' : '#9ea7ad'
   chartData.value = {
-    labels: data.map(item => item.Date),
+    labels: data.map(i => i.Date),
     datasets: [{
-      label: '원화 시세(g)',
-      borderColor: brandColor,
+      borderColor: color,
       backgroundColor: asset.value === 'gold' ? 'rgba(212, 175, 55, 0.1)' : 'rgba(158, 167, 173, 0.1)',
-      data: data.map(item => item.price_krw_g),
-      tension: 0.4,
-      fill: true,
-      pointRadius: data.length > 60 ? 0 : 4
+      data: data.map(i => i.price_krw_g),
+      tension: 0.4, fill: true, pointRadius: data.length > 60 ? 0 : 4
     }]
   }
   chartKey.value++
 }
 
-const formatKoreanAmount = (num) => {
-  if (!num || num === 0) return "";
-  const unitWords = ["", "만", "억", "조", "경"];
-  let result = [];
-  let unitIndex = 0;
-
-  while (num > 0) {
-    let part = num % 10000;
-    if (part > 0) {
-      result.unshift(part.toLocaleString() + unitWords[unitIndex]);
-    }
-    num = Math.floor(num / 10000);
-    unitIndex++;
-  }
-  return result.join(" ");
-};
-
 const calculate = () => {
-  if (!amount.value || amount.value < 0) {
-    totalPrice.value = "0";
-    koreanValue.value = "";
-    return;
-  }
-  const total = amount.value * currentPrice.value;
-  totalPrice.value = Math.floor(total).toLocaleString();
-  koreanValue.value = formatKoreanAmount(Math.floor(total));
+  const total = (amount.value || 0) * currentPrice.value
+  totalPrice.value = Math.floor(total).toLocaleString()
+  koreanValue.value = formatKorean(Math.floor(total))
 }
+
+const formatKorean = (num) => {
+  if (!num) return ""
+  const units = ["", "만", "억", "조", "경"]
+  let res = [], i = 0
+  while (num > 0) {
+    let p = num % 10000
+    if (p > 0) res.unshift(p.toLocaleString() + units[i])
+    num = Math.floor(num / 10000); i++
+  }
+  return res.join(" ")
+}
+
+const resetFilter = () => {
+  startYear.value = '2024'; startMonth.value = '01'; startDay.value = '01'
+  endYear.value = '2024'; endMonth.value = '12'; endDay.value = '31'
+  updateDateAndFilter()
+}
+
+const handleAmountInput = () => {
+  const maxAmount = 1000000000;
+  if (amount.value > maxAmount) {
+    alert("입력 가능한 최대 수량은 10억g입니다.");
+    amount.value = maxAmount;
+  }
+  calculate();
+}
+const linkToMyAsset = () => router.push({ name: 'asset-create', query: { asset_type: asset.value, amount: amount.value, price: currentPrice.value } })
+const chartOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#f0f0f0' } }, x: { grid: { display: false } } } }
 
 onMounted(() => fetchData(route.query.asset || 'gold'))
 watch(() => route.query.asset, (newAsset) => { if (newAsset) fetchData(newAsset) })
@@ -241,12 +202,16 @@ watch(() => route.query.asset, (newAsset) => { if (newAsset) fetchData(newAsset)
 .chart-wrapper { height: 450px; }
 .price-badge { background: #f1fcf4; color: #00a651; padding: 5px 15px; border-radius: 50px; font-size: 14px; font-weight: bold; }
 
-.filter-container { margin-bottom: 20px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
-.date-inputs { display: flex; align-items: center; gap: 8px; }
-.date-field { padding: 6px 10px; border: 1px solid #eee; border-radius: 8px; font-size: 13px; color: #555; }
-.swash { color: #ccc; }
-.reset-btn { background: #f5f5f5; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; color: #666; }
-.date-error-text { color: #ff5252; font-size: 12px; width: 100%; margin: 0; }
+.filter-container { margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; background: #f8f9fa; padding: 10px 15px; border-radius: 12px; border: 1px solid #eee; gap: 10px; }
+.date-group { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.label-tag { font-size: 11px; color: #888; font-weight: bold; margin-right: 2px; flex-shrink: 0; }
+.picker-select { border: 1px solid #ddd; background: #fff; font-size: 13px; color: #333; font-weight: 600; cursor: pointer; outline: none; padding: 4px 5px; border-radius: 6px; min-width: 65px; text-align: center; transition: 0.2s; }
+.picker-select:hover { border-color: #00a651; color: #00a651; }
+.sep { color: #aaa; font-weight: bold; padding: 0 2px; }
+.date-separator { color: #ccc; font-weight: bold; flex-shrink: 0; padding: 0 2px; }
+.reset-mini-btn { background: #00a651; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; white-space: nowrap; transition: 0.2s; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 5px rgba(0, 166, 81, 0.2); }
+.reset-mini-btn:hover { background: #008441; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0, 166, 81, 0.3); }
+.reset-mini-btn:active { transform: translateY(0); }
 
 .form-group { margin-bottom: 20px; display: flex; flex-direction: column; }
 label { font-size: 13px; font-weight: bold; color: #555; margin-bottom: 8px; }
@@ -255,16 +220,18 @@ label { font-size: 13px; font-weight: bold; color: #555; margin-bottom: 8px; }
 .amount-input:focus { border-color: #00a651; }
 .readonly-input { background: #f9f9f9; color: #888; border: 1px dashed #ccc; display: flex; align-items: center; }
 
-/* 금액 넘침 방지 스타일 */
-.result-area { background: #f1fcf4; border-radius: 15px; padding: 25px; text-align: center; margin-top: 10px; min-height: 140px; display: flex; flex-direction: column; justify-content: center; }
-.total-value-container { display: flex; flex-direction: column; gap: 8px; }
-.total-value { color: #00a651; font-weight: 900; display: flex;  align-items: baseline; justify-content: center; white-space: nowrap; width: 100%; overflow: hidden; gap: 2px; }
-.amount-text { font-size: 28px;  line-height: 1; }
-.korean-summary { font-size: 14px; color: #666; font-weight: 600; background: rgba(255, 255, 255, 0.5); padding: 4px 10px; border-radius: 20px; display: inline-block; align-self: center; }
-.currency { font-size: 16px; margin-left: 2px; color: #333; font-weight: 600; line-height: 1; position: relative; bottom: 0px; }
+/* 금액 넘침 방지 */
+.result-area { background: #f1fcf4; border-radius: 15px; padding: 20px 10px; text-align: center; margin-top: 10px; 
+  min-height: 140px; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
+.total-value-container { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.total-value { color: #00a651; font-weight: 900; display: flex; align-items: baseline; justify-content: center; width: 100%; gap: 4px; }
+.amount-text { font-size: clamp(16px, 4vw, 26px); line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1; }
+.korean-summary { font-size: 13px; color: #666; font-weight: 600; background: rgba(255, 255, 255, 0.5); padding: 4px 10px; 
+  border-radius: 20px; display: inline-block; align-self: center; word-break: keep-all; }
+.currency { font-size: 16px; color: #333; font-weight: 600; flex-shrink: 0; }
 
 .info-footer { margin-top: 25px; text-align: center; }
-.wood-badge { background: #8B4513; color: white; padding: 4px 12px; border-radius: 50px; font-size: 11px; display: inline-block; margin-bottom: 8px; }
+.wood-badge { background: #8B4513; color: white; padding: 8px 12px; border-radius: 80px; font-size: 14px; display: inline-block; margin-bottom: 8px; }
 .info-footer p { font-size: 12px; color: #999; }
 
 .theme-gold .title { color: #B8860B; }
@@ -274,5 +241,8 @@ label { font-size: 13px; font-weight: bold; color: #555; margin-bottom: 8px; }
 
 .loading-box { height: 450px; display: flex; align-items: center; justify-content: center; color: #999; }
 
-@media (max-width: 400px) { .amount-text { font-size: 20px; } }
+@media (max-width: 450px) { 
+  .amount-text { font-size: 18px; } 
+  .main-layout { grid-template-columns: 1fr; }
+}
 </style>
