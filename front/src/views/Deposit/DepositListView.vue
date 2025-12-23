@@ -1,95 +1,154 @@
 <template>
   <main class="main-content">
     <div class="page-header">
-      <h2 class="page-title">정기예금 상품 비교</h2>
-      <p class="page-subtitle">실시간 금융권 데이터를 기반으로 최고 금리를 확인하세요.</p>
+      <h2 class="page-title">예적금 비교</h2>
+      <p class="page-subtitle">나에게 딱 맞는 상품을 찾아보세요.</p>
     </div>
 
-    <div class="admin-section" v-if="authStore.token">
-      <button @click="fetchNewData" class="update-btn">🔄 금융 데이터 업데이트</button>
-      <p class="admin-tip">* 목록이 비어있다면 위 버튼을 눌러 DB에 데이터를 채워주세요.</p>
+    <div class="tab-menu">
+      <button 
+        class="tab-btn" 
+        :class="{ active: activeTab === 'deposit' }"
+        @click="activeTab = 'deposit'"
+      >
+        예금
+      </button>
+      <button 
+        class="tab-btn" 
+        :class="{ active: activeTab === 'saving' }"
+        @click="activeTab = 'saving'"
+      >
+        적금
+      </button>
     </div>
 
     <div class="filter-section">
-      <select v-model="selectedBank" @change="onBankChange" class="bank-select">
-        <option value="">모든 은행</option>
-        <option v-for="bank in bankList" :key="bank" :value="bank">{{ bank }}</option>
-      </select>
-    </div>
-
-    <div class="product-grid">
-      <div 
-        v-for="product in store.depositProducts" 
-        :key="product.fin_prdt_cd" 
-        class="product-card"
-        @click="goToDetail(product.fin_prdt_cd)"
-      >
-        <div class="bank-name">{{ product.kor_co_nm }}</div>
-        <h3 class="product-name">{{ product.fin_prdt_nm }}</h3>
-        
-        <div class="rate-info">
-          <span class="rate-label">최고 금리</span>
-          <span class="rate-value">{{ getMaxRate(product.options) }}%</span>
-        </div>
-        
-        <div class="tags">
-          <span class="tag">{{ product.join_way }}</span>
-          <span class="tag" v-if="product.join_member?.includes('개인')">개인 가능</span>
-        </div>
+      <div class="filter-group">
+        <label>저축 기간</label>
+        <select v-model="selectedTerm" class="term-select">
+          <option :value="0">전체 기간</option>
+          <option :value="6">6개월</option>
+          <option :value="12">12개월</option>
+          <option :value="24">24개월</option>
+          <option :value="36">36개월</option>
+        </select>
       </div>
+
+      <button 
+        class="filter-chip" 
+        :class="{ active: isFirstSectorOnly }"
+        @click="isFirstSectorOnly = !isFirstSectorOnly"
+      >
+        1금융권
+      </button>
+
+      <button 
+        class="filter-chip" 
+        :class="{ active: isNonFaceToFace }"
+        @click="isNonFaceToFace = !isNonFaceToFace"
+      >
+        방문없이 가입
+      </button>
     </div>
 
-    <div v-if="store.depositProducts.length === 0" class="no-data">
-      조회된 상품이 없습니다. 데이터를 업데이트 해주세요.
+    <div class="list-header">
+       <span class="count-text">
+        총 <strong>{{ filteredProducts.length }}</strong>개 상품
+      </span>
+    </div>
+
+    <div class="product-list">
+      <div v-if="isLoading" class="loading-state">
+        데이터를 불러오는 중입니다...
+      </div>
+
+      <template v-else>
+        <ProductListItem
+          v-for="product in filteredProducts"
+          :key="product.fin_prdt_cd"
+          :product="product"
+          @click="goToDetail(product.fin_prdt_cd)"
+        />
+        
+        <div v-if="filteredProducts.length === 0" class="empty-state">
+          조건에 맞는 상품이 없습니다.<br>
+          필터 조건을 변경해보세요.
+        </div>
+      </template>
     </div>
   </main>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import axios from 'axios';
 import { useDepositStore } from '@/stores/deposit';
-import { useAuthStore } from '@/stores/auth';
+import ProductListItem from '@/components/product/ProductListItem.vue';
 
 const router = useRouter();
 const store = useDepositStore();
-const authStore = useAuthStore();
-const selectedBank = ref('');
 
-const bankList = ['우리은행', '한국스탠다드차타드은행', '부산은행', '대구은행', '광주은행', '제주은행', '전북은행', '경남은행', '중소기업은행', '한국산업은행', '국민은행', '신한은행', '농협은행주식회사', '하나은행'];
+// 상태 관리
+const activeTab = ref('deposit');
+const isLoading = ref(false);
 
-onMounted(() => {
-  store.getDepositProducts();
-});
+// 필터 상태
+const selectedTerm = ref(12); // 기본값 12개월 (가장 일반적)
+const isFirstSectorOnly = ref(true); // 기본값 1금융권만 보기 (UX상 추천)
+const isNonFaceToFace = ref(false); // 비대면 가입 여부
 
-const onBankChange = () => {
-  store.getDepositProducts(selectedBank.value);
-};
+// 1금융권 목록
+const majorBanks = [
+  'iM뱅크', 'SC제일은행', '경남은행', '광주은행', '국민은행', 
+  '기업은행', '농협은행', '부산은행', '수협은행', 
+  '신한은행', '씨티은행', '우리은행', '우체국', '전북은행',
+  '제주은행', '카카오뱅크', '케이뱅크', '토스뱅크', '하나은행', '한국산업은행'
+];
 
-const fetchNewData = () => {
-  axios({
-    method: 'post',
-    url: 'http://127.0.0.1:8000/api/deposits/save-deposit-products/',
-    headers: {
-      Authorization: `Token ${authStore.token}`
+const fetchData = async () => {
+  isLoading.value = true;
+  try {
+    if (activeTab.value === 'deposit') {
+      await store.getDepositProducts();
+    } else {
+      // 적금 구현 시 주석 해제
+      // await store.getSavingProducts(); 
     }
-  })
-  .then(() => {
-    alert('데이터가 성공적으로 DB에 저장되었습니다.');
-    store.getDepositProducts();
-  })
-  .catch((err) => {
-    console.error(err);
-    alert('데이터 저장 실패: ' + (err.response?.data?.detail || '서버 에러'));
-  });
+  } finally {
+    isLoading.value = false;
+  }
 };
 
-const getMaxRate = (options) => {
-  if (!options || options.length === 0) return '-';
-  const rates = options.map(o => o.intr_rate2 || 0);
-  return Math.max(...rates).toFixed(2);
-};
+watch(activeTab, fetchData);
+onMounted(fetchData);
+
+// 필터링 로직 (핵심)
+const filteredProducts = computed(() => {
+  let products = store.depositProducts || [];
+  
+  // 1. 1금융권 필터
+  if (isFirstSectorOnly.value) {
+    products = products.filter(p => majorBanks.includes(p.kor_co_nm));
+  }
+
+  // 2. 비대면 가입 필터 ('인터넷' or '스마트폰' 포함 여부)
+  if (isNonFaceToFace.value) {
+    products = products.filter(p => 
+      p.join_way && (p.join_way.includes('인터넷') || p.join_way.includes('스마트폰'))
+    );
+  }
+
+  // 3. 저축 기간 필터
+  // 선택된 기간(예: 12개월) 옵션이 있는 상품만 남김
+  if (selectedTerm.value !== 0) {
+    products = products.filter(p => {
+      // options 배열 안에 save_trm이 selectedTerm과 일치하는 항목이 하나라도 있으면 통과
+      return p.options && p.options.some(opt => opt.save_trm == selectedTerm.value);
+    });
+  }
+
+  return products;
+});
 
 const goToDetail = (id) => {
   router.push({ name: 'deposit-detail', params: { id: id } });
@@ -97,49 +156,111 @@ const goToDetail = (id) => {
 </script>
 
 <style scoped>
-.main-content { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
-.page-title { color: #00a651; font-size: 28px; margin-bottom: 8px; }
-.page-subtitle { color: #666; margin-bottom: 30px; }
-
-.admin-section {
-  background: #fff9eb;
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 30px;
-  border: 1px solid #ffeeba;
-  text-align: center;
+.main-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
 }
-.update-btn {
-  background: #ffdda9;
-  color: #333;
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.page-subtitle {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 30px;
+}
+
+/* 탭 메뉴 */
+.tab-menu {
+  display: flex;
+  gap: 20px;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 25px;
+}
+
+.tab-btn {
+  background: none;
   border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: bold;
+  padding: 10px 4px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #aaa;
   cursor: pointer;
+  position: relative;
+}
+
+.tab-btn.active { color: #333; }
+.tab-btn.active::after {
+  content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 3px; background-color: #00a651;
+}
+
+/* 필터 섹션 */
+.filter-section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f9fbfb; /* 연한 배경 */
+  border-radius: 12px;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 10px;
+}
+
+.filter-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.term-select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+}
+
+.term-select:focus { border-color: #00a651; }
+
+.filter-chip {
+  background: white;
+  border: 1px solid #ddd;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-chip.active {
+  background-color: #e5faf0;
+  border-color: #00a651;
+  color: #00a651;
+  font-weight: 600;
+}
+
+.list-header {
+  display: flex;
+  justify-content: flex-end;
   margin-bottom: 10px;
 }
-.update-btn:hover { background: #473417; color: white; }
-.admin-tip { font-size: 13px; color: #654321; }
 
-.filter-section { margin-bottom: 25px; }
-.bank-select { padding: 10px; border-radius: 8px; border: 1px solid #ddd; width: 200px; }
+.count-text { font-size: 13px; color: #888; }
 
-.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-.product-card { 
-  background: white; border: 1px solid #eee; border-radius: 16px; padding: 25px;
-  cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+.loading-state, .empty-state {
+  text-align: center; padding: 60px 0; color: #888;
 }
-.product-card:hover { transform: translateY(-5px); border-color: #00a651; }
-
-.bank-name { font-size: 14px; color: #888; margin-bottom: 5px; }
-.product-name { font-size: 18px; margin-bottom: 15px; color: #333; }
-
-.rate-info { background: #f1fcf4; padding: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;}
-.rate-label { font-size: 14px; color: #00a651; font-weight: 600; }
-.rate-value { font-size: 20px; color: #00a651; font-weight: 700; }
-
-.tags { display: flex; gap: 8px; }
-.tag { background: #eee; font-size: 12px; padding: 4px 8px; border-radius: 4px; color: #666; }
-.no-data { text-align: center; padding: 50px; color: #999; }
 </style>
