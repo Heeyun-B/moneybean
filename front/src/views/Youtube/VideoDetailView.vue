@@ -1,13 +1,15 @@
 <template>
   <YoutubeNavBar />
+  
   <div class="detail-container">
     <button @click="goBack" class="btn-back">
-      &lt; 뒤로가기
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      뒤로가기
     </button>
     
     <div v-if="loading" class="loading">
       <div class="loading-spinner"></div>
-      잠시만 기다려주세요...
+      영상을 불러오는 중...
     </div>
     
     <div v-else-if="error" class="error">{{ error }}</div>
@@ -25,10 +27,10 @@
       
       <div class="video-info-section">
         <div class="info-header">
-            <h1 class="video-title">{{ videoInfo.title }}</h1>
-            <button @click="toggleSave" :class="['btn-save', { 'btn-cancel': isSaved }]">
-              {{ isSaved ? '♥ 저장됨' : '♡ 나중에 보기' }}
-            </button>
+          <h1 class="video-title">{{ videoInfo.title }}</h1>
+          <button @click="toggleSave" :class="['btn-save', { 'btn-cancel': isSaved }]">
+            {{ isSaved ? '♥ 저장됨' : '♡ 나중에 보기' }}
+          </button>
         </div>
         
         <div class="channel-info">
@@ -67,7 +69,7 @@ export default {
   setup() {
     const route = useRoute()
     const router = useRouter()
-    const videoId = ref('')
+    const videoId = ref(route.params.id)
     const videoInfo = ref({
       title: '',
       channelTitle: '',
@@ -80,6 +82,13 @@ export default {
     const savedVideos = ref([])
     const isDescriptionExpanded = ref(false)
 
+    const loadSavedVideos = () => {
+      const saved = localStorage.getItem('savedVideos')
+      if (saved) {
+        savedVideos.value = JSON.parse(saved)
+      }
+    }
+
     const isSaved = computed(() => {
       return savedVideos.value.some(v => v.id === videoId.value)
     })
@@ -90,15 +99,11 @@ export default {
       return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`
     })
 
-    const goBack = () => {
-      router.go(-1)
-    }
+    const goBack = () => router.go(-1)
 
     const fetchVideoDetails = async () => {
       try {
         loading.value = true
-        error.value = ''
-        
         const video = await getVideoDetails(videoId.value)
         
         if (video && video.snippet) {
@@ -106,44 +111,34 @@ export default {
             title: video.snippet.title,
             channelTitle: video.snippet.channelTitle,
             description: video.snippet.description,
-            thumbnail: video.snippet.thumbnails.medium.url,
+            thumbnail: video.snippet.thumbnails.medium?.url || '',
             publishedAt: video.snippet.publishedAt
           }
         } else {
           error.value = '비디오 정보를 찾을 수 없습니다.'
         }
       } catch (err) {
-        console.error('Error fetching video details:', err)
         error.value = '영상을 불러오는데 실패했습니다.'
       } finally {
         loading.value = false
       }
     }
 
-    const loadSavedVideos = () => {
-      const saved = localStorage.getItem('savedVideos')
-      if (saved) {
-        savedVideos.value = JSON.parse(saved)
-      }
-    }
-
     const toggleSave = () => {
-        if (isSaved.value) {
-            savedVideos.value = savedVideos.value.filter(v => v.id !== videoId.value)
-        } else {
-            const videoData = {
-              id: videoId.value,
-              title: videoInfo.value.title,
-              channelTitle: videoInfo.value.channelTitle,
-              thumbnail: videoInfo.value.thumbnail
-            }
-            savedVideos.value.push(videoData)
-        }
-        localStorage.setItem('savedVideos', JSON.stringify(savedVideos.value))
+      if (isSaved.value) {
+        savedVideos.value = savedVideos.value.filter(v => v.id !== videoId.value)
+      } else {
+        savedVideos.value.push({
+          id: videoId.value,
+          title: videoInfo.value.title,
+          channelTitle: videoInfo.value.channelTitle,
+          thumbnail: videoInfo.value.thumbnail
+        })
+      }
+      localStorage.setItem('savedVideos', JSON.stringify(savedVideos.value))
     }
 
     onMounted(() => {
-      videoId.value = route.params.id
       loadSavedVideos()
       fetchVideoDetails()
     })
@@ -167,19 +162,22 @@ export default {
 .detail-container {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 30px 20px;
 }
 
 .btn-back {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   background: none;
   border: none;
   font-size: 16px;
   color: #666;
   cursor: pointer;
   margin-bottom: 15px;
-  padding: 5px 10px;
+  padding: 8px 15px;
   border-radius: 20px;
-  transition: background 0.2s;
+  transition: all 0.2s;
 }
 
 .btn-back:hover {
