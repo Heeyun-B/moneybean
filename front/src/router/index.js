@@ -24,6 +24,9 @@ import DepositDetailView from '@/views/Deposit/DepositDetailView.vue'
 // 6. 지도 (Map)
 import MapView from '@/views/Map/MapView.vue'
 
+// 7. 현물 상품 (Exchange)
+import ExchangeView from '@/views/Gold/ExchangeView.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -113,6 +116,14 @@ const router = createRouter({
       name: 'map',
       component: MapView
     },
+
+    // 현물 관련
+    {
+      path: '/exchange',
+      name: 'exchange',
+      component: ExchangeView
+    },
+
     {
       path: '/saving-detail/:id',
       name: 'saving-detail',

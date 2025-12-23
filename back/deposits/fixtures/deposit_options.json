@@ -5,7 +5,7 @@
   "fields": {
     "product": "WR0001B",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 1,
     "intr_rate": 2.45,
     "intr_rate2": 2.45
@@ -17,7 +17,7 @@
   "fields": {
     "product": "WR0001B",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 2.5,
     "intr_rate2": 2.5
@@ -29,7 +29,7 @@
   "fields": {
     "product": "WR0001B",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.65,
     "intr_rate2": 2.65
@@ -41,7 +41,7 @@
   "fields": {
     "product": "WR0001B",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.65,
     "intr_rate2": 2.65
@@ -53,7 +53,7 @@
   "fields": {
     "product": "WR0001B",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 24,
     "intr_rate": 2.4,
     "intr_rate2": 2.4
@@ -65,7 +65,7 @@
   "fields": {
     "product": "WR0001B",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 36,
     "intr_rate": 2.4,
     "intr_rate2": 2.4
@@ -77,7 +77,7 @@
   "fields": {
     "product": "00320342",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 1,
     "intr_rate": 2.1,
     "intr_rate2": 2.3
@@ -89,7 +89,7 @@
   "fields": {
     "product": "00320342",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 2.5,
     "intr_rate2": 2.7
@@ -101,7 +101,7 @@
   "fields": {
     "product": "00320342",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.7,
     "intr_rate2": 2.9
@@ -113,7 +113,7 @@
   "fields": {
     "product": "00320342",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.7,
     "intr_rate2": 3.0
@@ -125,7 +125,7 @@
   "fields": {
     "product": "10511008000996000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 1.45,
     "intr_rate2": 2.1
@@ -137,7 +137,7 @@
   "fields": {
     "product": "10511008000996000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 1.99,
     "intr_rate2": 2.64
@@ -149,7 +149,7 @@
   "fields": {
     "product": "10511008000996000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 24,
     "intr_rate": 1.81,
     "intr_rate2": 2.46
@@ -161,7 +161,7 @@
   "fields": {
     "product": "10511008000996000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 36,
     "intr_rate": 1.83,
     "intr_rate2": 2.48
@@ -173,7 +173,7 @@
   "fields": {
     "product": "10511008001004000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 1.25,
     "intr_rate2": 1.7
@@ -185,7 +185,7 @@
   "fields": {
     "product": "10511008001004000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 1.65,
     "intr_rate2": 2.1
@@ -197,7 +197,7 @@
   "fields": {
     "product": "10511008001004000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.19,
     "intr_rate2": 2.64
@@ -209,7 +209,7 @@
   "fields": {
     "product": "10511008001004000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 24,
     "intr_rate": 2.01,
     "intr_rate2": 2.46
@@ -221,7 +221,7 @@
   "fields": {
     "product": "10511008001004000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 36,
     "intr_rate": 2.03,
     "intr_rate2": 2.48
@@ -233,7 +233,7 @@
   "fields": {
     "product": "10511008001166004",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.13,
     "intr_rate2": 2.58
@@ -245,7 +245,7 @@
   "fields": {
     "product": "10511008001278000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 1,
     "intr_rate": 1.38,
     "intr_rate2": 1.43
@@ -257,7 +257,7 @@
   "fields": {
     "product": "10511008001278000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 2.38,
     "intr_rate2": 2.43
@@ -269,7 +269,7 @@
   "fields": {
     "product": "10511008001278000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.28,
     "intr_rate2": 2.53
@@ -281,7 +281,7 @@
   "fields": {
     "product": "10511008001278000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.23,
     "intr_rate2": 2.48
@@ -293,7 +293,7 @@
   "fields": {
     "product": "10511008001278000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 24,
     "intr_rate": 1.86,
     "intr_rate2": 2.11
@@ -305,7 +305,7 @@
   "fields": {
     "product": "10511008001278000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 36,
     "intr_rate": 1.88,
     "intr_rate2": 2.13
@@ -317,7 +317,7 @@
   "fields": {
     "product": "01030500510002",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 1,
     "intr_rate": 1.5,
     "intr_rate2": 1.5
@@ -329,7 +329,7 @@
   "fields": {
     "product": "01030500510002",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 1.7,
     "intr_rate2": 2.4
@@ -341,7 +341,7 @@
   "fields": {
     "product": "01030500510002",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 1.8,
     "intr_rate2": 2.4
@@ -353,7 +353,7 @@
   "fields": {
     "product": "01030500510002",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 1.95,
     "intr_rate2": 2.4
@@ -365,7 +365,7 @@
   "fields": {
     "product": "01030500510002",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 24,
     "intr_rate": 1.6,
     "intr_rate2": 1.6
@@ -377,7 +377,7 @@
   "fields": {
     "product": "01030500510002",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 36,
     "intr_rate": 1.6,
     "intr_rate2": 1.6
@@ -389,7 +389,7 @@
   "fields": {
     "product": "01030500560002",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 1,
     "intr_rate": 1.4,
     "intr_rate2": 2.1
@@ -401,7 +401,7 @@
   "fields": {
     "product": "01030500560002",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 1.65,
     "intr_rate2": 2.35
@@ -413,7 +413,7 @@
   "fields": {
     "product": "01030500560002",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 1.8,
     "intr_rate2": 2.5
@@ -425,7 +425,7 @@
   "fields": {
     "product": "01030500560002",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 1.9,
     "intr_rate2": 2.6
@@ -437,7 +437,7 @@
   "fields": {
     "product": "01030500560002",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 24,
     "intr_rate": 1.55,
     "intr_rate2": 2.25
@@ -449,7 +449,7 @@
   "fields": {
     "product": "01030500560002",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 36,
     "intr_rate": 1.25,
     "intr_rate2": 1.95
@@ -461,7 +461,7 @@
   "fields": {
     "product": "01030500600002",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.2,
     "intr_rate2": 2.4
@@ -473,7 +473,7 @@
   "fields": {
     "product": "01030500600002",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.35,
     "intr_rate2": 2.55
@@ -485,7 +485,7 @@
   "fields": {
     "product": "TD11300027000",
     "intr_rate_type": "M",
-    "intr_rate_type_nm": "º¹¸®",
+    "intr_rate_type_nm": "ï¿½ï¿½ï¿½ï¿½",
     "save_trm": 12,
     "intr_rate": 2.47,
     "intr_rate2": 2.67
@@ -497,7 +497,7 @@
   "fields": {
     "product": "TD11300027000",
     "intr_rate_type": "M",
-    "intr_rate_type_nm": "º¹¸®",
+    "intr_rate_type_nm": "ï¿½ï¿½ï¿½ï¿½",
     "save_trm": 24,
     "intr_rate": 2.6,
     "intr_rate2": 2.8
@@ -509,7 +509,7 @@
   "fields": {
     "product": "TD11300027000",
     "intr_rate_type": "M",
-    "intr_rate_type_nm": "º¹¸®",
+    "intr_rate_type_nm": "ï¿½ï¿½ï¿½ï¿½",
     "save_trm": 36,
     "intr_rate": 2.56,
     "intr_rate2": 2.76
@@ -521,7 +521,7 @@
   "fields": {
     "product": "TD11300031000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 1,
     "intr_rate": 2.06,
     "intr_rate2": 2.16
@@ -533,7 +533,7 @@
   "fields": {
     "product": "TD11300031000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 2.2,
     "intr_rate2": 2.3
@@ -545,7 +545,7 @@
   "fields": {
     "product": "TD11300031000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.29,
     "intr_rate2": 2.39
@@ -557,7 +557,7 @@
   "fields": {
     "product": "TD11300031000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.37,
     "intr_rate2": 2.57
@@ -569,7 +569,7 @@
   "fields": {
     "product": "TD11300031000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 24,
     "intr_rate": 2.5,
     "intr_rate2": 2.7
@@ -581,7 +581,7 @@
   "fields": {
     "product": "TD11300031000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 36,
     "intr_rate": 2.46,
     "intr_rate2": 2.66
@@ -593,7 +593,7 @@
   "fields": {
     "product": "TD11300035000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.27,
     "intr_rate2": 2.77
@@ -605,7 +605,7 @@
   "fields": {
     "product": "TD11300036000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 2.45,
     "intr_rate2": 2.45
@@ -617,7 +617,7 @@
   "fields": {
     "product": "TD11300036000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.63,
     "intr_rate2": 2.63
@@ -629,7 +629,7 @@
   "fields": {
     "product": "TD11300036000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.6,
     "intr_rate2": 2.6
@@ -641,7 +641,7 @@
   "fields": {
     "product": "101272000006",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 1,
     "intr_rate": 2.0,
     "intr_rate2": 2.1
@@ -653,7 +653,7 @@
   "fields": {
     "product": "101272000006",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 2.1,
     "intr_rate2": 2.2
@@ -665,7 +665,7 @@
   "fields": {
     "product": "101272000006",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.25,
     "intr_rate2": 2.35
@@ -677,7 +677,7 @@
   "fields": {
     "product": "101272000006",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.3,
     "intr_rate2": 2.4
@@ -689,7 +689,7 @@
   "fields": {
     "product": "101272000006",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 24,
     "intr_rate": 2.2,
     "intr_rate2": 2.3
@@ -701,7 +701,7 @@
   "fields": {
     "product": "101272000006",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 36,
     "intr_rate": 2.2,
     "intr_rate2": 2.3
@@ -713,7 +713,7 @@
   "fields": {
     "product": "101272000057",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 1,
     "intr_rate": 1.4,
     "intr_rate2": 2.4
@@ -725,7 +725,7 @@
   "fields": {
     "product": "101272000057",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 1.7,
     "intr_rate2": 2.45
@@ -737,7 +737,7 @@
   "fields": {
     "product": "101272000057",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 1.9,
     "intr_rate2": 2.6
@@ -749,7 +749,7 @@
   "fields": {
     "product": "101272000057",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.0,
     "intr_rate2": 2.65
@@ -761,7 +761,7 @@
   "fields": {
     "product": "101272000057",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 24,
     "intr_rate": 1.85,
     "intr_rate2": 2.4
@@ -773,7 +773,7 @@
   "fields": {
     "product": "101272000057",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 36,
     "intr_rate": 1.85,
     "intr_rate2": 2.4
@@ -785,7 +785,7 @@
   "fields": {
     "product": "101272000058",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 1.7,
     "intr_rate2": 2.35
@@ -797,7 +797,7 @@
   "fields": {
     "product": "101272000058",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 1.8,
     "intr_rate2": 2.5
@@ -809,7 +809,7 @@
   "fields": {
     "product": "101272000058",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 1.9,
     "intr_rate2": 2.55
@@ -821,7 +821,7 @@
   "fields": {
     "product": "10-01-20-024-0046-0000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 2.5,
     "intr_rate2": 2.5
@@ -833,7 +833,7 @@
   "fields": {
     "product": "10-01-20-024-0046-0000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.55,
     "intr_rate2": 2.55
@@ -845,7 +845,7 @@
   "fields": {
     "product": "10-01-20-024-0046-0000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.7,
     "intr_rate2": 2.7
@@ -857,7 +857,7 @@
   "fields": {
     "product": "10-01-20-024-0059-0000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.45,
     "intr_rate2": 2.85
@@ -869,7 +869,7 @@
   "fields": {
     "product": "10-01-20-024-0063-0000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 1,
     "intr_rate": 1.9,
     "intr_rate2": 2.0
@@ -881,7 +881,7 @@
   "fields": {
     "product": "10-01-20-024-0063-0000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 2.45,
     "intr_rate2": 2.55
@@ -893,7 +893,7 @@
   "fields": {
     "product": "10-01-20-024-0063-0000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.35,
     "intr_rate2": 2.8
@@ -905,7 +905,7 @@
   "fields": {
     "product": "10-01-20-024-0063-0000",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.35,
     "intr_rate2": 2.45
@@ -917,7 +917,7 @@
   "fields": {
     "product": "21001115",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 2.0,
     "intr_rate2": 2.5
@@ -929,7 +929,7 @@
   "fields": {
     "product": "21001115",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.05,
     "intr_rate2": 2.55
@@ -941,7 +941,7 @@
   "fields": {
     "product": "21001115",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.05,
     "intr_rate2": 2.55
@@ -953,7 +953,7 @@
   "fields": {
     "product": "21001115",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 24,
     "intr_rate": 2.05,
     "intr_rate2": 2.55
@@ -965,7 +965,7 @@
   "fields": {
     "product": "21001280",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 2.05,
     "intr_rate2": 2.6
@@ -977,7 +977,7 @@
   "fields": {
     "product": "21001280",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.05,
     "intr_rate2": 2.6
@@ -989,7 +989,7 @@
   "fields": {
     "product": "21001280",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.0,
     "intr_rate2": 2.6
@@ -1001,7 +1001,7 @@
   "fields": {
     "product": "21001285",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.2,
     "intr_rate2": 2.6
@@ -1013,7 +1013,7 @@
   "fields": {
     "product": "21001285",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.25,
     "intr_rate2": 2.65
@@ -1025,7 +1025,7 @@
   "fields": {
     "product": "21001285",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 24,
     "intr_rate": 2.15,
     "intr_rate2": 2.55
@@ -1037,7 +1037,7 @@
   "fields": {
     "product": "01211310121",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.25,
     "intr_rate2": 2.45
@@ -1049,7 +1049,7 @@
   "fields": {
     "product": "01211310121",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 24,
     "intr_rate": 2.1,
     "intr_rate2": 2.3
@@ -1061,7 +1061,7 @@
   "fields": {
     "product": "01211310121",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 36,
     "intr_rate": 2.05,
     "intr_rate2": 2.25
@@ -1073,7 +1073,7 @@
   "fields": {
     "product": "01211310130",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.46,
     "intr_rate2": 2.46
@@ -1085,7 +1085,7 @@
   "fields": {
     "product": "01211310130",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.48,
     "intr_rate2": 2.48
@@ -1097,7 +1097,7 @@
   "fields": {
     "product": "01211310130",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 24,
     "intr_rate": 2.6,
     "intr_rate2": 2.6
@@ -1109,7 +1109,7 @@
   "fields": {
     "product": "01211310130",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 36,
     "intr_rate": 2.68,
     "intr_rate2": 2.68
@@ -1121,7 +1121,7 @@
   "fields": {
     "product": "01211310142",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 1,
     "intr_rate": 2.22,
     "intr_rate2": 2.22
@@ -1133,7 +1133,7 @@
   "fields": {
     "product": "01211310142",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 2.37,
     "intr_rate2": 2.37
@@ -1145,7 +1145,7 @@
   "fields": {
     "product": "01211310142",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.49,
     "intr_rate2": 2.49
@@ -1157,7 +1157,7 @@
   "fields": {
     "product": "01211310142",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.49,
     "intr_rate2": 2.49
@@ -1169,7 +1169,7 @@
   "fields": {
     "product": "06492",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 1,
     "intr_rate": 2.45,
     "intr_rate2": 2.45
@@ -1181,7 +1181,7 @@
   "fields": {
     "product": "06492",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 2.5,
     "intr_rate2": 2.5
@@ -1193,7 +1193,7 @@
   "fields": {
     "product": "06492",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.55,
     "intr_rate2": 2.55
@@ -1205,7 +1205,7 @@
   "fields": {
     "product": "06492",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.6,
     "intr_rate2": 2.6
@@ -1217,7 +1217,7 @@
   "fields": {
     "product": "06492",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 24,
     "intr_rate": 2.4,
     "intr_rate2": 2.4
@@ -1229,7 +1229,7 @@
   "fields": {
     "product": "06492",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 36,
     "intr_rate": 2.4,
     "intr_rate2": 2.4
@@ -1241,7 +1241,7 @@
   "fields": {
     "product": "010300100335",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 1,
     "intr_rate": 1.8,
     "intr_rate2": 2.45
@@ -1253,7 +1253,7 @@
   "fields": {
     "product": "010300100335",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 2.0,
     "intr_rate2": 2.5
@@ -1265,7 +1265,7 @@
   "fields": {
     "product": "010300100335",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.1,
     "intr_rate2": 2.6
@@ -1277,7 +1277,7 @@
   "fields": {
     "product": "010300100335",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.15,
     "intr_rate2": 2.65
@@ -1289,7 +1289,7 @@
   "fields": {
     "product": "010300100335",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 24,
     "intr_rate": 2.2,
     "intr_rate2": 2.4
@@ -1301,7 +1301,7 @@
   "fields": {
     "product": "010300100335",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 36,
     "intr_rate": 2.2,
     "intr_rate2": 2.4
@@ -1313,7 +1313,7 @@
   "fields": {
     "product": "200-0135-12",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 1,
     "intr_rate": 1.8,
     "intr_rate2": 2.4
@@ -1325,7 +1325,7 @@
   "fields": {
     "product": "200-0135-12",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 2.0,
     "intr_rate2": 2.45
@@ -1337,7 +1337,7 @@
   "fields": {
     "product": "200-0135-12",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.0,
     "intr_rate2": 2.6
@@ -1349,7 +1349,7 @@
   "fields": {
     "product": "200-0135-12",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.05,
     "intr_rate2": 2.65
@@ -1361,7 +1361,7 @@
   "fields": {
     "product": "200-0135-12",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 24,
     "intr_rate": 2.1,
     "intr_rate2": 2.4
@@ -1373,7 +1373,7 @@
   "fields": {
     "product": "200-0135-12",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 36,
     "intr_rate": 2.1,
     "intr_rate2": 2.4
@@ -1385,7 +1385,7 @@
   "fields": {
     "product": "10-003-1225-0001",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 1,
     "intr_rate": 2.3,
     "intr_rate2": 2.4
@@ -1397,7 +1397,7 @@
   "fields": {
     "product": "10-003-1225-0001",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 2.45,
     "intr_rate2": 2.55
@@ -1409,7 +1409,7 @@
   "fields": {
     "product": "10-003-1225-0001",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.55,
     "intr_rate2": 2.65
@@ -1421,7 +1421,7 @@
   "fields": {
     "product": "10-003-1225-0001",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.55,
     "intr_rate2": 2.65
@@ -1433,7 +1433,7 @@
   "fields": {
     "product": "10-003-1381-0001",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.15,
     "intr_rate2": 2.55
@@ -1445,7 +1445,7 @@
   "fields": {
     "product": "10-003-1381-0001",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 24,
     "intr_rate": 2.1,
     "intr_rate2": 2.5
@@ -1457,7 +1457,7 @@
   "fields": {
     "product": "10-003-1381-0001",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 36,
     "intr_rate": 2.05,
     "intr_rate2": 2.45
@@ -1469,7 +1469,7 @@
   "fields": {
     "product": "10-003-1384-0001",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 1,
     "intr_rate": 2.35,
     "intr_rate2": 2.35
@@ -1481,7 +1481,7 @@
   "fields": {
     "product": "10-003-1384-0001",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 2.55,
     "intr_rate2": 2.55
@@ -1493,7 +1493,7 @@
   "fields": {
     "product": "10-003-1384-0001",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.65,
     "intr_rate2": 2.65
@@ -1505,7 +1505,7 @@
   "fields": {
     "product": "10-003-1384-0001",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.65,
     "intr_rate2": 2.65
@@ -1517,7 +1517,7 @@
   "fields": {
     "product": "10-003-1384-0001",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 24,
     "intr_rate": 2.4,
     "intr_rate2": 2.4
@@ -1529,7 +1529,7 @@
   "fields": {
     "product": "10-003-1384-0001",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 36,
     "intr_rate": 2.4,
     "intr_rate2": 2.4
@@ -1541,7 +1541,7 @@
   "fields": {
     "product": "10-003-1387-0001",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.15,
     "intr_rate2": 2.6
@@ -1553,7 +1553,7 @@
   "fields": {
     "product": "4",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 1,
     "intr_rate": 1.8,
     "intr_rate2": 2.45
@@ -1565,7 +1565,7 @@
   "fields": {
     "product": "4",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 1.9,
     "intr_rate2": 2.5
@@ -1577,7 +1577,7 @@
   "fields": {
     "product": "4",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.0,
     "intr_rate2": 2.65
@@ -1589,7 +1589,7 @@
   "fields": {
     "product": "4",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.05,
     "intr_rate2": 2.65
@@ -1601,7 +1601,7 @@
   "fields": {
     "product": "4",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 24,
     "intr_rate": 2.05,
     "intr_rate2": 2.4
@@ -1613,7 +1613,7 @@
   "fields": {
     "product": "4",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 36,
     "intr_rate": 2.05,
     "intr_rate2": 2.4
@@ -1625,7 +1625,7 @@
   "fields": {
     "product": "01013000110000000001",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 1,
     "intr_rate": 2.5,
     "intr_rate2": 2.5
@@ -1637,7 +1637,7 @@
   "fields": {
     "product": "01013000110000000001",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 2.65,
     "intr_rate2": 2.65
@@ -1649,7 +1649,7 @@
   "fields": {
     "product": "01013000110000000001",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.75,
     "intr_rate2": 2.75
@@ -1661,7 +1661,7 @@
   "fields": {
     "product": "01013000110000000001",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.75,
     "intr_rate2": 2.75
@@ -1673,7 +1673,7 @@
   "fields": {
     "product": "01013000110000000001",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 24,
     "intr_rate": 2.45,
     "intr_rate2": 2.45
@@ -1685,7 +1685,7 @@
   "fields": {
     "product": "01013000110000000001",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 36,
     "intr_rate": 2.45,
     "intr_rate2": 2.45
@@ -1697,7 +1697,7 @@
   "fields": {
     "product": "10120114300011",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.4,
     "intr_rate2": 2.75
@@ -1709,7 +1709,7 @@
   "fields": {
     "product": "10120114300011",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.4,
     "intr_rate2": 2.75
@@ -1721,7 +1721,7 @@
   "fields": {
     "product": "10120114700011",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 2.65,
     "intr_rate2": 2.65
@@ -1733,7 +1733,7 @@
   "fields": {
     "product": "10120114700011",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.7,
     "intr_rate2": 2.7
@@ -1745,7 +1745,7 @@
   "fields": {
     "product": "10120114700011",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.7,
     "intr_rate2": 2.7
@@ -1757,7 +1757,7 @@
   "fields": {
     "product": "10120116100011",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 1.75,
     "intr_rate2": 2.8
@@ -1769,7 +1769,7 @@
   "fields": {
     "product": "10-01-20-388-0002",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 1,
     "intr_rate": 2.45,
     "intr_rate2": 2.45
@@ -1781,7 +1781,7 @@
   "fields": {
     "product": "10-01-20-388-0002",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 2.6,
     "intr_rate2": 2.6
@@ -1793,7 +1793,7 @@
   "fields": {
     "product": "10-01-20-388-0002",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.7,
     "intr_rate2": 2.7
@@ -1805,7 +1805,7 @@
   "fields": {
     "product": "10-01-20-388-0002",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 12,
     "intr_rate": 2.7,
     "intr_rate2": 2.7
@@ -1817,7 +1817,7 @@
   "fields": {
     "product": "10-01-20-388-0002",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 24,
     "intr_rate": 2.4,
     "intr_rate2": 2.4
@@ -1829,7 +1829,7 @@
   "fields": {
     "product": "10-01-20-388-0002",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 36,
     "intr_rate": 2.4,
     "intr_rate2": 2.4
@@ -1841,7 +1841,7 @@
   "fields": {
     "product": "1001202000002",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 3,
     "intr_rate": 2.4,
     "intr_rate2": 2.4
@@ -1853,7 +1853,7 @@
   "fields": {
     "product": "1001202000002",
     "intr_rate_type": "S",
-    "intr_rate_type_nm": "´Ü¸®",
+    "intr_rate_type_nm": "ï¿½Ü¸ï¿½",
     "save_trm": 6,
     "intr_rate": 2.4,
     "intr_rate2": 2.4
