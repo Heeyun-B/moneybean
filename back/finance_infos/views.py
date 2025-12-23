@@ -1,12 +1,13 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from .models import ArticleInfo, CommentInfo
 from .serializers import ArticleInfoSerializer, ArticleInfoListSerializer, CommentInfoSeriallizer
+from .permissions import IsAdminOrReadOnly
 
 @api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticatedOrReadOnly])
+@permission_classes([IsAdminOrReadOnly])
 def info_list(request):
     if request.method == 'GET':
         articles = ArticleInfo.objects.all().order_by('-created_at')
@@ -21,18 +22,23 @@ def info_list(request):
 
     
 @api_view(['GET', 'DELETE', 'PUT'])
-@permission_classes([IsAuthenticatedOrReadOnly])
-def info_detail(request, article_pk):
+@permission_classes([IsAdminOrReadOnly])
+def info_detail(request, info_pk):
     try:
-        article = ArticleInfo.objects.get(pk=article_pk)
+        article = ArticleInfo.objects.get(pk=info_pk)
     except ArticleInfo.DoesNotExist:
         return Response({'error': '게시글을 찾을 수 없습니다.'}, 
                        status=status.HTTP_404_NOT_FOUND)
     
     if request.method == 'GET':
-        serializer = ArticleInfoSerializer(article)
+        serializer = ArticleInfoSerializer(article, context={'request': request})
         return Response(serializer.data)
     
+    if request.method in ['DELETE', 'PUT']:
+        if not request.user.is_staff:
+            return Response({'error': '권한이 없습니다.'}, 
+                           status=status.HTTP_403_FORBIDDEN)
+        
     if request.user != article.user:
         return Response({'error': '권한이 없습니다.'}, 
                        status=status.HTTP_403_FORBIDDEN)
@@ -51,9 +57,9 @@ def info_detail(request, article_pk):
             
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def comment_create(request, article_pk):
+def comment_create(request, info_pk):
     try:
-        article = ArticleInfo.objects.get(pk=article_pk)
+        article = ArticleInfo.objects.get(pk=info_pk)
     except ArticleInfo.DoesNotExist:
         return Response({'error': '게시글을 찾을 수 없습니다.'}, 
                        status=status.HTTP_404_NOT_FOUND)
@@ -62,3 +68,22 @@ def comment_create(request, article_pk):
     if serializer.is_valid(raise_exception=True):
         serializer.save(article=article, user=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def like_article(request, info_pk):
+    try:
+        article = ArticleInfo.objects.get(pk=info_pk)
+    except ArticleInfo.DoesNotExist:
+        return Response({'error': '게시글을 찾을 수 없습니다.'}, 
+                       status=status.HTTP_404_NOT_FOUND)
+    
+    # 이미 좋아요를 눌렀으면 취소, 안 눌렀으면 추가
+    if article.like_users.filter(pk=request.user.pk).exists():
+        article.like_users.remove(request.user)
+        return Response({'message': '좋아요가 취소되었습니다.', 'is_liked': False}, 
+                       status=status.HTTP_200_OK)
+    else:
+        article.like_users.add(request.user)
+        return Response({'message': '좋아요를 눌렀습니다.', 'is_liked': True}, 
+                       status=status.HTTP_200_OK)
