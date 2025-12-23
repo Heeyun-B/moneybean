@@ -182,10 +182,25 @@ const handleAiDiagnosis = async () => {
   isAiLoading.value = true
   aiReport.value = ''
 
+  // 백엔드 AI가 분석하기 좋게 가공된 데이터 꾸러미(Payload)
+  const payload = {
+    totalAssets: store.totalAssets,
+    totalCash: store.totalCash,
+    totalInvest: store.totalInvest,
+    totalDebt: store.totalDebt,
+    netWorth: store.netWorth,
+    income: store.financialInfo.income,
+    expense: store.financialInfo.expense,
+    // Vue에서 computed로 만든 계층 구조 데이터를 그대로 보냅니다.
+    sections: assetSections.value 
+  }
+
   try {
-    const result = await store.getAiDiagnosis()
+    // 스토어 함수 호출 시 위에서 만든 payload를 전달
+    const result = await store.getAiDiagnosis(payload)
     aiReport.value = result
   } catch (error) {
+    console.error(error)
     alert('AI 서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.')
   } finally {
     isAiLoading.value = false
