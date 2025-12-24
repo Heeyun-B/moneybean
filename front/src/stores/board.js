@@ -17,8 +17,25 @@ export const useBoardStore = defineStore('board', () => {
   // 댓글 목록
   const comments = ref({})
 
-  // 좋아요한 게시글 목록 (postId 배열)
-  const likedPosts = ref(JSON.parse(localStorage.getItem('likedPosts') || '[]'))
+  // 좋아요한 게시글 목록 (boardType-postId 형태의 문자열 배열)
+  // 예: ['free-1', 'news-2', 'info-3']
+  const migrateLikedPosts = () => {
+    const stored = localStorage.getItem('likedPosts')
+    if (!stored) return []
+
+    try {
+      const parsed = JSON.parse(stored)
+      // 이미 마이그레이션된 경우 (문자열 배열)
+      if (parsed.length > 0 && typeof parsed[0] === 'string' && parsed[0].includes('-')) {
+        return parsed
+      }
+      // 마이그레이션이 필요한 경우 (숫자 배열) - 모두 삭제하고 새로 시작
+      return []
+    } catch {
+      return []
+    }
+  }
+  const likedPosts = ref(migrateLikedPosts())
 
   // Getter: 게시판 타입에 따른 게시글 목록 반환
   const getPosts = (boardType) => {
@@ -46,8 +63,9 @@ export const useBoardStore = defineStore('board', () => {
   }
 
   // Getter: 게시글 좋아요 여부
-  const isLiked = (postId) => {
-    return likedPosts.value.includes(postId)
+  const isLiked = (boardType, postId) => {
+    const key = `${boardType}-${postId}`
+    return likedPosts.value.includes(key)
   }
 
   // Getter: 좋아요한 게시글 목록
@@ -57,7 +75,10 @@ export const useBoardStore = defineStore('board', () => {
     const infoPostsWithType = infoPosts.value.map(post => ({ ...post, boardType: 'info' }))
 
     const allPosts = [...freePostsWithType, ...newsPostsWithType, ...infoPostsWithType]
-    return allPosts.filter(post => likedPosts.value.includes(post.id))
+    return allPosts.filter(post => {
+      const key = `${post.boardType}-${post.id}`
+      return likedPosts.value.includes(key)
+    })
   }
 
   // Actions
@@ -92,8 +113,9 @@ export const useBoardStore = defineStore('board', () => {
             const newsPosts_data = newsData.map(article => {
               const content = article.content || ''
               const pressDisplayName = getPressDisplayName(article.press)
-              // 로컬에서 좋아요 개수 계산
-              const likeCount = likedPosts.value.includes(article.id) ? 1 : 0
+              // 로컬에서 좋아요 개수 계산 (boardType-postId로 확인)
+              const key = `news-${article.id}`
+              const likeCount = likedPosts.value.includes(key) ? 1 : 0
               return {
                 id: article.id,
                 title: article.title || '제목 없음',
@@ -231,8 +253,9 @@ export const useBoardStore = defineStore('board', () => {
           // 뉴스 상세 조회
           const newsDetail = await getNewsDetail(postId)
           const pressDisplayName = getPressDisplayName(newsDetail.press)
-          // 로컬에서 좋아요 상태 확인
-          const isNewsLiked = likedPosts.value.includes(parseInt(postId))
+          // 로컬에서 좋아요 상태 확인 (boardType-postId로 확인)
+          const newsKey = `news-${postId}`
+          const isNewsLiked = likedPosts.value.includes(newsKey)
           const newsLikeCount = isNewsLiked ? 1 : 0
           post = {
             id: newsDetail.id,
@@ -506,14 +529,16 @@ export const useBoardStore = defineStore('board', () => {
   // 9. 좋아요 토글
   const toggleLike = async (boardType, postId) => {
     try {
+      const key = `${boardType}-${postId}`
+
       // 뉴스의 경우 로컬에서만 좋아요 상태 관리
       if (boardType === 'news') {
-        const isCurrentlyLiked = likedPosts.value.includes(postId)
+        const isCurrentlyLiked = likedPosts.value.includes(key)
         if (isCurrentlyLiked) {
-          likedPosts.value = likedPosts.value.filter(id => id !== postId)
+          likedPosts.value = likedPosts.value.filter(k => k !== key)
         } else {
-          if (!likedPosts.value.includes(postId)) {
-            likedPosts.value.push(postId)
+          if (!likedPosts.value.includes(key)) {
+            likedPosts.value.push(key)
           }
         }
         localStorage.setItem('likedPosts', JSON.stringify(likedPosts.value))
@@ -548,11 +573,11 @@ export const useBoardStore = defineStore('board', () => {
 
       const isNowLiked = response.data.is_liked
       if (isNowLiked) {
-        if (!likedPosts.value.includes(postId)) {
-          likedPosts.value.push(postId)
+        if (!likedPosts.value.includes(key)) {
+          likedPosts.value.push(key)
         }
       } else {
-        likedPosts.value = likedPosts.value.filter(id => id !== postId)
+        likedPosts.value = likedPosts.value.filter(k => k !== key)
       }
 
       localStorage.setItem('likedPosts', JSON.stringify(likedPosts.value))
