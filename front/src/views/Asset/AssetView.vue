@@ -11,6 +11,8 @@
       <button @click="goToCreatePage" class="primary-btn">내 자산 입력하러 가기</button>
     </div>
 
+    
+
     <div v-else-if="isLoading" class="skeleton-dashboard">
       <div class="summary-row">
         <SkeletonLoader height="120px" radius="16px" />
@@ -29,7 +31,17 @@
     </div>
 
     <div v-else class="dashboard">
-      
+      <div class="level-status-card">
+        <div class="character-box">
+          <img :src="getImageUrl(currentLevel.img)" :alt="currentLevel.name" class="level-img">
+        </div>
+        <div class="level-info">
+          <p class="level-msg">
+            현재 <strong>{{ currentLevel.name }}</strong> 단계입니다. <br>
+            자산을 모아 다음 단계로 성장시켜 보세요!</p>
+        </div>
+      </div>
+
       <div class="summary-row">
         <div class="summary-card net-worth-card">
           <h3>순자산 (자산 - 부채)</h3>
@@ -52,7 +64,11 @@
           <h3>자산 포트폴리오</h3>
           <div class="doughnut-wrapper">
             <div class="center-logo">
-              <span class="floating-emoji">🌱</span>
+              <img 
+                :src="getImageUrl(currentLevel.img)" 
+                :alt="currentLevel.name" 
+                class="floating-level-img"
+              >
             </div>
             <Doughnut v-if="doughnutData" :data="doughnutData" :options="doughnutOptions" />
           </div>
@@ -133,8 +149,8 @@
 <script setup>
 import { onMounted, computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAssetStore } from '@/stores/asset' // [수정] 파일명 변경 반영
-import SkeletonLoader from '@/components/common/SkeletonLoader.vue' // [추가] 스켈레톤 컴포넌트
+import { useAssetStore } from '@/stores/asset'
+import SkeletonLoader from '@/components/common/SkeletonLoader.vue'
 
 // 차트 라이브러리 설정
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
@@ -146,6 +162,20 @@ ChartJS.register(ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearS
 const store = useAssetStore()
 const router = useRouter()
 const md = new MarkdownIt()
+
+const getLevelInfo = (balance) => {
+  if (balance >= 100000000) return { name: "돈 나무", img: "level_money_tree.png" };
+  if (balance >= 80000000) return { name: "나무", img: "level_tree.png" };
+  if (balance >= 50000000) return { name: "가지", img: "level_branch.png" };
+  if (balance >= 10000000) return { name: "새싹", img: "level_sprout.png" };
+  return { name: "콩", img: "level_bean.png" };
+};
+
+const currentLevel = computed(() => getLevelInfo(store.netWorth));
+
+const getImageUrl = (name) => {
+  return new URL(`../../assets/level_logos/${name}`, import.meta.url).href;
+};
 
 // UI 상태 관리
 const isLoading = ref(true)     // 초기 데이터 로딩 상태
@@ -187,7 +217,7 @@ const handleAiDiagnosis = async () => {
   isAiLoading.value = true
   aiReport.value = ''
 
-  // 백엔드 AI가 분석하기 좋게 가공된 데이터 꾸러미(Payload)
+  // 백엔드 AI가 분석하기 좋게 가공된 데이터 꾸러미
   const payload = {
     totalAssets: store.totalAssets,
     totalCash: store.totalCash,
@@ -196,7 +226,7 @@ const handleAiDiagnosis = async () => {
     netWorth: store.netWorth,
     income: store.financialInfo.income,
     expense: store.financialInfo.expense,
-    // Vue에서 computed로 만든 계층 구조 데이터를 그대로 보냅니다.
+    // Vue에서 computed로 만든 계층 구조 데이터 보내기
     sections: assetSections.value 
   }
 
@@ -215,13 +245,13 @@ const handleAiDiagnosis = async () => {
 const scrollToSection = (key) => {
   const element = document.getElementById(`section-${key}`)
   if (element) {
-    const yOffset = -80 // 네비바 높이 고려
+    const yOffset = -80
     const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset
     window.scrollTo({ top: y, behavior: 'smooth' })
   }
 }
 
-// --- 차트 및 리스트 데이터 가공 로직 (기존 유지) ---
+// --- 차트 및 리스트 데이터
 const groupAssets = (assets) => {
   if (!assets || assets.length === 0) return []
   const groups = {}
@@ -304,7 +334,7 @@ const doughnutOptions = {
           // 자산 목록을 금액 순으로 정렬해서 상위 5개만 보여주거나 전체 보여주기
           const sortedList = [...targetAssets].sort((a, b) => b.current_value - a.current_value)
           
-          const lines = ['----------------'] // 구분선
+          const lines = ['----------------']
           
           sortedList.forEach(asset => {
              lines.push(`• ${asset.name}: ${Number(asset.current_value).toLocaleString()}원`)
@@ -341,14 +371,62 @@ const barOptions = {
 </script>
 
 <style scoped>
+/* --- 기본 레이아웃 및 폰트 --- */
 .asset-container { max-width: 900px; margin: 0 auto; padding: 40px 20px; color: #333; }
 h1 { text-align: center; margin-bottom: 40px; font-size: 26px; font-weight: 800; }
 
-/* 스켈레톤 레이아웃 */
+/* --- 스켈레톤 레이아웃 --- */
 .skeleton-dashboard { animation: fadeIn 0.5s ease; }
 .skeleton-card { background: #fff; padding: 20px; border-radius: 16px; border: 1px solid #f0f0f0; }
 
-/* Summary Cards */
+/* --- [추가/수정] 레벨 상태 카드 (중앙 정렬 버전) --- */
+.level-status-card { 
+  background: white; 
+  border-radius: 16px; 
+  padding: 30px 25px; 
+  margin-bottom: 25px;
+  display: flex; 
+  flex-direction: column; /* 중앙 정렬을 위해 컬럼 방향 */
+  align-items: center; 
+  justify-content: center; 
+  gap: 15px; 
+  border: 1px solid #f0f0f0; 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03); 
+}
+
+.character-box { 
+  width: 100px; height: 100px;
+  background: #f9f9f9; 
+  border-radius: 50%; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  flex-shrink: 0; 
+  border: 2px solid #e8f5e9; 
+  overflow: hidden; 
+  box-shadow: 0 0 15px rgba(0, 166, 81, 0.2);
+  animation: pulse-green 2s infinite; 
+}
+
+.level-img { width: 70px; height: 70px; object-fit: contain; }
+
+.level-info { 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; /* 텍스트 중앙 정렬 */
+  gap: 8px; 
+}
+
+.level-msg { 
+  font-size: 16px;
+  color: #555; 
+  margin: 0; 
+  text-align: center; 
+  line-height: 1.6;
+}
+.level-msg strong { color: #00a651; font-weight: 800; }
+
+/* --- Summary Cards --- */
 .summary-row { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 20px; margin-bottom: 40px; }
 .summary-card {
   background: white; padding: 25px; border-radius: 16px;
@@ -371,47 +449,33 @@ h1 { text-align: center; margin-bottom: 40px; font-size: 26px; font-weight: 800;
 .amount.asset-color { color: #00a651; }
 .amount.debt-color { color: #FF7043; }
 
-/* Charts */
+/* --- Charts & 도넛 캐릭터 확대 --- */
 .chart-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
 .chart-card {
   background: white; padding: 25px; border-radius: 16px;
   border: 1px solid #f0f0f0; box-shadow: 0 4px 15px rgba(0,0,0,0.03); text-align: center;
 }
-.doughnut-wrapper { 
-  position: relative; 
-  height: 300px; /* 차트 높이를 조금 더 넉넉하게 줌 */
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+.doughnut-wrapper { position: relative; height: 320px; width: 100%; display: flex; justify-content: center; align-items: center; }
 .bar-wrapper { position: relative; height: 240px; }
+
 .center-logo {
   position: absolute; 
-  top: 45%; /* 범례가 아래로 내려갔으므로 중앙점을 살짝 위로 조정 */
+  top: 45%; 
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 60px; height: 60px; 
+  width: 140px; height: 140px;
   display: flex; align-items: center; justify-content: center; 
-  
-  /* [중요] 마우스 이벤트를 통과시켜서 뒤에 있는 차트(툴팁)가 반응하게 함 */
   pointer-events: none; 
-  z-index: 0; /* 차트보다 뒤로 보낼 필요는 없지만, 툴팁 간섭 최소화 */
-}
-.floating-emoji { font-size: 45px; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
-
-/* 차트 캔버스 (Chart.js가 생성하는 canvas) */
-:deep(canvas) {
-  z-index: 10; /* 캔버스가 로고보다 위에 있어야 함 (그래야 툴팁이 로고 위로 올라옴) */
+  z-index: 0;
 }
 
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
-  100% { transform: translateY(0px); }
+.floating-level-img { 
+  width: 100px; height: 100px;
+  object-fit: contain; 
+  animation: float-and-glow 3s ease-in-out infinite;
 }
 
-/* AI Section */
+/* --- AI Section --- */
 .ai-section { margin-bottom: 40px; }
 .ai-banner {
   background: linear-gradient(95deg, #E3F2FD 0%, #BBDEFB 100%);
@@ -440,23 +504,17 @@ h1 { text-align: center; margin-bottom: 40px; font-size: 26px; font-weight: 800;
 }
 .close-report:hover { background: #e0e0e0; }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Markdown Styles */
+/* --- Markdown Styles --- */
 :deep(.markdown-body h1) { font-size: 22px; color: #00a651; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
 :deep(.markdown-body h2) { font-size: 18px; color: #333; margin-top: 20px; margin-bottom: 10px; }
 :deep(.markdown-body p) { line-height: 1.6; color: #555; margin-bottom: 10px; }
 
-/* List Section */
+/* --- List Section --- */
 .list-section { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
 .list-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
 .header-action-btns { display: flex; gap: 10px; }
 .exchange-btn { background: #fff; border: 1px solid #D4AF37; padding: 6px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; color: #B8860B; font-weight: bold; transition: 0.2s; }
 .exchange-btn:hover { background: #FFFDE7; transform: translateY(-1px); }
-.edit-btn { background: white; border: 1px solid #ddd; padding: 6px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; color: #555; }
 .edit-btn { background: white; border: 1px solid #ddd; padding: 6px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; color: #555; }
 .edit-btn:hover { background: #f5f5f5; color: #111; }
 
@@ -475,10 +533,27 @@ h1 { text-align: center; margin-bottom: 40px; font-size: 26px; font-weight: 800;
 .asset-value { font-weight: bold; color: #333; }
 .empty-section-msg { color: #999; font-size: 13px; padding: 10px; text-align: center; background: #fafafa; border-radius: 8px; }
 
-/* Empty State & Mobile */
+/* --- 애니메이션 정의 --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse-green {
+  0% { box-shadow: 0 0 0 0 rgba(0, 166, 81, 0.4); }
+  70% { box-shadow: 0 0 0 15px rgba(0, 166, 81, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 166, 81, 0); }
+}
+@keyframes float-and-glow {
+  0%, 100% { transform: translateY(0px); filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)) brightness(1); }
+  50% { transform: translateY(-10px); filter: drop-shadow(0 10px 15px rgba(0, 166, 81, 0.4)) brightness(1.2); }
+}
+
+/* --- Empty State & Mobile --- */
 .empty-state { text-align: center; padding: 60px 20px; background: #f9f9f9; border-radius: 20px; }
 .mascot-img { width: 100px; margin-bottom: 20px; }
 .primary-btn { background-color: #00a651; color: white; padding: 12px 30px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+
+:deep(canvas) { z-index: 10; }
 
 @media (max-width: 768px) {
   .summary-row, .chart-section { grid-template-columns: 1fr; }
