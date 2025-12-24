@@ -70,7 +70,7 @@
           </div>
 
           <button type="button" :class="['reflect-btn', { edit: isEditing }]" @click="reflectToLocalList">
-            {{ isEditing ? '수정사항 반영하기 💾' : '목록에 추가하기 ⬇️' }}
+            {{ isEditing ? '수정사항 반영하기 💾' : '목록에 추가하기 ⬇' }}
           </button>
         </div>
 
@@ -227,7 +227,7 @@ onMounted(async () => {
   if (asset_type && amount && price) {
     selectedMajor.value = 'invest'
     
-    formData.value.name = `${asset_type === 'gold' ? '금' : '은'} (${amount}oz)`
+    formData.value.name = `${asset_type === 'gold' ? '금' : '은'} [${amount}g]`
     formData.value.current_value = Math.floor(Number(amount) * Number(price))
     alert('시세 정보가 연동되었습니다. 상세 종류를 선택하고 반영하기를 눌러주세요!')
   }
@@ -472,7 +472,7 @@ label { font-size: 13px; font-weight: bold; color: #555; margin-bottom: 8px; }
 .custom-input:focus, .custom-select:focus { border-color: #00a651; }
 .money-input { text-align: right; color: #00a651; font-weight: bold; }
 .korean-money { position: absolute; bottom: -25px; right: 0; font-size: 12px; color: #00a651; font-weight: bold; background: #e8f5e9; padding: 2px 6px; border-radius: 4px; z-index: 10; }
-.reflect-btn { width: 100%; padding: 15px; background: #333; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 5px; transition: 0.2s; }
+.reflect-btn { width: 100%; height: 40px; padding: 0; background: #333; color: white; border: none; border-radius: 10px; font-size: 15px; line-height: 1.5; font-weight: bold; cursor: pointer; margin-top: 5px; transition: 0.2s; }
 .reflect-btn:hover { background: #555; }
 .reflect-btn.edit { background: #0288d1; }
 .reflect-btn.edit:hover { background: #0277bd; }
