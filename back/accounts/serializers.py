@@ -43,9 +43,19 @@ class LoginSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    profile_image_url = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'nickname', 'birth_date', 'profile_image_url', 'is_staff')
+
+    def get_profile_image_url(self, obj):
+        if obj.profile_image and hasattr(obj.profile_image, 'url'):
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.profile_image.url)
+            return obj.profile_image.url
+        return None
 
 class DepositSubscriptionSerializer(serializers.ModelSerializer):
     """가입한 예금 상품"""
