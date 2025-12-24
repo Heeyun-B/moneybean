@@ -205,7 +205,7 @@ const handleBannerClick = () => {
 const recentNews = computed(() => boardStore.getPosts('news').slice(0, 5))
 const recentInfo = computed(() => boardStore.getPosts('info').slice(0, 5))
 
-// [추가] 자유게시판 데이터
+// 자유게시판 데이터
 const trendingPost = computed(() => {
   const posts = boardStore.getPosts('free')
   return posts.length > 0 ? posts[0] : null
@@ -218,7 +218,7 @@ const getPreviewText = (content) => {
   return text.length > 80 ? text.substring(0, 80) + '...' : text
 }
 
-// --- 메서드 ---
+// 메서드
 const startSlide = () => {
   stopSlide()
   slideInterval = setInterval(() => {
@@ -258,7 +258,7 @@ const handlePickClick = (title) => {
   }
 }
 
-// --- 라이프사이클 훅 ---
+// 라이프사이클 훅
 onMounted(() => {
   startSlide()
   boardStore.fetchPosts('news')
@@ -274,23 +274,96 @@ onUnmounted(() => { stopSlide() })
 .moneybean-container { background-color: #f8faf9; min-height: 100vh; color: #333; }
 .content-wrapper { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
 .hero-section { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 20px; }
-.banner-box { background: #00a651; border-radius: 20px; color: white; padding: 0; position: relative; min-height: 350px; display: flex; align-items: center; overflow: hidden; }
-.banner-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer; }
-.banner-full-image { width: 100%; height: 100%; object-fit: cover; border-radius: 20px; }
-.banner-dots { position: absolute; bottom: 30px; left: 40px; display: flex; gap: 8px; z-index: 10; }
-.dot { width: 8px; height: 8px; background: rgba(255,255,255,0.3); border-radius: 50%; cursor: pointer; transition: all 0.3s ease; }
-.dot.active { background: white; width: 24px; border-radius: 10px; }
-.login-box { background: white; border: 1px solid #eee; border-radius: 20px; padding: 30px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; min-height: 350px; }
+
+/* 배너 박스 - 확실히 둥글게 */
+.banner-box { 
+  background: white; 
+  border-radius: 20px; 
+  color: white; 
+  padding: 0; 
+  position: relative; 
+  height: 400px;
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  border: 1px solid #f0f0f0;
+}
+
+.banner-slide { 
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  right: 0;
+  bottom: 0;
+  width: 100%; 
+  height: 100%; 
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* 배너 이미지 - 확실히 둥글게 */
+.banner-full-image { 
+  width: 100%; 
+  height: 100%; 
+  object-fit: contain;
+  object-position: center center;
+}
+
+.banner-dots { 
+  position: absolute; 
+  bottom: 30px; 
+  left: 40px; 
+  display: flex; 
+  gap: 8px; 
+  z-index: 10; 
+}
+
+.dot { 
+  width: 8px; 
+  height: 8px; 
+  background: rgba(255,255,255,0.3); 
+  border-radius: 50%; 
+  cursor: pointer; 
+  transition: all 0.3s ease; 
+}
+
+.dot.active { 
+  background: white; 
+  width: 24px; 
+  border-radius: 10px; 
+}
+
+.login-box { 
+  background: white; 
+  border: 1px solid #eee; 
+  border-radius: 20px; 
+  padding: 30px; 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center; 
+  align-items: center; 
+  text-align: center; 
+  height: 400px;
+}
+
 .login-intro { width: 100%; margin-bottom: 25px; }
 .intro-text { font-size: 15px; line-height: 1.5; color: #666; margin-bottom: 20px; font-weight: 500; }
 .login-move-btn { width: 100%; max-width: 250px; background: #00a651; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 16px; cursor: pointer; transition: all 0.2s; font-weight: 700; }
 .login-move-btn:hover { background: #008e45; }
+.login-move-btn h3 { margin: 0; font-size: 16px; }
 .logout-text-btn { background: none; border: none; color: #999; font-size: 13px; text-decoration: underline; cursor: pointer; margin-top: 5px; }
 .find-join { font-size: 12px; color: #888; }
 .find-join span { cursor: pointer; margin: 0 5px; }
 .find-join span:hover { text-decoration: underline; color: #666; }
+.join-link { font-weight: 600; color: #00a651; }
+
 .profile-content { width: 100%; display: flex; flex-direction: column; align-items: center; }
-.profile-img-wrapper { margin-bottom: 15px; }
+.profile-img-wrapper { margin-bottom: 15px; cursor: pointer; }
 .profile-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #f0f0f0; }
 .welcome-text { margin-bottom: 30px; }
 .user-name { font-size: 22px; color: #00a651; margin-bottom: 5px; font-weight: 700; }
@@ -298,18 +371,21 @@ onUnmounted(() => { stopSlide() })
 .profile-actions { width: 100%; display: flex; flex-direction: column; gap: 10px; }
 .action-btn { width: 100%; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; border: none; font-size: 15px; }
 .action-btn.primary { background-color: #00a651; color: white; }
+.action-btn.primary:hover { background-color: #008e45; }
 .action-btn.secondary { background-color: #f5f5f5; color: #555; }
+.action-btn.secondary:hover { background-color: #e8e8e8; }
+
 .pick-section { margin-top: 60px; }
 .section-title-container { display: flex; align-items: center; margin-bottom: 20px; gap: 10px; position: relative; }
 .section-logo { width: 30px; height: 30px; border-radius: 50%; object-fit: cover;}
 .section-title { font-size: 22px; margin: 0; font-weight: 700; }
 .pick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .pick-card { background: white; border: 1px solid #eee; border-radius: 20px; padding: 30px; text-align: center; cursor: pointer; transition: 0.3s; }
-.pick-card:hover { transform: translateY(-5px); border-color: #00a651; }
+.pick-card:hover { transform: translateY(-5px); border-color: #00a651; box-shadow: 0 8px 20px rgba(0, 166, 81, 0.1); }
 .pick-icon { font-size: 30px; margin-bottom: 10px; }
 .pick-name { font-weight: 500; }
 
-/* 트렌딩 섹션 스타일 */
+/* 트렌딩 섹션 */
 .trending-section { margin-top: 60px; }
 .section-icon { font-size: 24px; }
 .more-link { margin-left: auto; font-size: 14px; color: #999; cursor: pointer; transition: 0.2s; }
@@ -330,33 +406,50 @@ onUnmounted(() => { stopSlide() })
 .trending-title { font-size: 24px; font-weight: bold; margin: 0 0 10px 0; color: #333; }
 .trending-desc { font-size: 15px; color: #666; line-height: 1.6; margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .trending-meta { display: flex; align-items: center; gap: 20px; font-size: 14px; color: #888; }
+.author-info { display: flex; align-items: center; gap: 5px; }
 .reaction-info { display: flex; gap: 12px; }
 .trending-visual { font-size: 80px; opacity: 0.1; transform: rotate(-10deg); transition: 0.3s; }
 .trending-card:hover .trending-visual { opacity: 0.2; transform: rotate(0deg) scale(1.1); }
+
+.board-section { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 60px; }
+.board-column { }
+.board-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
+.board-header h3 { font-weight: 700; margin: 0; }
+.board-list { list-style: none; padding: 0; margin: 0; background: white; border-radius: 15px; border: 1px solid #eee; }
+.board-list li { padding: 15px 20px; border-bottom: 1px solid #f5f5f5; font-size: 14px; cursor: pointer; font-weight: 500; transition: 0.2s; }
+.board-list li:hover { background: #fafafa; color: #00a651; }
+.board-list li:last-child { border-bottom: none; }
+
+.main-footer { background: #f8faf9; padding: 80px 20px; border-top: 1px solid #eee; margin-top: 100px; }
+.footer-content { max-width: 1100px; margin: 0 auto; text-align: center; }
+.footer-info { margin-bottom: 20px; }
+.footer-copy-text { font-size: 16px; color: #666; font-weight: 500; margin: 0 0 15px 0; letter-spacing: -0.5px; }
+.footer-copyright { font-size: 13px; color: #aaa; font-weight: 300; margin: 0; }
+.more-btn { cursor: pointer; color: #00a651; font-size: 14px; font-weight: 600; }
+.more-btn:hover { text-decoration: underline; }
+.empty-board { color: #999; text-align: center; pointer-events: none; }
+
+/* 페이드 애니메이션 */
+.fade-enter-active, .fade-leave-active { 
+  transition: opacity 0.5s ease; 
+}
+.fade-enter-from, .fade-leave-to { 
+  opacity: 0; 
+}
+
+/* 반응형 */
+@media (max-width: 1024px) {
+  .hero-section { grid-template-columns: 1fr; }
+  .banner-box, .login-box { height: 350px; }
+  .pick-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
 @media (max-width: 768px) {
+  .banner-box, .login-box { height: 300px; }
+  .pick-grid { grid-template-columns: 1fr 1fr; }
+  .board-section { grid-template-columns: 1fr; }
   .trending-card { flex-direction: column; text-align: left; }
   .trending-visual { display: none; }
   .trending-content { padding-right: 0; }
 }
-
-.board-section { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 60px; }
-.board-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
-.board-header h3 { font-weight: 700; }
-.board-list { list-style: none; padding: 0; background: white; border-radius: 15px; border: 1px solid #eee; }
-.board-list li { padding: 15px 20px; border-bottom: 1px solid #f5f5f5; font-size: 14px; cursor: pointer; font-weight: 500; }
-.board-list li:hover { background: #fafafa; color: #00a651; }
-
-.main-footer { background: #f8faf9; padding: 80px 20px; border-top: 1px solid #eee; margin-top: 100px; }
-.footer-content { max-width: 1100px; margin: 0 auto; text-align: center; }
-.footer-copy-text { font-size: 16px; color: #666; font-weight: 500; margin-bottom: 15px; letter-spacing: -0.5px; }
-.footer-copyright { font-size: 13px; color: #aaa; font-weight: 300; }
-.more-btn { cursor: pointer; color: #00a651; font-size: 14px; }
-.more-btn:hover { text-decoration: underline; }
-.empty-board { color: #999; text-align: center; pointer-events: none; }
-
-
-/* 애니메이션: Transition name="slide-fade"와 연결 */
-.slide-fade-enter-active, .slide-fade-leave-active { transition: all 0.3s ease-in-out; }
-.slide-fade-enter-from { opacity: 0; transform: translateX(30px); }
-.slide-fade-leave-to { opacity: 0; transform: translateX(-30px); }
 </style>
