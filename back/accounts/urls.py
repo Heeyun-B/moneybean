@@ -15,4 +15,5 @@ urlpatterns = [
     path('profile/update/', views.profile_update),      # 프로필 수정
     path('profile/password/', views.change_password),   # 비밀번호 변경
     path('profile/delete/', views.profile_delete),      # 회원 탈퇴
+    path('profile/image/delete/', views.delete_profile_image),  # 이미지 삭제
 ]
