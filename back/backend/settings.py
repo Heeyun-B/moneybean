@@ -25,6 +25,8 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 API_KEY = env("API_KEY")
 GMS_API_KEY = os.getenv("GMS_API_KEY")
+NAVER_CLIENT_ID = os.getenv("NAVER_CLIENT_ID")
+NAVER_CLIENT_SECRET = os.getenv("NAVER_CLIENT_SECRET")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -41,6 +43,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "finance_news",
     "quizzes",
     "finance_infos",
     "ais",
