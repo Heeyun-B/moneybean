@@ -45,7 +45,7 @@ class LoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'nickname', 'birth_date', 'is_staff')
+        fields = ('id', 'username', 'email', 'nickname', 'birth_date', 'profile_image_url', 'is_staff')
 
 class DepositSubscriptionSerializer(serializers.ModelSerializer):
     """가입한 예금 상품"""
@@ -80,6 +80,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
     """프로필 조회용 Serializer"""
     deposit_subscriptions = DepositSubscriptionSerializer(many=True, read_only=True)
     saving_subscriptions = serializers.SerializerMethodField()
+    profile_image_url = serializers.SerializerMethodField()
+
+    def get_profile_image_url(self, obj):  # 이 메서드 추가!
+        if obj.profile_image and hasattr(obj.profile_image, 'url'):
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.profile_image.url)
+            return obj.profile_image.url
+        return None
 
     def get_saving_subscriptions(self, obj):
         from deposits.models import SavingSubscription
@@ -88,15 +97,19 @@ class UserProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'nickname', 'birth_date', 'first_name', 'last_name', 'date_joined', 'deposit_subscriptions', 'saving_subscriptions')
+        fields = ('id', 'username', 'email', 'nickname', 'birth_date', 'first_name', 'last_name', 
+                  'profile_image', 'profile_image_url', 'date_joined', 
+                  'deposit_subscriptions', 'saving_subscriptions')
         read_only_fields = ('id', 'username', 'date_joined')
 
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer):
     """프로필 수정용 Serializer"""
+    profile_image = serializers.ImageField(required=False, allow_null=True)
+
     class Meta:
         model = User
-        fields = ('email', 'nickname', 'birth_date', 'first_name', 'last_name')
+        fields = ('email', 'nickname', 'birth_date', 'first_name', 'last_name', 'profile_image')
     
     def validate_nickname(self, value):
         """닉네임 중복 체크 (자기 자신 제외)"""

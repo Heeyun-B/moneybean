@@ -93,9 +93,29 @@
           </button>
         </div>
 
-        <div v-if="aiReport" class="ai-result-card">
-          <div class="markdown-body" v-html="renderedReport"></div>
-          <button class="close-report" @click="aiReport = ''">접기</button>
+        <div v-if="aiSections.length > 0" class="ai-result-card">
+          <div v-for="(section, index) in aiSections" :key="index">
+            
+            <div v-if="section.is_main" class="main-title-section">
+              <h1>{{ section.title }}</h1>
+              <p v-if="section.content" class="main-content">{{ section.content }}</p>
+            </div>
+            
+            <div v-else class="report-section">
+              <button 
+                @click="toggleReportSection(index)" 
+                class="report-section-header"
+              >
+                <span class="section-title">{{ section.title }}</span>
+                <span class="toggle-icon">{{ isReportOpen[index] ? '▲' : '▼' }}</span>
+              </button>
+              
+              <div v-show="isReportOpen[index]" class="report-section-content">
+                <p style="white-space: pre-line">{{ section.content }}</p>
+              </div>
+            </div>
+
+          </div>
         </div>
       </div>
 
@@ -180,9 +200,8 @@ const getImageUrl = (name) => {
 // UI 상태 관리
 const isLoading = ref(true)     // 초기 데이터 로딩 상태
 const isAiLoading = ref(false)  // AI 진단 로딩 상태
-const aiReport = ref('')
-
-const renderedReport = computed(() => md.render(aiReport.value))
+const aiSections = ref([])  // sections 배열로 변경
+const isReportOpen = ref({})  // 섹션별 토글 상태
 
 onMounted(async () => {
   isLoading.value = true
@@ -215,9 +234,8 @@ const handleAiDiagnosis = async () => {
   if (!confirm('AI 진단을 시작하시겠습니까? (약 3초 소요)')) return
 
   isAiLoading.value = true
-  aiReport.value = ''
+  aiSections.value = []
 
-  // 백엔드 AI가 분석하기 좋게 가공된 데이터 꾸러미
   const payload = {
     totalAssets: store.totalAssets,
     totalCash: store.totalCash,
@@ -226,20 +244,23 @@ const handleAiDiagnosis = async () => {
     netWorth: store.netWorth,
     income: store.financialInfo.income,
     expense: store.financialInfo.expense,
-    // Vue에서 computed로 만든 계층 구조 데이터 보내기
     sections: assetSections.value 
   }
 
   try {
-    // 스토어 함수 호출 시 위에서 만든 payload를 전달
     const result = await store.getAiDiagnosis(payload)
-    aiReport.value = result
+    // 백엔드에서 sections 배열을 받음
+    aiSections.value = result  // 변경: aiReport → aiSections
   } catch (error) {
     console.error(error)
     alert('AI 서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.')
   } finally {
     isAiLoading.value = false
   }
+}
+
+const toggleReportSection = (index) => {
+  isReportOpen.value[index] = !isReportOpen.value[index]
 }
 
 const scrollToSection = (key) => {
@@ -379,14 +400,14 @@ h1 { text-align: center; margin-bottom: 40px; font-size: 26px; font-weight: 800;
 .skeleton-dashboard { animation: fadeIn 0.5s ease; }
 .skeleton-card { background: #fff; padding: 20px; border-radius: 16px; border: 1px solid #f0f0f0; }
 
-/* --- [추가/수정] 레벨 상태 카드 (중앙 정렬 버전) --- */
+/* --- 레벨 상태 카드 (중앙 정렬 버전) --- */
 .level-status-card { 
   background: white; 
   border-radius: 16px; 
   padding: 30px 25px; 
   margin-bottom: 25px;
   display: flex; 
-  flex-direction: column; /* 중앙 정렬을 위해 컬럼 방향 */
+  flex-direction: column;
   align-items: center; 
   justify-content: center; 
   gap: 15px; 
@@ -413,7 +434,7 @@ h1 { text-align: center; margin-bottom: 40px; font-size: 26px; font-weight: 800;
 .level-info { 
   display: flex; 
   flex-direction: column; 
-  align-items: center; /* 텍스트 중앙 정렬 */
+  align-items: center;
   gap: 8px; 
 }
 
@@ -493,21 +514,130 @@ h1 { text-align: center; margin-bottom: 40px; font-size: 26px; font-weight: 800;
 .ai-btn:hover:not(:disabled) { background-color: #1565C0; transform: translateY(-2px); }
 .ai-btn:disabled { background-color: #90CAF9; cursor: not-allowed; }
 
+/* --- AI 리포트 결과 카드 --- */
 .ai-result-card {
-  margin-top: 20px; background: #fff; border: 1px solid #e0e0e0;
-  border-radius: 16px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); text-align: left;
+  margin-top: 20px; 
+  background: #fff; 
+  border: 1px solid #e0e0e0;
+  border-radius: 16px; 
+  padding: 30px; 
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
+  text-align: left;
   animation: fadeIn 0.5s ease-in-out;
 }
-.close-report {
-  margin-top: 20px; background: #f5f5f5; border: none; padding: 10px 20px;
-  border-radius: 8px; cursor: pointer; font-weight: bold; color: #666; width: 100%;
-}
-.close-report:hover { background: #e0e0e0; }
 
-/* --- Markdown Styles --- */
-:deep(.markdown-body h1) { font-size: 22px; color: #00a651; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-:deep(.markdown-body h2) { font-size: 18px; color: #333; margin-top: 20px; margin-bottom: 10px; }
-:deep(.markdown-body p) { line-height: 1.6; color: #555; margin-bottom: 10px; }
+/* AI 리포트 메인 제목 */
+.main-title-section {
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #00a651;
+}
+
+.main-title-section h1 {
+  font-size: 24px;
+  color: #00a651;
+  margin: 0 0 10px 0;
+  font-weight: 800;
+}
+
+.main-content {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* AI 리포트 토글 섹션 */
+.report-section {
+  margin-bottom: 12px;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.report-section:hover {
+  border-color: #d0d0d0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.report-section-header {
+  width: 100%;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #f0f1f3 100%);
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+  font-family: 'Pretendard', sans-serif;
+}
+
+.report-section-header:hover {
+  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+}
+
+.toggle-icon {
+  font-size: 14px;
+  color: #666;
+  transition: transform 0.2s ease;
+}
+
+.report-section-content {
+  padding: 20px;
+  background: white;
+  line-height: 1.8;
+  font-size: 15px;
+  color: #444;
+  animation: slideDown 0.3s ease;
+}
+
+.close-report {
+  margin-top: 20px; 
+  background: #f5f5f5; 
+  border: none; 
+  padding: 10px 20px;
+  border-radius: 8px; 
+  cursor: pointer; 
+  font-weight: bold; 
+  color: #666; 
+  width: 100%;
+  transition: background 0.2s ease;
+}
+.close-report:hover { 
+  background: #e0e0e0; 
+}
+
+/* 일반 섹션 (토글 없는 섹션) */
+.plain-section {
+  margin-bottom: 20px;
+  padding: 15px 20px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border-left: 4px solid #00a651;
+}
+
+.plain-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 10px 0;
+}
+
+.plain-content {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.8;
+  margin: 0;
+}
 
 /* --- List Section --- */
 .list-section { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
@@ -538,11 +668,26 @@ h1 { text-align: center; margin-bottom: 40px; font-size: 26px; font-weight: 800;
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+    transform: translateY(0);
+  }
+}
+
 @keyframes pulse-green {
   0% { box-shadow: 0 0 0 0 rgba(0, 166, 81, 0.4); }
   70% { box-shadow: 0 0 0 15px rgba(0, 166, 81, 0); }
   100% { box-shadow: 0 0 0 0 rgba(0, 166, 81, 0); }
 }
+
 @keyframes float-and-glow {
   0%, 100% { transform: translateY(0px); filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)) brightness(1); }
   50% { transform: translateY(-10px); filter: drop-shadow(0 10px 15px rgba(0, 166, 81, 0.4)) brightness(1.2); }

@@ -80,6 +80,7 @@ def user_info(request):
     serializer = UserSerializer(request.user)
     return Response(serializer.data)
 
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def check_id(request, username):
@@ -88,6 +89,7 @@ def check_id(request, username):
     if User.objects.filter(username=username).exists():
         return Response({'is_exist': True}, status=status.HTTP_200_OK)
     return Response({'is_exist': False}, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -105,7 +107,7 @@ def check_nickname(request, nickname):
 @permission_classes([IsAuthenticated])
 def profile(request):
     """로그인한 사용자의 프로필 조회"""
-    serializer = UserProfileSerializer(request.user)
+    serializer = UserProfileSerializer(request.user, context={'request': request})
     return Response(serializer.data)
 
 
@@ -122,6 +124,7 @@ def profile_update(request):
     
     if serializer.is_valid(raise_exception=True):
         serializer.save()
+        response_serializer = UserProfileSerializer(request.user, context={'request': request})
         return Response(serializer.data)
 
 
@@ -152,3 +155,16 @@ def profile_delete(request):
     return Response({
         'message': '회원 탈퇴가 완료되었습니다.'
     }, status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_profile_image(request):
+    """프로필 이미지 삭제"""
+    user = request.user
+    if user.profile_image:
+        user.profile_image.delete()  # 파일도 함께 삭제
+        user.profile_image = None
+        user.save()
+        return Response({'message': '프로필 이미지가 삭제되었습니다.'})
+    return Response({'message': '삭제할 이미지가 없습니다.'}, status=400)

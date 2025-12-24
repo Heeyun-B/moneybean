@@ -1,4 +1,5 @@
 import openai
+import re
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -32,7 +33,7 @@ def diagnosis(request):
         cash_ratio = (total_cash / total_assets * 100) if total_assets > 0 else 0
         invest_ratio = (total_invest / total_assets * 100) if total_assets > 0 else 0
 
-        # 2. GPT 전달용 프롬프트 조립 (기존 가이드라인 유지)
+        # GPT 전달용 프롬프트 조립
         prompt_content = f"""
 당신은 20년 경력의 전문 금융 컨설턴트입니다. 다음 고객의 자산 포트폴리오를 분석하고 실용적인 조언을 제공해주세요.
 
@@ -54,20 +55,27 @@ def diagnosis(request):
 ## 📋 분석 요청사항
 다음 형식으로 **한국어**로 상세하게 분석해주세요:
 # 💰 자산 진단 리포트
+
 ## 📊 포트폴리오 분석
+(이 섹션 안에 다음 내용을 포함하여 하나의 글로 작성해주세요)
+1. 자산 구성: 총 자산 대비 현금 및 투자 자산의 비율과 그에 대한 진단
+2. 부채 상황: 총 부채와 순자산 현황 및 부채 관리 전략
+
 ## 💪 강점
 ## ⚠️ 개선이 필요한 부분
 ## 💡 맞춤 실행 제안
 ## 📈 기대 효과
 
 **작성 가이드:**
+- **중요**: '자산 구성'이나 '부채 상황'을 별도의 '## 제목'으로 만들지 마세요.
+- 오직 '## 📊 포트폴리오 분석'이라는 제목 아래에 모든 내용을 서술형으로 작성하세요.
 - 친근하고 공감하는 톤으로 작성
 - 구체적인 숫자와 비율 언급
 - 전문 용어는 쉽게 풀어서 설명
+- 가독성이 좋게 이모티콘 활용
 """
 
-        # 3. GPT API 호출
-        # gpt-4o 모델은 분석 능력이 매우 뛰어납니다.
+        # GPT API 호출
         response = client.chat.completions.create(
             model="gpt-4o", 
             messages=[
@@ -77,16 +85,69 @@ def diagnosis(request):
             temperature=0.7
         )
 
-        # 4. 결과 반환
+        full_report = response.choices[0].message.content
+        
+        # 섹션별로 파싱
+        parsed_sections = parse_report_sections(full_report)
+        
+        # 결과 반환 (sections만)
         return Response({
             'success': True,
-            'report': response.choices[0].message.content,
+            'sections': parsed_sections
         })
 
     except Exception as e:
         return Response({
+            'success': False,
             'error': f'GPT 진단 중 오류가 발생했습니다: {str(e)}'
         }, status=500)
+
+
+def parse_report_sections(report_text):
+    """
+    리포트를 섹션별로 파싱 (# 제목과 ## 제목 모두 포함)
+    """
+    sections = []
+    
+    # # 제목 찾기 (자산 진단 리포트)
+    main_title_pattern = r'^#\s+(.+?)$'
+    main_title_match = re.search(main_title_pattern, report_text, re.MULTILINE)
+    
+    # # 제목 이후부터 첫 번째 ## 제목 전까지의 내용 (있다면)
+    main_content = ''
+    if main_title_match:
+        main_title_end = main_title_match.end()
+        first_section_match = re.search(r'##', report_text[main_title_end:])
+        if first_section_match:
+            main_content = report_text[main_title_end:main_title_end + first_section_match.start()].strip()
+        else:
+            main_content = report_text[main_title_end:].strip()
+        
+        sections.append({
+            'title': main_title_match.group(1).strip(),
+            'content': main_content,
+            'is_main': True
+        })
+    
+    # ## 으로 시작하는 하위 제목들
+    pattern = r'##\s+(.+?)(?=##|$)'
+    matches = re.finditer(pattern, report_text, re.DOTALL)
+    
+    for match in matches:
+        full_text = match.group(0).strip()
+        
+        # 제목과 내용 분리
+        lines = full_text.split('\n', 1)
+        title = lines[0].replace('##', '').strip()
+        content = lines[1].strip() if len(lines) > 1 else ''
+        
+        sections.append({
+            'title': title,
+            'content': content,
+            'is_main': False
+        })
+    
+    return sections
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -136,7 +197,7 @@ def luck(request):
 ## 💳 추천 금융 활동
 (나이대에 맞는 금융 활동 1-2가지 추천)
 
-## 🎯 럭키 넘버
+## 🎯 럭키 넘버 
 (생년월일과 관련된 행운의 숫자와 그 의미)
 
 ## 💡 한 줄 조언
