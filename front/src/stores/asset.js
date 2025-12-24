@@ -64,25 +64,21 @@ export const useAssetStore = defineStore('asset', () => {
   }
 
   // 4. [AI] 진단 요청 Action
-  const getAiDiagnosis = async (diagnosisData) => { // diagnosisData 인자 추가
+  const getAiDiagnosis = async (diagnosisData) => {
     try {
-      // 1. 헤더 설정
       const headers = getHeaders()
 
-      // 2. 백엔드 API 호출 (주석 해제 및 데이터 전달)
-      // URL은 작성하신 Django urls.py 설정에 맞춰 확인하세요 (예: /api/v1/assets/ai-diagnosis/)
       const response = await axios.post(
         `${API_URL}/api/ais/diagnosis/`, 
         diagnosisData, 
         { headers }
       )
 
-      // 3. 백엔드에서 보낸 'report' 필드 반환
-      return response.data.report
+      // 백엔드에서 sections 배열 반환
+      return response.data.sections  // 변경: response.data.report → response.data.sections
 
     } catch (error) {
       console.error("AI 진단 실패:", error)
-      // 에러 발생 시 사용자에게 알리기 위해 throw
       throw error
     }
   }
