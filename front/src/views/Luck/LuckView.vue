@@ -150,15 +150,53 @@ const fetchFortuneData = async () => {
 .action-btn:disabled { background: #ccc; }
 
 /* 게이지 및 리포트 스타일 (이전과 동일하게 유지하되 간격 보정) */
-.gauge-section { position: relative; width: 180px; margin: 40px auto 60px; text-align: center; }
-.gauge-svg { transform: rotate(-90deg); }
+.gauge-section { 
+  position: relative; 
+  /* 원 크기(180px)보다 넓게 설정하여 summary가 옆으로 퍼질 공간 확보 */
+  width: 100%; 
+  max-width: 450px; 
+  margin: 40px auto 60px; 
+  text-align: center; 
+}
+
+/* 실제 원형 SVG 크기는 고정 */
+.gauge-svg { 
+  width: 180px;
+  height: 180px;
+  transform: rotate(-90deg); 
+}
+
 .gauge-svg circle { fill: none; stroke-width: 8; stroke-linecap: round; }
 .gauge-svg .bg { stroke: #f0fdf4; }
 .gauge-svg .meter { stroke: #00a651; transition: stroke-dashoffset 1.5s ease-out; }
-.gauge-text { position: absolute; top: 28%; left: 54%; transform: translate(-50%, -50%); }
-.score { font-size: 36px; font-weight: 900; color: #00a651; }
-.summary { margin-top: 25px; color: #333; font-size: 17px; line-height: 1.6; font-weight: 700; }
 
+/* 점수 텍스트 위치 보정 (원 안의 정중앙) */
+.gauge-text { 
+  position: absolute; 
+  top: 90px; /* 원 높이 180px의 절반 */
+  left: 50%; 
+  transform: translate(-45%, -45%); 
+  text-align: center;
+}
+
+.score { font-size: 36px; font-weight: 900; color: #00a651; }
+
+/* 요약 텍스트 수정 */
+.summary { 
+  margin-top: 30px; 
+  color: #333; 
+  font-size: 18px;    /* 가독성을 위해 살짝 키움 */
+  line-height: 1.6; 
+  font-weight: 700; 
+  
+  /* 너비 확장 및 줄바꿈 설정 */
+  width: 100%;
+  max-width: 380px;   /* 이 값을 조절해서 두 줄 라인을 맞추세요 */
+  margin-left: auto;
+  margin-right: auto;
+  word-break: keep-all; /* 단어 단위 줄바꿈으로 깔끔하게 */
+  text-align: center;
+}
 .report-list { border-top: 1.5px solid #f0f0f0; }
 .report-item { border-bottom: 1px solid #f0f0f0; }
 .report-header { width: 100%; padding: 25px 10px; display: flex; justify-content: space-between; background: none; border: none; cursor: pointer; }
