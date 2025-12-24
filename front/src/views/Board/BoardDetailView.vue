@@ -86,7 +86,10 @@
             class="comment-item"
           >
             <div class="comment-header">
-              <span class="comment-author">{{ comment.author }}</span>
+              <div class="comment-author-wrapper">
+                <span class="comment-author">{{ comment.author }}</span>
+                <span v-if="post && comment.author === post.author" class="author-badge">작성자</span>
+              </div>
               <span class="comment-date">{{ formatDate(comment.created_at) }}</span>
             </div>
             <p class="comment-content">{{ comment.content }}</p>
@@ -276,8 +279,10 @@ onMounted(() => {
 .comment-list { display: flex; flex-direction: column; gap: 15px; }
 .comment-item { background-color: white; padding: 20px; border-radius: 8px; border: 1px solid #eee; transition: border-color 0.2s; }
 .comment-item:hover { border-color: #ddd; }
-.comment-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px; }
+.comment-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px; align-items: center; }
+.comment-author-wrapper { display: flex; align-items: center; gap: 6px; }
 .comment-author { font-weight: 600; color: #555; }
+.author-badge { background-color: #00a651; color: white; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
 .comment-date { color: #999; }
 .comment-content { font-size: 15px; line-height: 1.6; color: #333; margin: 0; white-space: pre-wrap; }
 .comment-footer { display: flex; justify-content: flex-end; margin-top: 10px; }

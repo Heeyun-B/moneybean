@@ -56,10 +56,8 @@ const boardStore = useBoardStore()
 const likedPosts = computed(() => boardStore.getLikedPosts())
 
 const goToDetail = (post) => {
-  // 게시글이 어느 게시판에 속하는지 확인
-  const boardType = boardStore.freePosts.some(p => p.id === post.id) ? 'free'
-    : boardStore.newsPosts.some(p => p.id === post.id) ? 'news'
-    : 'info'
+  // 게시글에 포함된 boardType 사용
+  const boardType = post.boardType || 'free'
 
   router.push({ name: 'board-detail', params: { type: boardType, id: post.id } })
 }
