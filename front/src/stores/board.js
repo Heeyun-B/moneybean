@@ -52,7 +52,11 @@ export const useBoardStore = defineStore('board', () => {
 
   // Getter: 좋아요한 게시글 목록
   const getLikedPosts = () => {
-    const allPosts = [...freePosts.value, ...newsPosts.value, ...infoPosts.value]
+    const freePostsWithType = freePosts.value.map(post => ({ ...post, boardType: 'free' }))
+    const newsPostsWithType = newsPosts.value.map(post => ({ ...post, boardType: 'news' }))
+    const infoPostsWithType = infoPosts.value.map(post => ({ ...post, boardType: 'info' }))
+
+    const allPosts = [...freePostsWithType, ...newsPostsWithType, ...infoPostsWithType]
     return allPosts.filter(post => likedPosts.value.includes(post.id))
   }
 
@@ -83,27 +87,37 @@ export const useBoardStore = defineStore('board', () => {
           break
         case 'news':
           // 뉴스 API 호출
-          const newsData = await getNewsList()
-          const newsPosts_data = newsData.map(article => {
-            const content = article.content || ''
-            const pressDisplayName = getPressDisplayName(article.press)
-            return {
-              id: article.id,
-              title: article.title || '제목 없음',
-              content: content,
-              author: pressDisplayName,
-              created_at: article.published_date || article.crawled_at,
-              comment_count: 0,
-              like_count: 0,
-              is_notice: false,
-              link: article.link,
-              press: pressDisplayName,
-              pressCode: article.press,
-              content_preview: content.substring(0, 100) + (content.length > 100 ? '...' : '')
-            }
-          })
-          newsPosts.value = newsPosts_data
-          return newsPosts_data
+          try {
+            const newsData = await getNewsList()
+            const newsPosts_data = newsData.map(article => {
+              const content = article.content || ''
+              const pressDisplayName = getPressDisplayName(article.press)
+              // 로컬에서 좋아요 개수 계산
+              const likeCount = likedPosts.value.includes(article.id) ? 1 : 0
+              return {
+                id: article.id,
+                title: article.title || '제목 없음',
+                content: content,
+                author: pressDisplayName,
+                created_at: article.published_date || article.crawled_at,
+                comment_count: 0,
+                like_count: likeCount,
+                is_notice: false,
+                link: article.link,
+                press: pressDisplayName,
+                pressCode: article.press,
+                content_preview: content.substring(0, 100) + (content.length > 100 ? '...' : '')
+              }
+            })
+            newsPosts.value = newsPosts_data
+            return newsPosts_data
+          } catch (newsError) {
+            console.error('뉴스 API 호출 실패:', newsError)
+            console.error('에러 상세:', newsError.response?.data || newsError.message)
+            // 에러 발생 시에도 빈 배열 반환하여 페이지가 깨지지 않도록 함
+            newsPosts.value = []
+            return []
+          }
         default:
           throw new Error('Invalid board type')
       }
@@ -132,14 +146,10 @@ export const useBoardStore = defineStore('board', () => {
       return posts
     } catch (error) {
       console.error('게시글 목록 조회 실패:', error)
+      console.error('boardType:', boardType)
+      console.error('에러 상세:', error.response?.data || error.message)
 
-      // 뉴스는 에러 시 빈 배열 반환 (목 데이터 사용 안 함)
-      if (boardType === 'news') {
-        newsPosts.value = []
-        return []
-      }
-
-      // 다른 게시판만 목 데이터 사용
+      // 목 데이터 사용 (뉴스 제외)
       const mockPosts = generateMockPosts(boardType)
       switch (boardType) {
         case 'free':
@@ -221,6 +231,9 @@ export const useBoardStore = defineStore('board', () => {
           // 뉴스 상세 조회
           const newsDetail = await getNewsDetail(postId)
           const pressDisplayName = getPressDisplayName(newsDetail.press)
+          // 로컬에서 좋아요 상태 확인
+          const isNewsLiked = likedPosts.value.includes(parseInt(postId))
+          const newsLikeCount = isNewsLiked ? 1 : 0
           post = {
             id: newsDetail.id,
             title: newsDetail.title,
@@ -229,8 +242,8 @@ export const useBoardStore = defineStore('board', () => {
             created_at: newsDetail.published_date || newsDetail.crawled_at,
             updated_at: newsDetail.published_date || newsDetail.crawled_at,
             comment_count: 0,
-            like_count: 0,
-            is_liked: false,
+            like_count: newsLikeCount,
+            is_liked: isNewsLiked,
             is_notice: false,
             link: newsDetail.link,
             press: pressDisplayName,
@@ -493,6 +506,28 @@ export const useBoardStore = defineStore('board', () => {
   // 9. 좋아요 토글
   const toggleLike = async (boardType, postId) => {
     try {
+      // 뉴스의 경우 로컬에서만 좋아요 상태 관리
+      if (boardType === 'news') {
+        const isCurrentlyLiked = likedPosts.value.includes(postId)
+        if (isCurrentlyLiked) {
+          likedPosts.value = likedPosts.value.filter(id => id !== postId)
+        } else {
+          if (!likedPosts.value.includes(postId)) {
+            likedPosts.value.push(postId)
+          }
+        }
+        localStorage.setItem('likedPosts', JSON.stringify(likedPosts.value))
+
+        // 뉴스 목록에서 해당 게시글의 좋아요 개수 업데이트
+        const posts = getPosts(boardType)
+        const postIndex = posts.findIndex(p => p.id === parseInt(postId))
+        if (postIndex !== -1) {
+          posts[postIndex].like_count = isCurrentlyLiked ? 0 : 1
+        }
+
+        return !isCurrentlyLiked
+      }
+
       let apiPath = ''
       switch (boardType) {
         case 'free':
@@ -501,8 +536,6 @@ export const useBoardStore = defineStore('board', () => {
         case 'info':
           apiPath = `${API_URL}/api/finance_infos/info/${postId}/like/`
           break
-        case 'news':
-          throw new Error('뉴스는 좋아요를 할 수 없습니다.')
         default:
           throw new Error('Invalid board type')
       }

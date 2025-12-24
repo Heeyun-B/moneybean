@@ -5,25 +5,25 @@
         
         <div class="banner-box" @mouseenter="stopSlide" @mouseleave="startSlide">
           <Transition name="fade">
-            <div 
-              :key="currentSlide" 
+            <div
+              :key="currentSlide"
               class="banner-slide"
               @click="handleBannerClick"
             >
-              <div class="banner-content">
-                <span class="banner-tag">{{ banners[currentSlide].tag }}</span>
-                <h2>{{ banners[currentSlide].title }}</h2>
-                <p>{{ banners[currentSlide].desc }}</p>
-              </div>
+              <img
+                :src="banners[currentSlide].img"
+                alt="배너 이미지"
+                class="banner-full-image"
+              >
             </div>
           </Transition>
-          
+
           <div class="banner-dots">
-            <span 
-              v-for="(banner, i) in banners" 
-              :key="i" 
+            <span
+              v-for="(_, i) in banners"
+              :key="i"
               :class="['dot', { active: currentSlide === i }]"
-              @click.stop="goToSlide(i)" 
+              @click.stop="goToSlide(i)"
             ></span>
           </div>
         </div>
@@ -161,6 +161,9 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useBoardStore } from '@/stores/board'
+import quizImg from '@/assets/banner_imgs/quiz_img.png'
+import fortuneImg from '@/assets/banner_imgs/fortune_img.png'
+import balanceImg from '@/assets/banner_imgs/balance_img.png'
 
 const router = useRouter()
 const store = useAuthStore()
@@ -169,17 +172,17 @@ const boardStore = useBoardStore()
 const currentSlide = ref(0)
 let slideInterval = null
 
-// target 속성을 추가하여 클릭 시 이동할 페이지 지정
+// 배너 이미지와 이동 페이지 지정
 const banners = [
-  { tag: 'QUIZ', title: '금융 퀴즈 챌린지!', desc: '매일 퀴즈 풀고 자산 나무에 물을 주세요.', target: 'quiz' },
-  { tag: 'NEWS', title: '금리 인상 소식', desc: '나에게 유리한 예적금 상품을 찾아보세요.', target: 'deposit-list' },
-  { tag: 'EVENT', title: '자산 관리 MBTI', desc: '당신의 투자 성향은 어떤 콩인가요?', target: 'assets' },
+  { img: quizImg, target: 'quiz' },
+  { img: balanceImg, target: 'assets' },
+  { img: fortuneImg, target: 'luck' },
 ]
 
 const picks = [
   { title: '자산관리', icon: '🏦' },
-  { title: '카드', icon: '💳' },
   { title: '예적금', icon: '🐷' },
+  { title: '카드', icon: '💳' },
   { title: '투자', icon: '📈' },
 ]
 
@@ -242,8 +245,8 @@ const handlePickClick = (title) => {
   }
   switch (title) {
     case '예적금': router.push({ name: 'deposit-list' }); break
-    case '자산관리':
-    case '투자': router.push({ name: 'assets' }); break
+    case '자산관리': router.push({ name: 'assets' }); break
+    case '투자': alert('준비 중인 서비스입니다.'); break
     default: alert('준비 중인 서비스입니다.')
   }
 }
@@ -265,10 +268,8 @@ onUnmounted(() => { stopSlide() })
 .content-wrapper { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
 .hero-section { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 20px; }
 .banner-box { background: #00a651; border-radius: 20px; color: white; padding: 0; position: relative; min-height: 350px; display: flex; align-items: center; overflow: hidden; }
-.banner-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 40px 0 40px 40px; display: flex; flex-direction: column; justify-content: center; cursor: pointer; box-sizing: border-box; }
-.banner-tag { background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; align-self: flex-start; }
-.banner-content h2 { font-size: 32px; margin: 15px 0; font-weight: 700; }
-.banner-content p { text-align: left; margin: 0; font-weight: 500; }
+.banner-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer; }
+.banner-full-image { width: 100%; height: 100%; object-fit: cover; border-radius: 20px; }
 .banner-dots { position: absolute; bottom: 30px; left: 40px; display: flex; gap: 8px; z-index: 10; }
 .dot { width: 8px; height: 8px; background: rgba(255,255,255,0.3); border-radius: 50%; cursor: pointer; transition: all 0.3s ease; }
 .dot.active { background: white; width: 24px; border-radius: 10px; }

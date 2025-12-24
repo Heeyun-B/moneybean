@@ -13,25 +13,35 @@
         <div class="chart-card">
           <div class="filter-container">
             <div class="date-group">
-              <select v-model="startYear" @change="updateDateAndFilter" class="picker-select">
-                <option v-for="y in years" :key="y" :value="y">{{ y }}년</option>
+              <select v-model="startYear" class="picker-select">
+                <option value="" disabled>년도</option>
+                <option v-for="y in years" :key="y" :value="y">{{ y }}</option>
               </select>
-              <select v-model="startMonth" @change="updateDateAndFilter" class="picker-select">
-                <option v-for="m in months" :key="m" :value="m">{{ m }}월</option>
+              <select v-model="startMonth" class="picker-select">
+                <option value="" disabled>월</option>
+                <option v-for="m in months" :key="m" :value="m">{{ m }}</option>
               </select>
-              <select v-model="startDay" @change="updateDateAndFilter" class="picker-select">
-                <option v-for="d in startDays" :key="d" :value="d">{{ d }}일</option>
+              <select v-model="startDay" class="picker-select">
+                <option value="" disabled>일</option>
+                <option v-for="d in startDays" :key="d" :value="d">{{ d }}</option>
               </select>
+              
               <span class="sep">~</span>
-              <select v-model="endYear" @change="updateDateAndFilter" class="picker-select">
-                <option v-for="y in years" :key="y" :value="y">{{ y }}년</option>
+
+              <select v-model="endYear" class="picker-select">
+                <option value="" disabled>년도</option>
+                <option v-for="y in years" :key="y" :value="y">{{ y }}</option>
               </select>
-              <select v-model="endMonth" @change="updateDateAndFilter" class="picker-select">
-                <option v-for="m in months" :key="m" :value="m">{{ m }}월</option>
+              <select v-model="endMonth" class="picker-select">
+                <option value="" disabled>월</option>
+                <option v-for="m in months" :key="m" :value="m">{{ m }}</option>
               </select>
-              <select v-model="endDay" @change="updateDateAndFilter" class="picker-select">
-                <option v-for="d in endDays" :key="d" :value="d">{{ d }}일</option>
+              <select v-model="endDay" class="picker-select">
+                <option value="" disabled>일</option>
+                <option v-for="d in endDays" :key="d" :value="d">{{ d }}</option>
               </select>
+
+              <button @click="handleSearch" class="search-btn">검색</button>
             </div>
             <button @click="resetFilter" class="reset-mini-btn">초기화</button>
           </div>
@@ -87,56 +97,124 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
-const route = useRoute(); const router = useRouter()
-const asset = ref('gold'); const allRawData = ref([]); const chartData = ref(null); const chartKey = ref(0) 
-const currentPrice = ref(0); const averagePrice = ref(0); const amount = ref(1); const totalPrice = ref("0")
-const startYear = ref('2024'); const startMonth = ref('01'); const startDay = ref('01')
-const endYear = ref('2024'); const endMonth = ref('12'); const endDay = ref('31')
-const startDate = ref(''); const endDate = ref(''); const koreanValue = ref("")
+const route = useRoute();
+const router = useRouter()
+const asset = ref('gold');
+const allRawData = ref([]);
+const chartData = ref(null);
+const chartKey = ref(0);
+const currentPrice = ref(0);
+const averagePrice = ref(0);
+const amount = ref(1);
+const totalPrice = ref("0")
+const koreanValue = ref("")
+const startYear = ref('');
+const startMonth = ref('');
+const startDay = ref('');
+const endYear = ref('');
+const endMonth = ref('');
+const endDay = ref('');
+const startDate = ref('');
+const endDate = ref('');
 
 const years = ['2023', '2024', '2025', '2026']
 const months = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'))
 const getDaysInMonth = (year, month) => new Date(year, month, 0).getDate()
 
-const startDays = computed(() => Array.from({ length: getDaysInMonth(startYear.value, startMonth.value) }, (_, i) => String(i + 1).padStart(2, '0')))
-const endDays = computed(() => Array.from({ length: getDaysInMonth(endYear.value, endMonth.value) }, (_, i) => String(i + 1).padStart(2, '0')))
+const startDays = computed(() => {
+  const y = parseInt(startYear.value) || 2024;
+  const m = parseInt(startMonth.value) || 1;
+  return Array.from({ length: getDaysInMonth(y, m) }, (_, i) => String(i + 1).padStart(2, '0'));
+});
+
+const endDays = computed(() => {
+  const y = parseInt(endYear.value) || 2024;
+  const m = parseInt(endMonth.value) || 1;
+  return Array.from({ length: getDaysInMonth(y, m) }, (_, i) => String(i + 1).padStart(2, '0'));
+});
+
 const assetTheme = computed(() => asset.value === 'gold' ? 'theme-gold' : 'theme-silver')
 const chartPeriodText = computed(() => (startDate.value || endDate.value) ? '선택 기간' : '전체 기간')
 
 const fetchData = async (type) => {
-  asset.value = type; chartData.value = null 
+  asset.value = type;
+  chartData.value = null 
   try {
     const token = localStorage.getItem('token')
     const response = await axios.get(`http://127.0.0.1:8000/api/gold_prices/prices/`, {
       params: { asset: type },
       headers: { Authorization: token ? `Token ${token}` : '' }
     })
-    const data = response.data.data.sort((a, b) => new Date(a.Date) - new Date(b.Date))
-    allRawData.value = data
+    const data = response.data.data.sort((a, b) => new Date(a.Date) - new Date(b.Date));
+    allRawData.value = data;
     if (data.length > 0) {
-      currentPrice.value = data[data.length - 1].price_krw_g
+      currentPrice.value = data[data.length - 1].price_krw_g;
     }
-    updateDateAndFilter(); calculate()
-  } catch (error) { console.error('데이터 로드 실패:', error) }
-}
-
-const applyFilter = () => {
-  let filtered = [...allRawData.value]
-  if (startDate.value && endDate.value && new Date(startDate.value) > new Date(endDate.value)) return
-  if (startDate.value) filtered = filtered.filter(item => new Date(item.Date) >= new Date(startDate.value))
-  if (endDate.value) filtered = filtered.filter(item => new Date(item.Date) <= new Date(endDate.value))
-  if (filtered.length > 0) {
-    renderChart(filtered)
-    const sum = filtered.reduce((acc, item) => acc + (item.price_krw_g || 0), 0)
-    averagePrice.value = Math.floor(sum / filtered.length)
+    applyFilter(); 
+    calculate();
+  } catch (error) {
+    console.error('데이터 로드 실패:', error)
   }
 }
 
+const handleSearch = () => {
+  const isStartIncomplete = !startYear.value || !startMonth.value || !startDay.value;
+  const isEndIncomplete = !endYear.value || !endMonth.value || !endDay.value;
+
+  // 하나라도 선택 안 된게 있으면 전체 기간 조회
+  if (isStartIncomplete || isEndIncomplete) {
+    startDate.value = '';
+    endDate.value = '';
+  } else {
+    // 모두 선택되었을 때만 날짜 조합
+    const sDate = `${startYear.value}-${startMonth.value}-${startDay.value}`;
+    const eDate = `${endYear.value}-${endMonth.value}-${endDay.value}`;
+
+    // 날짜 역전 방지
+    if (new Date(sDate) > new Date(eDate)) {
+      alert("시작 날짜가 종료 날짜보다 늦을 수 없습니다");
+      return;
+    }
+    
+    startDate.value = sDate;
+    endDate.value = eDate;
+  }
+
+  // 필터 함수 직접 실행
+  applyFilter();
+};
+
+const applyFilter = () => {
+  if (!allRawData.value || allRawData.value.length === 0) return;
+
+  let filtered = [];
+
+  if (!startDate.value || !endDate.value) {
+    // 날짜가 없으면 전체 데이터
+    filtered = [...allRawData.value];
+  } else {
+    // 날짜가 있으면 기간 필터링
+    const start = new Date(startDate.value);
+    const end = new Date(endDate.value);
+    
+    filtered = allRawData.value.filter(item => {
+      const itemDate = new Date(item.Date);
+      return itemDate >= start && itemDate <= end;
+    });
+  }
+
+  if (filtered.length > 0) {
+    renderChart(filtered);
+    const sum = filtered.reduce((acc, item) => acc + (item.price_krw_g || 0), 0);
+    averagePrice.value = Math.floor(sum / filtered.length);
+  } else {
+    alert("해당 기간에 데이터가 없습니다.");
+    resetFilter();
+  }
+};
+
 const updateDateAndFilter = () => {
-  startDate.value = `${startYear.value}-${startMonth.value}-${startDay.value}`
-  endDate.value = `${endYear.value}-${endMonth.value}-${endDay.value}`
-  applyFilter()
-}
+};
 
 const renderChart = (data) => {
   const color = asset.value === 'gold' ? '#D4AF37' : '#9ea7ad'
@@ -171,9 +249,17 @@ const formatKorean = (num) => {
 }
 
 const resetFilter = () => {
-  startYear.value = '2024'; startMonth.value = '01'; startDay.value = '01'
-  endYear.value = '2024'; endMonth.value = '12'; endDay.value = '31'
-  updateDateAndFilter()
+  startYear.value = ''; startMonth.value = ''; startDay.value = '';
+  endYear.value = ''; endMonth.value = ''; endDay.value = '';
+  startDate.value = '';
+  endDate.value = '';
+
+  if (allRawData.value.length > 0) {
+    renderChart(allRawData.value);
+    
+    const sum = allRawData.value.reduce((acc, item) => acc + (item.price_krw_g || 0), 0);
+    averagePrice.value = Math.floor(sum / allRawData.value.length);
+  }
 }
 
 const handleAmountInput = () => {
@@ -203,14 +289,21 @@ watch(() => route.query.asset, (newAsset) => { if (newAsset) fetchData(newAsset)
 .price-badge { background: #f1fcf4; color: #00a651; padding: 5px 15px; border-radius: 50px; font-size: 14px; font-weight: bold; }
 
 .filter-container { margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; background: #f8f9fa; padding: 10px 15px; border-radius: 12px; border: 1px solid #eee; gap: 10px; }
-.date-group { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.date-group { display: flex; align-items: center; gap: 4px; flex-shrink: 0; margin-right: 10px; }
 .label-tag { font-size: 11px; color: #888; font-weight: bold; margin-right: 2px; flex-shrink: 0; }
 .picker-select { border: 1px solid #ddd; background: #fff; font-size: 13px; color: #333; font-weight: 600; cursor: pointer; outline: none; padding: 4px 5px; border-radius: 6px; min-width: 65px; text-align: center; transition: 0.2s; }
 .picker-select:hover { border-color: #00a651; color: #00a651; }
 .sep { color: #aaa; font-weight: bold; padding: 0 2px; }
 .date-separator { color: #ccc; font-weight: bold; flex-shrink: 0; padding: 0 2px; }
-.reset-mini-btn { background: #00a651; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; white-space: nowrap; transition: 0.2s; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 5px rgba(0, 166, 81, 0.2); }
-.reset-mini-btn:hover { background: #008441; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0, 166, 81, 0.3); }
+
+.search-btn { background: #00a651; color: white; border: none; padding: 6px 15px; border-radius: 8px; font-size: 13px;
+  font-weight: bold; cursor: pointer; margin-left: 5px; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.search-btn:hover { background: #008441; transform: translateY(-1px); }
+.search-btn:active { transform: translateY(0); }
+
+.reset-mini-btn { background: #473417; color: white; border: none; padding: 6px 15px; border-radius: 8px; font-size: 13px;
+  font-weight: bold; cursor: pointer; margin-left: 5px; transition: 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 5px rgba(0, 166, 81, 0.2); }
+.reset-mini-btn:hover { background: #795c34; color: white; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0, 166, 81, 0.3); }
 .reset-mini-btn:active { transform: translateY(0); }
 
 .form-group { margin-bottom: 20px; display: flex; flex-direction: column; }
