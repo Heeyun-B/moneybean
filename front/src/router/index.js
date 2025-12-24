@@ -27,6 +27,12 @@ import MapView from '@/views/Map/MapView.vue'
 // 7. 현물 상품 (Exchange)
 import ExchangeView from '@/views/Gold/ExchangeView.vue'
 
+// 8. 게시판 (Board)
+import BoardListView from '@/views/Board/BoardListView.vue'
+import BoardDetailView from '@/views/Board/BoardDetailView.vue'
+import BoardWriteView from '@/views/Board/BoardWriteView.vue'
+import BoardLikedView from '@/views/Board/BoardLikedView.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -135,6 +141,33 @@ const router = createRouter({
       path: '/quiz',
       name: 'quiz',
       component: () => import('@/views/Quiz/QuizView.vue')
+    },
+
+    // 게시판 관련
+    {
+      path: '/board/:type',
+      name: 'board-list',
+      component: BoardListView
+    },
+    {
+      path: '/board/:type/write',
+      name: 'board-write',
+      component: BoardWriteView
+    },
+    {
+      path: '/board/:type/edit/:id',
+      name: 'board-edit',
+      component: BoardWriteView
+    },
+    {
+      path: '/board/:type/:id',
+      name: 'board-detail',
+      component: BoardDetailView
+    },
+    {
+      path: '/board-liked',
+      name: 'board-liked',
+      component: BoardLikedView
     },
   ],
 })
