@@ -175,56 +175,45 @@ def luck(request):
         birth_day = user.birth_date.day
         
         birth_info = f"""
-- 생년월일: {birth_year}년 {birth_month}월 {birth_day}일
-- 나이: 만 {age}세
-"""
+        - 생년월일: {birth_year}년 {birth_month}월 {birth_day}일
+        - 나이: 만 {age}세
+        """
         
         # 프롬프트 작성
         prompt_content = f"""
-당신은 재미있고 긍정적인 금융 운세를 제공하는 AI입니다.
-다음 정보를 바탕으로 오늘의 금융 운세를 작성해주세요.
+        사용자의 생년월일({user.birth_date})을 기반으로 사주명리학(만세력) 금전운을 분석하세요.
 
-## 사용자 정보
-{birth_info}
+        ## 지침
+        1. '행운의 가이드'를 제외한 모든 섹션의 'content'는 반드시 **5문장 이상의 상세한 설명**을 포함하세요.
+        2. '행운의 가이드'는 "색상: 그린, 아이템: 손목시계, 장소: 공원" 처럼 짧은 키워드로만 3~4개 작성하세요.
+        3. luck_index는 반드시 0~100 사이의 숫자여야 합니다.
 
-다음 형식으로 작성해주세요:
+        형식:
+        {{
+            "luck_index": 65,
+            "summary": "안정적인 흐름 속에 작은 기회가 찾아오는 날입니다.",
+            "details": [
+                {{ "title": "🏮 만세력 기반 사주 풀이", "content": "..." }},
+                {{ "title": "💰 금전운 상세 분석", "content": "..." }},
+                {{ "title": "🎨 행운의 가이드 (색상/물건)", "content": "..." }},
+                {{ "title": "🚶 오늘의 행동 지침", "content": "..." }}
+            ]
+        }}
+        """
 
-# 🍀 오늘의 금융 운세
-
-## 💰 오늘의 재물운
-(생년월일을 고려한 오늘의 재물운 메시지)
-
-## 💳 추천 금융 활동
-(나이대에 맞는 금융 활동 1-2가지 추천)
-
-## 🎯 럭키 넘버 
-(생년월일과 관련된 행운의 숫자와 그 의미)
-
-## 💡 한 줄 조언
-(오늘 하루를 위한 짧고 임팩트 있는 조언)
-
-**작성 가이드:**
-- 생년월일 정보를 자연스럽게 활용
-- 나이대에 맞는 실질적인 금융 조언 제공
-- 밝고 긍정적인 톤
-- 재미있지만 진지한 조언
-- 200-300자 분량
-"""
-
-        # GPT API 호출
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
-                {"role": "system", "content": "당신은 재미있고 유익한 금융 운세를 제공하는 AI입니다. 생년월일 정보를 자연스럽게 활용하여 개인화된 운세를 제공하세요."},
+                {"role": "system", "content": "당신은 만세력을 기반으로 금전운을 분석하여 반드시 JSON 객체로만 응답하는 전문가입니다."},
                 {"role": "user", "content": prompt_content}
             ],
-            temperature=0.9
+            response_format={ "type": "json_object" },
+            temperature=0.8
         )
 
-        return Response({
-            'success': True,
-            'luck_message': response.choices[0].message.content
-        })
+        import json
+        result_data = json.loads(response.choices[0].message.content)
+        return Response({'success': True, **result_data})
 
     except Exception as e:
         return Response({

@@ -30,7 +30,6 @@ import TheNavbar from '@/components/common/TheNavbar.vue'
   box-sizing: border-box; 
 }
 
-/* 모바일에서 텍스트가 너무 작아 보이지 않게 방지 */
 html { -webkit-text-size-adjust: 100%; }
 
 body { 
