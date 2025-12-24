@@ -87,3 +87,87 @@ def diagnosis(request):
         return Response({
             'error': f'GPT 진단 중 오류가 발생했습니다: {str(e)}'
         }, status=500)
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def luck(request):
+    """
+    오늘의 금융 운세 생성 (생년월일 기반)
+    """
+    try:
+        user = request.user
+        
+        # 생년월일이 없으면 에러 반환
+        if not user.birth_date:
+            return Response({
+                'success': False,
+                'error': 'birth_date_required',
+                'message': '생년월일 정보가 필요합니다. 프로필 설정에서 생년월일을 입력해주세요.'
+            }, status=400)
+        
+        # 생년월일 정보 준비
+        from datetime import datetime
+        today = datetime.now()
+        age = today.year - user.birth_date.year
+        birth_year = user.birth_date.year
+        birth_month = user.birth_date.month
+        birth_day = user.birth_date.day
+        
+        birth_info = f"""
+- 생년월일: {birth_year}년 {birth_month}월 {birth_day}일
+- 나이: 만 {age}세
+"""
+        
+        # 프롬프트 작성
+        prompt_content = f"""
+당신은 재미있고 긍정적인 금융 운세를 제공하는 AI입니다.
+다음 정보를 바탕으로 오늘의 금융 운세를 작성해주세요.
+
+## 사용자 정보
+{birth_info}
+
+다음 형식으로 작성해주세요:
+
+# 🍀 오늘의 금융 운세
+
+## 💰 오늘의 재물운
+(생년월일을 고려한 오늘의 재물운 메시지)
+
+## 💳 추천 금융 활동
+(나이대에 맞는 금융 활동 1-2가지 추천)
+
+## 🎯 럭키 넘버
+(생년월일과 관련된 행운의 숫자와 그 의미)
+
+## 💡 한 줄 조언
+(오늘 하루를 위한 짧고 임팩트 있는 조언)
+
+**작성 가이드:**
+- 생년월일 정보를 자연스럽게 활용
+- 나이대에 맞는 실질적인 금융 조언 제공
+- 밝고 긍정적인 톤
+- 재미있지만 진지한 조언
+- 200-300자 분량
+"""
+
+        # GPT API 호출
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "당신은 재미있고 유익한 금융 운세를 제공하는 AI입니다. 생년월일 정보를 자연스럽게 활용하여 개인화된 운세를 제공하세요."},
+                {"role": "user", "content": prompt_content}
+            ],
+            temperature=0.9
+        )
+
+        return Response({
+            'success': True,
+            'luck_message': response.choices[0].message.content
+        })
+
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': 'api_error',
+            'message': f'운세 생성 중 오류가 발생했습니다: {str(e)}'
+        }, status=500)

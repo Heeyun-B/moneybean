@@ -5,4 +5,5 @@ app_name = "ais"
 
 urlpatterns = [
     path('diagnosis/', views.diagnosis, name='diagnosis'),
+    path('luck/', views.luck, name='luck'),
 ]
