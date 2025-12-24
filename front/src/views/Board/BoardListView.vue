@@ -57,7 +57,9 @@
             </div>
           </div>
           <div class="post-info">
-            <span class="author">{{ post.author }}</span>
+            <span class="author" :class="{ 'news-press': boardType === 'news' }">
+              {{ boardType === 'news' && post.press ? post.press : post.author }}
+            </span>
           </div>
           <div class="post-date">
             <span>{{ formatDate(post.created_at) }}</span>
@@ -460,6 +462,11 @@ onMounted(() => {
   font-size: 14px;
   font-weight: 500;
   color: #555;
+}
+
+.post-info .author.news-press {
+  color: #00a651;
+  font-weight: 600;
 }
 
 .post-date {

@@ -7,9 +7,9 @@ class NewsArticle(models.Model):
     published_date = models.DateTimeField(null=True, blank=True)
     press = models.CharField(max_length=100, null=True, blank=True)
     crawled_at = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
-        ordering = ['-published_date']
-    
+        ordering = ['-published_date', '-crawled_at']
+
     def __str__(self):
         return self.title

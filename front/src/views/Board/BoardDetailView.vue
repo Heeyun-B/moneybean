@@ -42,10 +42,20 @@
       </div>
 
       <div class="post-body">
-        <div class="post-content notion-style" v-html="formattedContent"></div>
+        <div v-if="boardType === 'news' && post.link" class="news-link-banner">
+          <a :href="post.link" target="_blank" rel="noopener noreferrer" class="original-link-btn">
+            📰 원문 기사 보기
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </a>
         </div>
+        <div class="post-content notion-style" v-html="formattedContent"></div>
+      </div>
 
-      <div class="comment-section">
+      <div v-if="boardType !== 'news'" class="comment-section">
         <h3 class="comment-title">
           댓글 <span class="comment-count">{{ sortedComments.length }}</span>
         </h3>
@@ -128,6 +138,7 @@ const sortedComments = computed(() => {
 
 const isAuthor = computed(() => {
   if (!authStore.isAuthenticated || !post.value) return false
+  if (boardType.value === 'news') return false
   return post.value.author === authStore.userNickname
 })
 
@@ -297,4 +308,20 @@ onMounted(() => {
 .notion-style :deep(table) { border-collapse: collapse; width: 100%; margin: 1em 0; }
 .notion-style :deep(th), .notion-style :deep(td) { border: 1px solid #e0e0e0; padding: 8px 12px; text-align: left; }
 .notion-style :deep(th) { background-color: #f7f6f3; font-weight: 600; }
+
+/* News Link Banner */
+.news-link-banner { margin-bottom: 20px; }
+.original-link-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, #00a651 0%, #008e45 100%);
+  color: white; padding: 12px 24px; border-radius: 8px;
+  text-decoration: none; font-weight: 600; font-size: 15px;
+  transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0, 166, 81, 0.2);
+}
+.original-link-btn:hover {
+  transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 166, 81, 0.3);
+  background: linear-gradient(135deg, #008e45 0%, #00a651 100%);
+}
+.original-link-btn svg { transition: transform 0.3s ease; }
+.original-link-btn:hover svg { transform: translate(2px, -2px); }
 </style>
