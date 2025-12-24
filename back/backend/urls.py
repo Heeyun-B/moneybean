@@ -26,5 +26,6 @@ urlpatterns = [
     path('api/boards/', include('boards.urls')),
     path('api/deposits/', include('deposits.urls')),
     path('api/ais/', include('ais.urls')),
+    path('api/quizzes/', include('quizzes.urls')),
     path('api/finance_infos/', include('finance_infos.urls')),
 ]

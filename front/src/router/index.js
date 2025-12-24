@@ -136,6 +136,13 @@ const router = createRouter({
       component: () => import('@/views/Deposit/SavingDetailView.vue')
     },
 
+    // 퀴즈 관련
+    {
+      path: '/quiz',
+      name: 'quiz',
+      component: () => import('@/views/Quiz/QuizView.vue')
+    },
+
     // 게시판 관련
     {
       path: '/board/:type',
