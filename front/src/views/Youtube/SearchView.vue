@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import YoutubeNavBar from '@/components/youtube/YoutubeNavBar.vue'
 import VideoCard from '@/components/youtube/VideoCard.vue'
@@ -61,11 +61,35 @@ const videos = ref([])
 const loading = ref(false)
 const error = ref('')
 
+// 세션스토리지에서 검색 상태 복원
+const restoreSearchState = () => {
+  const savedQuery = sessionStorage.getItem('youtube_search_query')
+  const savedVideos = sessionStorage.getItem('youtube_search_videos')
+
+  if (savedQuery) {
+    searchQuery.value = savedQuery
+  }
+  if (savedVideos) {
+    try {
+      videos.value = JSON.parse(savedVideos)
+    } catch (e) {
+      console.error('검색 결과 복원 실패:', e)
+    }
+  }
+}
+
+// 검색 상태 저장
+const saveSearchState = () => {
+  sessionStorage.setItem('youtube_search_query', searchQuery.value)
+  sessionStorage.setItem('youtube_search_videos', JSON.stringify(videos.value))
+}
+
 const handleSearch = async () => {
   if (!searchQuery.value.trim()) return
   loading.value = true
   try {
     videos.value = await searchVideos(searchQuery.value)
+    saveSearchState()
   } catch (err) {
     error.value = '데이터를 불러오는데 실패했습니다.'
   } finally {
@@ -74,8 +98,17 @@ const handleSearch = async () => {
 }
 
 const goToDetail = (video) => {
+  saveSearchState() // 상세 페이지로 이동하기 전에 상태 저장
   router.push(`/video/${video.id.videoId}`)
 }
+
+onMounted(() => {
+  restoreSearchState()
+})
+
+onBeforeUnmount(() => {
+  saveSearchState()
+})
 </script>
 
 <style scoped>

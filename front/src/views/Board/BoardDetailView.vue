@@ -32,10 +32,10 @@
             <button
               v-if="authStore.isAuthenticated"
               class="like-btn"
-              :class="{ liked: boardStore.isLiked(post.id) }"
+              :class="{ liked: boardStore.isLiked(boardType, post.id) }"
               @click="handleLike"
             >
-              {{ boardStore.isLiked(post.id) ? '❤️' : '🤍' }} {{ post.like_count || 0 }}
+              {{ boardStore.isLiked(boardType, post.id) ? '❤️' : '🤍' }} {{ post.like_count || 0 }}
             </button>
           </div>
         </div>
