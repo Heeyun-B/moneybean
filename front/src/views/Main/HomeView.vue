@@ -32,7 +32,7 @@
           <div class="login-intro">
             <p class="intro-text">머니빈을 더 안전하고<br>편리하게 이용하세요.</p>
             <button class="login-move-btn" @click="router.push('/login')">
-              <strong>머니빈 로그인</strong>
+              <h3>머니빈 로그인</h3>
             </button>
           </div>
           <div class="login-footer">
@@ -101,7 +101,14 @@
     </main>
 
     <footer class="main-footer">
-      &copy; 2025 — 머니빈 Team. All rights reserved.
+      <div class="footer-content">
+        <div class="footer-info">
+          <p class="footer-copy-text">매일매일 쌓이는 금융 지식, 머니빈과 함께 똑똑한 자산 관리를 시작하세요.</p>
+        </div>
+        <div class="footer-copyright">
+          &copy; 2025 — 머니빈 Team. All rights reserved.
+        </div>
+      </div>
     </footer>
   </div>
 </template>
@@ -183,21 +190,22 @@ onUnmounted(() => { stopSlide() })
 </script>
 
 <style scoped>
+* { font-family: 'GmarketSans'; }
 .moneybean-container { background-color: #f8faf9; min-height: 100vh; color: #333; }
 .content-wrapper { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
 .hero-section { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 20px; }
 .banner-box { background: #00a651; border-radius: 20px; color: white; padding: 0; position: relative; min-height: 350px; display: flex; align-items: center; overflow: hidden; }
 .banner-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 40px 0 40px 40px; display: flex; flex-direction: column; justify-content: center; cursor: pointer; box-sizing: border-box; }
 .banner-tag { background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; align-self: flex-start; }
-.banner-content h2 { font-size: 32px; margin: 15px 0; }
-.banner-content p { text-align: left; margin: 0; }
+.banner-content h2 { font-size: 32px; margin: 15px 0; font-weight: 700; }
+.banner-content p { text-align: left; margin: 0; font-weight: 500; }
 .banner-dots { position: absolute; bottom: 30px; left: 40px; display: flex; gap: 8px; z-index: 10; }
 .dot { width: 8px; height: 8px; background: rgba(255,255,255,0.3); border-radius: 50%; cursor: pointer; transition: all 0.3s ease; }
 .dot.active { background: white; width: 24px; border-radius: 10px; }
 .login-box { background: white; border: 1px solid #eee; border-radius: 20px; padding: 30px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; min-height: 350px; }
 .login-intro { width: 100%; margin-bottom: 25px; }
-.intro-text { font-size: 15px; line-height: 1.5; color: #666; margin-bottom: 20px; }
-.login-move-btn { width: 100%; max-width: 250px; background: #00a651; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 16px; cursor: pointer; transition: all 0.2s; }
+.intro-text { font-size: 15px; line-height: 1.5; color: #666; margin-bottom: 20px; font-weight: 500; }
+.login-move-btn { width: 100%; max-width: 250px; background: #00a651; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 16px; cursor: pointer; transition: all 0.2s; font-weight: 700; }
 .login-move-btn:hover { background: #008e45; }
 .find-join { font-size: 12px; color: #888; }
 .find-join span { cursor: pointer; margin: 0 5px; }
@@ -206,28 +214,31 @@ onUnmounted(() => { stopSlide() })
 .profile-img-wrapper { margin-bottom: 15px; }
 .profile-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #f0f0f0; }
 .welcome-text { margin-bottom: 30px; }
-.user-name { font-size: 22px; color: #00a651; margin-bottom: 5px; font-weight: bold; }
-.greeting { color: #666; font-size: 14px; margin: 0; }
+.user-name { font-size: 22px; color: #00a651; margin-bottom: 5px; font-weight: 700; }
+.greeting { color: #666; font-size: 14px; margin: 0; font-weight: 500; }
 .profile-actions { width: 100%; display: flex; flex-direction: column; gap: 10px; }
-.action-btn { width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; border: none; font-size: 15px; }
+.action-btn { width: 100%; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; border: none; font-size: 15px; }
 .action-btn.primary { background-color: #00a651; color: white; }
 .action-btn.secondary { background-color: #f5f5f5; color: #555; }
 .pick-section { margin-top: 60px; }
 .section-title-container { display: flex; align-items: center; margin-bottom: 20px; gap: 10px; }
 .section-logo { width: 30px; height: 30px; border-radius: 50%; object-fit: cover;}
-.section-title { font-size: 22px; margin: 0; }
+.section-title { font-size: 22px; margin: 0; font-weight: 700; }
 .pick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .pick-card { background: white; border: 1px solid #eee; border-radius: 20px; padding: 30px; text-align: center; cursor: pointer; transition: 0.3s; }
 .pick-card:hover { transform: translateY(-5px); border-color: #00a651; }
 .pick-icon { font-size: 30px; margin-bottom: 10px; }
+.pick-name { font-weight: 500; }
 .board-section { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 60px; }
 .board-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
+.board-header h3 { font-weight: 700; }
 .board-list { list-style: none; padding: 0; background: white; border-radius: 15px; border: 1px solid #eee; }
-.board-list li { padding: 15px 20px; border-bottom: 1px solid #f5f5f5; font-size: 14px; cursor: pointer; }
+.board-list li { padding: 15px 20px; border-bottom: 1px solid #f5f5f5; font-size: 14px; cursor: pointer; font-weight: 500; }
 .board-list li:hover { background: #fafafa; color: #00a651; }
-.main-footer { text-align: center; padding: 40px; color: #999; font-size: 12px; }
-
-/* 애니메이션: Transition name="slide-fade"와 연결 */
+.main-footer { background: #f8faf9; padding: 80px 20px; border-top: 1px solid #eee; margin-top: 100px; }
+.footer-content { max-width: 1100px; margin: 0 auto; text-align: center; }
+.footer-copy-text { font-size: 16px; color: #666; font-weight: 500; margin-bottom: 15px; letter-spacing: -0.5px; }
+.footer-copyright { font-size: 13px; color: #aaa; font-weight: 300; }
 .slide-fade-enter-active, .slide-fade-leave-active { transition: all 0.3s ease-in-out; }
 .slide-fade-enter-from { opacity: 0; transform: translateX(30px); }
 .slide-fade-leave-to { opacity: 0; transform: translateX(-30px); }
