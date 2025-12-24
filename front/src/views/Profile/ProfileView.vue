@@ -202,6 +202,13 @@ import levelBranchImg from '@/assets/level_logos/level_branch.png'
 import levelTreeImg from '@/assets/level_logos/level_tree.png'
 import levelMoneyTreeImg from '@/assets/level_logos/level_money_tree.png'
 
+// 레벨 이미지 import
+import levelBeanImg from '@/assets/level_logos/level_bean.png'
+import levelSproutImg from '@/assets/level_logos/level_sprout.png'
+import levelBranchImg from '@/assets/level_logos/level_branch.png'
+import levelTreeImg from '@/assets/level_logos/level_tree.png'
+import levelMoneyTreeImg from '@/assets/level_logos/level_money_tree.png'
+
 const router = useRouter()
 const authStore = useAuthStore()
 const assetStore = useAssetStore()
