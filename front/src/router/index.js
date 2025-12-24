@@ -169,6 +169,12 @@ const router = createRouter({
       name: 'board-liked',
       component: BoardLikedView
     },
+    // 금전운 관련
+    {
+      path: '/luck',
+      name: 'luck',
+      component: () => import('@/views/Luck/LuckView.vue')
+    },
   ],
 })
 

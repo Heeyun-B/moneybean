@@ -100,6 +100,9 @@ const handleSubMenu = (sub) => {
     case '좋아요한 글':
       router.push({ name: 'board-liked' })
       break
+    case '오늘의 금전운':
+      router.push({ name: 'luck' })
+      break
     default:
       alert(`${sub} 메뉴는 준비 중입니다.`)
   }
