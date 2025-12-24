@@ -107,6 +107,9 @@ const handleSubMenu = (sub) => {
     case '좋아요한 글':
       router.push({ name: 'board-liked' })
       break
+    case '오늘의 금전운':
+      router.push({ name: 'luck' })
+      break
     default:
       alert(`${sub} 메뉴는 준비 중입니다.`)
   }
@@ -128,7 +131,7 @@ const handleSubMenu = (sub) => {
 .submenu {
   display: none; position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
   background: white; border: 1px solid #eee; list-style: none;
-  padding: 10px 0; width: 160px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  padding: 10px 0; width: 165px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
   border-radius: 8px; z-index: 10001;
 }
 .menu-item:hover .submenu { display: block; }
