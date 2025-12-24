@@ -2,6 +2,8 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import { useAuthStore } from './auth'
+import { getNewsList, getNewsDetail } from '@/api/news'
+import { getPressDisplayName } from '@/utils/pressMapping'
 
 export const useBoardStore = defineStore('board', () => {
   const authStore = useAuthStore()
@@ -60,26 +62,51 @@ export const useBoardStore = defineStore('board', () => {
   const fetchPosts = async (boardType) => {
     try {
       let apiPath = ''
+      let response = null
+
       switch (boardType) {
         case 'free':
           apiPath = `${API_URL}/api/boards/`
+          response = await axios.get(apiPath, {
+            headers: authStore.token ? {
+              Authorization: `Token ${authStore.token}`
+            } : {}
+          })
           break
         case 'info':
           apiPath = `${API_URL}/api/finance_infos/`
+          response = await axios.get(apiPath, {
+            headers: authStore.token ? {
+              Authorization: `Token ${authStore.token}`
+            } : {}
+          })
           break
         case 'news':
-          const mockPosts = generateMockPosts(boardType)
-          newsPosts.value = mockPosts
-          return mockPosts
+          // 뉴스 API 호출
+          const newsData = await getNewsList()
+          const newsPosts_data = newsData.map(article => {
+            const content = article.content || ''
+            const pressDisplayName = getPressDisplayName(article.press)
+            return {
+              id: article.id,
+              title: article.title || '제목 없음',
+              content: content,
+              author: pressDisplayName,
+              created_at: article.published_date || article.crawled_at,
+              comment_count: 0,
+              like_count: 0,
+              is_notice: false,
+              link: article.link,
+              press: pressDisplayName,
+              pressCode: article.press,
+              content_preview: content.substring(0, 100) + (content.length > 100 ? '...' : '')
+            }
+          })
+          newsPosts.value = newsPosts_data
+          return newsPosts_data
         default:
           throw new Error('Invalid board type')
       }
-
-      const response = await axios.get(apiPath, {
-        headers: authStore.token ? {
-          Authorization: `Token ${authStore.token}`
-        } : {}
-      })
 
       const posts = response.data.map(post => ({
         id: post.id,
@@ -105,13 +132,18 @@ export const useBoardStore = defineStore('board', () => {
       return posts
     } catch (error) {
       console.error('게시글 목록 조회 실패:', error)
+
+      // 뉴스는 에러 시 빈 배열 반환 (목 데이터 사용 안 함)
+      if (boardType === 'news') {
+        newsPosts.value = []
+        return []
+      }
+
+      // 다른 게시판만 목 데이터 사용
       const mockPosts = generateMockPosts(boardType)
       switch (boardType) {
         case 'free':
           freePosts.value = mockPosts
-          break
-        case 'news':
-          newsPosts.value = mockPosts
           break
         case 'info':
           infoPosts.value = mockPosts
@@ -125,46 +157,88 @@ export const useBoardStore = defineStore('board', () => {
   const fetchPostDetail = async (boardType, postId) => {
     try {
       let apiPath = ''
+      let response = null
+      let post = null
+
       switch (boardType) {
         case 'free':
           apiPath = `${API_URL}/api/boards/articles/${postId}/`
+          response = await axios.get(apiPath, {
+            headers: authStore.token ? {
+              Authorization: `Token ${authStore.token}`
+            } : {}
+          })
+          post = {
+            id: response.data.id,
+            title: response.data.title,
+            content: response.data.content,
+            author: response.data.username,
+            created_at: response.data.created_at,
+            updated_at: response.data.updated_at,
+            comment_count: response.data.comment_count || 0,
+            like_count: response.data.like_count || 0,
+            is_liked: response.data.is_liked || false,
+            is_notice: response.data.is_notice || false,
+          }
+          if (response.data.comments) {
+            comments.value[postId] = response.data.comments.map(comment => ({
+              id: comment.id,
+              content: comment.content,
+              author: comment.username,
+              created_at: comment.created_at
+            }))
+          }
           break
         case 'info':
           apiPath = `${API_URL}/api/finance_infos/info/${postId}/`
+          response = await axios.get(apiPath, {
+            headers: authStore.token ? {
+              Authorization: `Token ${authStore.token}`
+            } : {}
+          })
+          post = {
+            id: response.data.id,
+            title: response.data.title,
+            content: response.data.content,
+            author: response.data.username,
+            created_at: response.data.created_at,
+            updated_at: response.data.updated_at,
+            comment_count: response.data.comment_count || 0,
+            like_count: response.data.like_count || 0,
+            is_liked: response.data.is_liked || false,
+            is_notice: response.data.is_notice || false,
+          }
+          if (response.data.comments) {
+            comments.value[postId] = response.data.comments.map(comment => ({
+              id: comment.id,
+              content: comment.content,
+              author: comment.username,
+              created_at: comment.created_at
+            }))
+          }
           break
         case 'news':
-          return getPost(boardType, postId)
+          // 뉴스 상세 조회
+          const newsDetail = await getNewsDetail(postId)
+          const pressDisplayName = getPressDisplayName(newsDetail.press)
+          post = {
+            id: newsDetail.id,
+            title: newsDetail.title,
+            content: newsDetail.content,
+            author: pressDisplayName,
+            created_at: newsDetail.published_date || newsDetail.crawled_at,
+            updated_at: newsDetail.published_date || newsDetail.crawled_at,
+            comment_count: 0,
+            like_count: 0,
+            is_liked: false,
+            is_notice: false,
+            link: newsDetail.link,
+            press: pressDisplayName,
+            pressCode: newsDetail.press,
+          }
+          break
         default:
           throw new Error('Invalid board type')
-      }
-
-      const response = await axios.get(apiPath, {
-        headers: authStore.token ? {
-          Authorization: `Token ${authStore.token}`
-        } : {}
-      })
-
-      const post = {
-        id: response.data.id,
-        title: response.data.title,
-        content: response.data.content,
-        author: response.data.username,
-        created_at: response.data.created_at,
-        updated_at: response.data.updated_at,
-        comment_count: response.data.comment_count || 0,
-        like_count: response.data.like_count || 0,
-        is_liked: response.data.is_liked || false,
-        is_notice: response.data.is_notice || false,
-        // tags, images 필드 제거됨
-      }
-
-      if (response.data.comments) {
-        comments.value[postId] = response.data.comments.map(comment => ({
-          id: comment.id,
-          content: comment.content,
-          author: comment.username,
-          created_at: comment.created_at
-        }))
       }
 
       const posts = getPosts(boardType)
