@@ -20,6 +20,7 @@ import LaterView from '@/views/Youtube/LaterView.vue'
 // 5. 예적금 (Deposit)
 import DepositListView from '@/views/Deposit/DepositListView.vue'
 import DepositDetailView from '@/views/Deposit/DepositDetailView.vue'
+import SavingDetailView from '@/views/Deposit/SavingDetailView.vue'
 
 // 6. 지도 (Map)
 import MapView from '@/views/Map/MapView.vue'
@@ -32,6 +33,12 @@ import BoardListView from '@/views/Board/BoardListView.vue'
 import BoardDetailView from '@/views/Board/BoardDetailView.vue'
 import BoardWriteView from '@/views/Board/BoardWriteView.vue'
 import BoardLikedView from '@/views/Board/BoardLikedView.vue'
+
+// 9. 퀴즈 (Quiz)
+import QuizView from '@/views/Quiz/QuizView.vue'
+
+// 10. 프로필 (Profile)
+import ProfileView from '@/views/Profile/ProfileView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -115,6 +122,11 @@ const router = createRouter({
       name: 'deposit-detail',
       component: DepositDetailView
     },
+    {
+      path: '/saving-detail/:id',
+      name: 'saving-detail',
+      component: SavingDetailView
+    },
 
     // 지도 관련
     {
@@ -129,18 +141,12 @@ const router = createRouter({
       name: 'exchange',
       component: ExchangeView
     },
-
-    {
-      path: '/saving-detail/:id',
-      name: 'saving-detail',
-      component: () => import('@/views/Deposit/SavingDetailView.vue')
-    },
-
+    
     // 퀴즈 관련
     {
       path: '/quiz',
       name: 'quiz',
-      component: () => import('@/views/Quiz/QuizView.vue')
+      component: QuizView
     },
 
     // 게시판 관련
@@ -169,6 +175,23 @@ const router = createRouter({
       name: 'board-liked',
       component: BoardLikedView
     },
+
+    // 프로필 관련
+    {
+      path: '/profile',
+      name: 'profile',
+      component: ProfileView,
+      beforeEnter: (to, from, next) => {
+        const token = localStorage.getItem('token')
+        if (!token) {
+          alert("로그인이 필요한 서비스입니다.")
+          next({ name: 'login' })
+        } else {
+          next()
+        }
+      }
+    },
+
   ],
 })
 

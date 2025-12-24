@@ -4,6 +4,8 @@ import axios from 'axios'
 
 export const useAuthStore = defineStore('auth', () => {
   const API_URL = 'http://127.0.0.1:8000'
+  const storageImg = localStorage.getItem('profileImage')
+  const profileImage = ref(storageImg && storageImg !== 'null' ? storageImg : null)
   const token = ref(localStorage.getItem('token'))
   const userNickname = ref(localStorage.getItem('nickname'))
   const userRole = ref(localStorage.getItem('userRole') || 'user')
@@ -28,22 +30,18 @@ export const useAuthStore = defineStore('auth', () => {
       const res = await axios.post(`${API_URL}/api/accounts/login/`, payload)
 
       const newToken = res.data.token || res.data.key
-      const newNickname = res.data.user?.nickname || res.data.nickname || '사용자'
+      const newNickname = res.data.user?.nickname || '사용자'
       const newRole = res.data.user?.role || res.data.role || 'user'
       const newIsStaff = res.data.user?.is_staff || false
-
-      console.log('로그인 응답:', res.data)
-      console.log('is_staff 값:', newIsStaff)
+      
+      const newProfileImg = res.data.user?.profile_image_url || res.data.user?.profile_image || null
 
       if (newToken) {
-        setToken(newToken, newNickname, newRole, newIsStaff)
-      } else {
-        throw new Error("토큰을 받아오지 못했습니다.")
+        setToken(newToken, newNickname, newRole, newIsStaff, newProfileImg)
       }
       return res.data
     } catch (err) {
-      console.error('로그인 에러:', err)
-      throw err
+      console.error('로그인 에러:', err); throw err
     }
   }
 
@@ -56,18 +54,47 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('nickname')
     localStorage.removeItem('userRole')
     localStorage.removeItem('isStaff')
+    profileImage.value = null
+    localStorage.removeItem('profileImage')
   }
 
   // 내부 헬퍼 함수
-  const setToken = (newToken, newNickname, newRole = 'user', newIsStaff = false) => {
+  const setToken = (newToken, newNickname, newRole = 'user', newIsStaff = false, newProfileImg) => {
     token.value = newToken
     userNickname.value = newNickname
     userRole.value = newRole
     isStaff.value = newIsStaff
+    
+    // 이미지 경로 처리
+    let imgUrl = newProfileImg
+    if (imgUrl && !imgUrl.startsWith('http')) {
+      imgUrl = `${API_URL}${imgUrl}`
+    }
+    
+    profileImage.value = imgUrl
+    
     localStorage.setItem('token', newToken)
     localStorage.setItem('nickname', newNickname)
     localStorage.setItem('userRole', newRole)
     localStorage.setItem('isStaff', newIsStaff.toString())
+    localStorage.setItem('profileImage', imgUrl || '')
+  }
+
+  const updateUserInfo = (userData) => {
+    if (userData.nickname) {
+      userNickname.value = userData.nickname
+      localStorage.setItem('nickname', userData.nickname)
+    }
+    
+    const newImg = userData.profile_image_url || userData.profile_image
+    if (newImg) {
+      let imgUrl = newImg
+      if (!imgUrl.startsWith('http')) {
+        imgUrl = `${API_URL}${imgUrl}`
+      }
+      profileImage.value = imgUrl
+      localStorage.setItem('profileImage', imgUrl)
+    }
   }
 
   return {
@@ -79,6 +106,8 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     signUp,
     logIn,
-    logOut
+    logOut,
+    updateUserInfo,
+    profileImage
   }
 })

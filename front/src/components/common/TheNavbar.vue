@@ -19,9 +19,13 @@
 
       <div class="profile-area">
         <div v-if="authStore.isAuthenticated" class="profile-menu">
-          <div class="profile-trigger">
-            <img src="@/assets/logo_bean.png" alt="프로필" class="profile-img">
-            <span class="profile-name">{{ authStore.userNickname }}</span>
+          <div class="profile-trigger" @click="router.push({ name: 'profile' })">
+            <img 
+              :src="authStore.profileImage ? `${authStore.profileImage}?t=${new Date().getTime()}` : '/src/assets/logo_bean.png'" 
+              alt="프로필" 
+              class="profile-img"
+            >
+            <span class="profile-name">{{ authStore.userNickname }}님</span>
           </div>
           <ul class="profile-submenu">
             <li @click="router.push({ name: 'assets' })">내 자산 보기</li>
@@ -29,9 +33,10 @@
             <li @click="handleLogout" class="logout-item">로그아웃</li>
           </ul>
         </div>
+        
         <div v-else class="auth-buttons">
-          <button class="login-btn" @click="router.push('/login')">로그인</button>
-          <button class="signup-btn" @click="router.push('/signup')">회원가입</button>
+          <button class="login-btn" @click="router.push({ name: 'login' })">로그인</button>
+          <button class="signup-btn" @click="router.push({ name: 'signup' })">회원가입</button>
         </div>
       </div>
     </div>
@@ -58,6 +63,7 @@ const goHome = () => {
   router.push({ name: 'home' })
 }
 
+// 로그아웃 함수 하나로 통합
 const handleLogout = () => {
   if (confirm('로그아웃 하시겠습니까?')) {
     authStore.logOut()
@@ -131,14 +137,13 @@ const handleSubMenu = (sub) => {
 /* 프로필 영역 */
 .profile-area { display: flex; align-items: center; height: 100%; }
 
-/* 로그인된 상태 - 프로필 메뉴 */
 .profile-menu { position: relative; height: 100%; display: flex; align-items: center; }
 .profile-trigger {
   display: flex; align-items: center; gap: 8px; padding: 8px 12px;
   cursor: pointer; border-radius: 20px; transition: all 0.2s;
 }
 .profile-trigger:hover { background-color: #f8faf9; }
-.profile-img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #eee; }
+.profile-img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #00a651; }
 .profile-name { font-size: 15px; font-weight: 600; color: #333; }
 
 .profile-submenu {
@@ -153,10 +158,10 @@ const handleSubMenu = (sub) => {
   color: #555; transition: 0.2s;
 }
 .profile-submenu li:hover { background: #f1fcf4; color: #00a651; font-weight: bold; }
-.profile-submenu li.logout-item { color: #ff6b6b; }
+.profile-submenu li.logout-item { color: #ff6b6b; border-top: 1px solid #eee; }
 .profile-submenu li.logout-item:hover { background: #fff5f5; color: #ff5252; }
 
-/* 비로그인 상태 - 로그인/회원가입 버튼 */
+/* 비로그인 상태 */
 .auth-buttons { display: flex; gap: 10px; }
 .login-btn, .signup-btn {
   padding: 8px 16px; border-radius: 8px; font-size: 14px;

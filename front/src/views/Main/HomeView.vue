@@ -46,8 +46,12 @@
 
         <div class="login-box profile-box" v-else>
           <div class="profile-content">
-            <div class="profile-img-wrapper">
-              <img src="@/assets/logo_bean.png" alt="프로필" class="profile-img">
+            <div class="profile-img-wrapper" @click="router.push({ name: 'profile' })">
+              <img 
+                :src="store.profileImage || '/src/assets/logo_bean.png'" 
+                alt="프로필" 
+                class="profile-img"
+              >
             </div>
             <div class="welcome-text">
               <h3 class="user-name">{{ store.userNickname }}님</h3>
@@ -57,7 +61,10 @@
               <button class="action-btn primary" @click="router.push({ name: 'assets' })">
                 내 자산 보러가기
               </button>
-              <button class="action-btn secondary" @click="handleLogout">
+              <button class="action-btn secondary" @click="router.push({ name: 'profile' })">
+                마이페이지
+              </button>
+              <button class="action-btn logout-text-btn" @click="handleLogout">
                 로그아웃
               </button>
             </div>
@@ -198,16 +205,16 @@ const handleBannerClick = () => {
 const recentNews = computed(() => boardStore.getPosts('news').slice(0, 5))
 const recentInfo = computed(() => boardStore.getPosts('info').slice(0, 5))
 
-// [추가] 자유게시판 데이터 (최신 1개)
+// [추가] 자유게시판 데이터
 const trendingPost = computed(() => {
   const posts = boardStore.getPosts('free')
   return posts.length > 0 ? posts[0] : null
 })
 
-// [추가] 본문 미리보기 텍스트 처리
+// 본문 미리보기 텍스트 처리
 const getPreviewText = (content) => {
   if (!content) return ''
-  const text = content.replace(/<[^>]*>?/gm, '') // HTML 태그 제거
+  const text = content.replace(/<[^>]*>?/gm, '')
   return text.length > 80 ? text.substring(0, 80) + '...' : text
 }
 
@@ -256,7 +263,7 @@ onMounted(() => {
   startSlide()
   boardStore.fetchPosts('news')
   boardStore.fetchPosts('info')
-  boardStore.fetchPosts('free') // [추가] 자유게시판 데이터 로드
+  boardStore.fetchPosts('free')
 })
 
 onUnmounted(() => { stopSlide() })
@@ -278,6 +285,7 @@ onUnmounted(() => { stopSlide() })
 .intro-text { font-size: 15px; line-height: 1.5; color: #666; margin-bottom: 20px; font-weight: 500; }
 .login-move-btn { width: 100%; max-width: 250px; background: #00a651; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 16px; cursor: pointer; transition: all 0.2s; font-weight: 700; }
 .login-move-btn:hover { background: #008e45; }
+.logout-text-btn { background: none; border: none; color: #999; font-size: 13px; text-decoration: underline; cursor: pointer; margin-top: 5px; }
 .find-join { font-size: 12px; color: #888; }
 .find-join span { cursor: pointer; margin: 0 5px; }
 .find-join span:hover { text-decoration: underline; color: #666; }
@@ -301,7 +309,7 @@ onUnmounted(() => { stopSlide() })
 .pick-icon { font-size: 30px; margin-bottom: 10px; }
 .pick-name { font-weight: 500; }
 
-/* [추가] 트렌딩 섹션 스타일 */
+/* 트렌딩 섹션 스타일 */
 .trending-section { margin-top: 60px; }
 .section-icon { font-size: 24px; }
 .more-link { margin-left: auto; font-size: 14px; color: #999; cursor: pointer; transition: 0.2s; }

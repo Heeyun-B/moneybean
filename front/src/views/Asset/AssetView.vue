@@ -184,7 +184,7 @@ const router = useRouter()
 const md = new MarkdownIt()
 
 const getLevelInfo = (balance) => {
-  if (balance >= 100000000) return { name: "돈 나무", img: "level_money_tree.png" };
+  if (balance >= 100000000) return { name: "돈나무", img: "level_money_tree.png" };
   if (balance >= 80000000) return { name: "나무", img: "level_tree.png" };
   if (balance >= 50000000) return { name: "가지", img: "level_branch.png" };
   if (balance >= 10000000) return { name: "새싹", img: "level_sprout.png" };
