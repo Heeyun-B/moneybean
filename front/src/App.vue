@@ -14,10 +14,17 @@ import TheNavbar from '@/components/common/TheNavbar.vue'
 </script>
 
 <style>
-@import url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.css');
+/* 1. 외부 주소 대신 로컬 파일을 불러오도록 설정 */
+@font-face {
+  font-family: 'GmarketSans';
+  src: url('./assets/fonts/GmarketSansTTFMedium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
 
 * { 
-  font-family: 'GmarketSansMedium', sans-serif; 
+  /* 2. 폰트 적용 ( !important를 추가해서 확실히 적용되게 합니다 ) */
+  font-family: 'GmarketSans', sans-serif !important; 
   margin: 0; 
   padding: 0; 
   box-sizing: border-box; 
@@ -31,8 +38,9 @@ body {
   -webkit-font-smoothing: antialiased; 
 }
 
+/* 버튼에도 폰트 적용 */
 button { 
   -webkit-tap-highlight-color: transparent; 
-  font-family: 'GmarketSansMedium', sans-serif; 
+  font-family: 'GmarketSans', sans-serif !important; 
 }
 </style>
