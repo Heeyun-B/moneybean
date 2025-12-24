@@ -14,6 +14,12 @@ def signup(request):
     serializer = SignupSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
+
+        # 개발 환경: 모든 신규 가입자에게 관리자 권한 부여 (임시)
+        # TODO: 프로덕션 환경에서는 이 코드 제거할 것
+        user.is_staff = True
+        user.save()
+
         # 회원가입 시 자동으로 토큰 생성
         token, created = Token.objects.get_or_create(user=user)
         return Response({

@@ -87,7 +87,7 @@
         <div class="list-header-row">
           <h3>상세 자산 목록</h3>
           <div class="header-action-btns">
-            <button @click="router.push({ name: 'Exchange' })" class="exchange-btn">
+            <button @click="router.push({ name: 'exchange', query: { asset: 'gold' } })" class="exchange-btn">
               🪙 금/은 시세 확인
             </button>
             <button @click="goToCreatePage" class="edit-btn">목록 편집</button>
