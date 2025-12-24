@@ -192,6 +192,12 @@ const router = createRouter({
       }
     },
 
+    // 금전운 관련
+    {
+      path: '/luck',
+      name: 'luck',
+      component: () => import('@/views/Luck/LuckView.vue')
+    },
   ],
 })
 
