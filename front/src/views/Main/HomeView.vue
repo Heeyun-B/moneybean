@@ -78,23 +78,66 @@
         </div>
       </section>
 
+      <section class="trending-section" v-if="trendingPost">
+        <div class="section-title-container">
+          <span class="section-icon">🔥</span>
+          <h2 class="section-title">지금 뜨는 이야기</h2>
+          <span class="more-link" @click="router.push({ name: 'board-list', params: { type: 'free' } })">자유게시판 전체보기 ></span>
+        </div>
+        
+        <div class="trending-card" @click="router.push({ name: 'board-detail', params: { type: 'free', id: trendingPost.id } })">
+          <div class="trending-content">
+            <div class="trending-badges">
+              <span class="badge free">자유게시판</span>
+              <span class="badge new">NEW</span>
+            </div>
+            <h3 class="trending-title">{{ trendingPost.title }}</h3>
+            <p class="trending-desc">{{ getPreviewText(trendingPost.content) }}</p>
+            <div class="trending-meta">
+              <span class="author-info">🖊️ {{ trendingPost.author }}</span>
+              <div class="reaction-info">
+                <span>❤️ {{ trendingPost.like_count || 0 }}</span>
+                <span>💬 {{ trendingPost.comment_count || 0 }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="trending-visual">
+            <span class="visual-icon">💬</span>
+          </div>
+        </div>
+      </section>
+
       <section class="board-section">
         <div class="board-column">
           <div class="board-header">
             <h3>🗞️ 금융기사</h3>
-            <span class="more-btn">더보기 ></span>
+            <span class="more-btn" @click="router.push({ name: 'board-list', params: { type: 'news' } })">더보기 ></span>
           </div>
           <ul class="board-list">
-            <li v-for="n in 5" :key="n">머니빈 금융 뉴스 제목입니다 ({{n}})</li>
+            <li
+              v-for="post in recentNews"
+              :key="post.id"
+              @click="router.push({ name: 'board-detail', params: { type: 'news', id: post.id } })"
+            >
+              {{ post.title }}
+            </li>
+            <li v-if="recentNews.length === 0" class="empty-board">등록된 기사가 없습니다</li>
           </ul>
         </div>
         <div class="board-column">
           <div class="board-header">
             <h3>💡 금융정보</h3>
-            <span class="more-btn">더보기 ></span>
+            <span class="more-btn" @click="router.push({ name: 'board-list', params: { type: 'info' } })">더보기 ></span>
           </div>
           <ul class="board-list">
-            <li v-for="n in 5" :key="n">재테크 꿀팁: 이렇게 모아보세요 ({{n}})</li>
+            <li
+              v-for="post in recentInfo"
+              :key="post.id"
+              @click="router.push({ name: 'board-detail', params: { type: 'info', id: post.id } })"
+            >
+              {{ post.title }}
+            </li>
+            <li v-if="recentInfo.length === 0" class="empty-board">등록된 정보가 없습니다</li>
           </ul>
         </div>
       </section>
@@ -107,12 +150,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useBoardStore } from '@/stores/board'
 
 const router = useRouter()
 const store = useAuthStore()
+const boardStore = useBoardStore()
 
 const currentSlide = ref(0)
 let slideInterval = null
@@ -139,6 +184,24 @@ const handleBannerClick = () => {
   }
 }
 
+// 게시판 데이터
+const recentNews = computed(() => boardStore.getPosts('news').slice(0, 5))
+const recentInfo = computed(() => boardStore.getPosts('info').slice(0, 5))
+
+// [추가] 자유게시판 데이터 (최신 1개)
+const trendingPost = computed(() => {
+  const posts = boardStore.getPosts('free')
+  return posts.length > 0 ? posts[0] : null
+})
+
+// [추가] 본문 미리보기 텍스트 처리
+const getPreviewText = (content) => {
+  if (!content) return ''
+  const text = content.replace(/<[^>]*>?/gm, '') // HTML 태그 제거
+  return text.length > 80 ? text.substring(0, 80) + '...' : text
+}
+
+// --- 메서드 ---
 const startSlide = () => {
   stopSlide()
   slideInterval = setInterval(() => {
@@ -178,7 +241,14 @@ const handlePickClick = (title) => {
   }
 }
 
-onMounted(() => { startSlide() })
+// --- 라이프사이클 훅 ---
+onMounted(() => {
+  startSlide()
+  boardStore.fetchPosts('news')
+  boardStore.fetchPosts('info')
+  boardStore.fetchPosts('free') // [추가] 자유게시판 데이터 로드
+})
+
 onUnmounted(() => { stopSlide() })
 </script>
 
@@ -213,18 +283,52 @@ onUnmounted(() => { stopSlide() })
 .action-btn.primary { background-color: #00a651; color: white; }
 .action-btn.secondary { background-color: #f5f5f5; color: #555; }
 .pick-section { margin-top: 60px; }
-.section-title-container { display: flex; align-items: center; margin-bottom: 20px; gap: 10px; }
+.section-title-container { display: flex; align-items: center; margin-bottom: 20px; gap: 10px; position: relative; }
 .section-logo { width: 30px; height: 30px; border-radius: 50%; object-fit: cover;}
 .section-title { font-size: 22px; margin: 0; }
 .pick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .pick-card { background: white; border: 1px solid #eee; border-radius: 20px; padding: 30px; text-align: center; cursor: pointer; transition: 0.3s; }
 .pick-card:hover { transform: translateY(-5px); border-color: #00a651; }
 .pick-icon { font-size: 30px; margin-bottom: 10px; }
+
+/* [추가] 트렌딩 섹션 스타일 */
+.trending-section { margin-top: 60px; }
+.section-icon { font-size: 24px; }
+.more-link { margin-left: auto; font-size: 14px; color: #999; cursor: pointer; transition: 0.2s; }
+.more-link:hover { color: #00a651; }
+
+.trending-card {
+  background: white; border-radius: 20px; padding: 35px; border: 1px solid #eee;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03); cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center;
+  transition: all 0.3s ease; position: relative; overflow: hidden;
+}
+.trending-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0, 166, 81, 0.15); border-color: #00a651; }
+.trending-content { flex: 1; padding-right: 20px; z-index: 1; }
+.trending-badges { display: flex; gap: 8px; margin-bottom: 15px; }
+.badge { font-size: 12px; font-weight: bold; padding: 4px 10px; border-radius: 12px; }
+.badge.free { background-color: #e8f5e9; color: #00a651; }
+.badge.new { background-color: #ff6b6b; color: white; }
+.trending-title { font-size: 24px; font-weight: bold; margin: 0 0 10px 0; color: #333; }
+.trending-desc { font-size: 15px; color: #666; line-height: 1.6; margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.trending-meta { display: flex; align-items: center; gap: 20px; font-size: 14px; color: #888; }
+.reaction-info { display: flex; gap: 12px; }
+.trending-visual { font-size: 80px; opacity: 0.1; transform: rotate(-10deg); transition: 0.3s; }
+.trending-card:hover .trending-visual { opacity: 0.2; transform: rotate(0deg) scale(1.1); }
+@media (max-width: 768px) {
+  .trending-card { flex-direction: column; text-align: left; }
+  .trending-visual { display: none; }
+  .trending-content { padding-right: 0; }
+}
+
 .board-section { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 60px; }
 .board-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
 .board-list { list-style: none; padding: 0; background: white; border-radius: 15px; border: 1px solid #eee; }
 .board-list li { padding: 15px 20px; border-bottom: 1px solid #f5f5f5; font-size: 14px; cursor: pointer; }
 .board-list li:hover { background: #fafafa; color: #00a651; }
+.more-btn { cursor: pointer; color: #00a651; font-size: 14px; }
+.more-btn:hover { text-decoration: underline; }
+.empty-board { color: #999; text-align: center; pointer-events: none; }
 .main-footer { text-align: center; padding: 40px; color: #999; font-size: 12px; }
 
 /* 애니메이션: Transition name="slide-fade"와 연결 */

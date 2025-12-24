@@ -42,10 +42,11 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "quizzes",
+    "finance_infos",
     "ais",
     "gold_prices",
     "deposits",
-    "finances",
+    "boards",
     "accounts",
     "assets",
     'rest_framework',
