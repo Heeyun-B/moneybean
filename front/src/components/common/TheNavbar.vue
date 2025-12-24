@@ -29,6 +29,7 @@
           </div>
           <ul class="profile-submenu">
             <li @click="router.push({ name: 'assets' })">내 자산 보기</li>
+            <li @click="router.push({ name: 'profile' })">마이페이지</li>
             <li @click="router.push({ name: 'board-liked' })">좋아요한 글</li>
             <li @click="handleLogout" class="logout-item">로그아웃</li>
           </ul>
