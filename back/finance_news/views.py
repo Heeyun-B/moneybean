@@ -1,7 +1,7 @@
 import openai
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework import status
 from django.conf import settings
 from .models import NewsArticle
@@ -15,6 +15,7 @@ client = openai.OpenAI(
 )
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def news_list(request):
     """뉴스 목록 조회"""
     articles = NewsArticle.objects.all()
@@ -22,6 +23,7 @@ def news_list(request):
     return Response(serializer.data)
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def news_detail(request, news_pk):
     """뉴스 상세 조회 및 content 필드에 요약 데이터 반환"""
     try:

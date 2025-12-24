@@ -53,7 +53,7 @@
             <div class="post-title-area">
               <span v-if="post.is_notice" class="notice-badge">공지</span>
               <h3 class="post-title">{{ post.title }}</h3>
-              <span v-if="post.comment_count > 0" class="comment-count">[{{ post.comment_count }}]</span>
+              <span v-if="boardType !== 'news' && post.comment_count > 0" class="comment-count">[{{ post.comment_count }}]</span>
             </div>
           </div>
           <div class="post-info">
@@ -69,7 +69,7 @@
               <span class="stat-icon">❤️</span>
               <span class="stat-value">{{ post.like_count || 0 }}</span>
             </span>
-            <span class="stat-item">
+            <span v-if="boardType !== 'news'" class="stat-item">
               <span class="stat-icon">💬</span>
               <span class="stat-value">{{ post.comment_count || 0 }}</span>
             </span>
