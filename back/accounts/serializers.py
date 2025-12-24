@@ -12,10 +12,11 @@ class SignupSerializer(serializers.ModelSerializer):
         validators=[validate_password]
     )
     password2 = serializers.CharField(write_only=True, required=True)
+    birth_date = serializers.DateField(required=False, allow_null=True)
     
     class Meta:
         model = User
-        fields = ('username', 'password', 'password2', 'email', 'nickname')
+        fields = ('username', 'password', 'password2', 'email', 'nickname', 'birth_date')
     
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
@@ -29,6 +30,7 @@ class SignupSerializer(serializers.ModelSerializer):
             username=validated_data['username'],
             email=validated_data.get('email', ''),
             nickname=validated_data['nickname'],
+            birth_date=validated_data.get('birth_date'),
         )
         user.set_password(validated_data['password'])
         user.save()
@@ -43,7 +45,7 @@ class LoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'nickname', 'is_staff')
+        fields = ('id', 'username', 'email', 'nickname', 'birth_date', 'is_staff')
 
 class DepositSubscriptionSerializer(serializers.ModelSerializer):
     """가입한 예금 상품"""
@@ -86,7 +88,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'nickname', 'first_name', 'last_name', 'date_joined', 'deposit_subscriptions', 'saving_subscriptions')
+        fields = ('id', 'username', 'email', 'nickname', 'birth_date', 'first_name', 'last_name', 'date_joined', 'deposit_subscriptions', 'saving_subscriptions')
         read_only_fields = ('id', 'username', 'date_joined')
 
 
@@ -94,7 +96,7 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
     """프로필 수정용 Serializer"""
     class Meta:
         model = User
-        fields = ('email', 'nickname', 'first_name', 'last_name')
+        fields = ('email', 'nickname', 'birth_date', 'first_name', 'last_name')
     
     def validate_nickname(self, value):
         """닉네임 중복 체크 (자기 자신 제외)"""
