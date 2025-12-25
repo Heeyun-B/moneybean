@@ -97,10 +97,9 @@
           <div class="trending-content">
             <div class="trending-badges">
               <span class="badge free">자유게시판</span>
-              <span class="badge new">NEW</span>
+              <span class="badge hot">🔥 HOT</span>
             </div>
             <h3 class="trending-title">{{ trendingPost.title }}</h3>
-            <p class="trending-desc">{{ getPreviewText(trendingPost.content) }}</p>
             <div class="trending-meta">
               <span class="author-info">🖊️ {{ trendingPost.author }}</span>
               <div class="reaction-info">
@@ -206,18 +205,21 @@ const handleBannerClick = () => {
 const recentNews = computed(() => boardStore.getPosts('news').slice(0, 5))
 const recentInfo = computed(() => boardStore.getPosts('info').slice(0, 5))
 
-// 자유게시판 데이터
+// 자유게시판 데이터 - 가장 많은 좋아요를 받은 글
 const trendingPost = computed(() => {
   const posts = boardStore.getPosts('free')
-  return posts.length > 0 ? posts[0] : null
-})
+  if (posts.length === 0) return null
 
-// 본문 미리보기 텍스트 처리
-const getPreviewText = (content) => {
-  if (!content) return ''
-  const text = content.replace(/<[^>]*>?/gm, '')
-  return text.length > 80 ? text.substring(0, 80) + '...' : text
-}
+  // 좋아요 수로 내림차순 정렬, 동일하면 최신순
+  const sortedPosts = [...posts].sort((a, b) => {
+    if (b.like_count !== a.like_count) {
+      return b.like_count - a.like_count
+    }
+    return new Date(b.created_at) - new Date(a.created_at)
+  })
+
+  return sortedPosts[0]
+})
 
 // 메서드
 const startSlide = () => {

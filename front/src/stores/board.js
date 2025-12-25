@@ -17,20 +17,21 @@ export const useBoardStore = defineStore('board', () => {
   // 댓글 목록
   const comments = ref({})
 
-  // 좋아요한 게시글 목록 (boardType-postId 형태의 문자열 배열)
-  // 예: ['free-1', 'news-2', 'info-3']
+  // 좋아요한 게시글 목록 (사용자별로 저장)
+  // 예: { 'user123': ['free-1', 'news-2'], 'user456': ['info-3'] }
+  const getLikedPostsKey = () => {
+    const username = authStore.userNickname || 'guest'
+    return `likedPosts_${username}`
+  }
+
   const migrateLikedPosts = () => {
-    const stored = localStorage.getItem('likedPosts')
+    const key = getLikedPostsKey()
+    const stored = localStorage.getItem(key)
     if (!stored) return []
 
     try {
       const parsed = JSON.parse(stored)
-      // 이미 마이그레이션된 경우 (문자열 배열)
-      if (parsed.length > 0 && typeof parsed[0] === 'string' && parsed[0].includes('-')) {
-        return parsed
-      }
-      // 마이그레이션이 필요한 경우 (숫자 배열) - 모두 삭제하고 새로 시작
-      return []
+      return Array.isArray(parsed) ? parsed : []
     } catch {
       return []
     }
@@ -226,6 +227,18 @@ export const useBoardStore = defineStore('board', () => {
             like_count: response.data.like_count || 0,
             is_liked: response.data.is_liked || false,
             is_notice: response.data.is_notice || false,
+          }
+
+          // 백엔드의 is_liked와 localStorage 동기화
+          const freeKey = `free-${postId}`
+          if (response.data.is_liked && !likedPosts.value.includes(freeKey)) {
+            likedPosts.value.push(freeKey)
+            const storageKey = getLikedPostsKey()
+            localStorage.setItem(storageKey, JSON.stringify(likedPosts.value))
+          } else if (!response.data.is_liked && likedPosts.value.includes(freeKey)) {
+            likedPosts.value = likedPosts.value.filter(k => k !== freeKey)
+            const storageKey = getLikedPostsKey()
+            localStorage.setItem(storageKey, JSON.stringify(likedPosts.value))
           }
           if (response.data.comments) {
             comments.value[postId] = response.data.comments.map(comment => {
@@ -584,7 +597,8 @@ export const useBoardStore = defineStore('board', () => {
             likedPosts.value.push(key)
           }
         }
-        localStorage.setItem('likedPosts', JSON.stringify(likedPosts.value))
+        const storageKey = getLikedPostsKey()
+        localStorage.setItem(storageKey, JSON.stringify(likedPosts.value))
 
         // 뉴스 목록에서 해당 게시글의 좋아요 개수 업데이트
         const posts = getPosts(boardType)
@@ -623,7 +637,8 @@ export const useBoardStore = defineStore('board', () => {
         likedPosts.value = likedPosts.value.filter(k => k !== key)
       }
 
-      localStorage.setItem('likedPosts', JSON.stringify(likedPosts.value))
+      const storageKey = getLikedPostsKey()
+      localStorage.setItem(storageKey, JSON.stringify(likedPosts.value))
 
       const posts = getPosts(boardType)
       const postIndex = posts.findIndex(p => p.id === parseInt(postId))
@@ -662,10 +677,15 @@ export const useBoardStore = defineStore('board', () => {
     })
   }
 
+  // 사용자별 좋아요 정보 다시 로드
+  const reloadLikedPosts = () => {
+    likedPosts.value = migrateLikedPosts()
+  }
+
   return {
     freePosts, newsPosts, infoPosts, comments, likedPosts,
     getPosts, getPost, getComments, isLiked, getLikedPosts,
     fetchPosts, fetchPostDetail, createPost, updatePost, deletePost,
-    fetchComments, createComment, deleteComment, toggleLike
+    fetchComments, createComment, deleteComment, toggleLike, reloadLikedPosts
   }
 })
