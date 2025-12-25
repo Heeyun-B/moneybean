@@ -50,7 +50,7 @@ const handleLogin = async () => {
     alert('아이디와 비밀번호를 입력해주세요.')
     return
   }
-  
+
   isLoading.value = true
   try {
     await authStore.logIn({
@@ -59,12 +59,8 @@ const handleLogin = async () => {
     })
 
     // 로그인 성공 시 리다이렉트 처리
-    const redirectPath = route.query.redirect
-    if (redirectPath) {
-      router.push({ name: redirectPath })
-    } else {
-      router.push({ name: 'home' })
-    }
+    const redirectPath = route.query.redirect || '/'
+    router.push(redirectPath)
   } catch (error) {
     alert('아이디 또는 비밀번호를 확인해주세요.')
   } finally {

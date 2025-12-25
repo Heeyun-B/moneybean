@@ -155,7 +155,7 @@ export default {
       // 로그인하지 않은 경우 로그인 페이지로 이동
       if (!authStore.isAuthenticated) {
         alert('로그인이 필요한 기능입니다.')
-        router.push({ name: 'login' })
+        router.push({ name: 'login', query: { redirect: route.fullPath } })
         return
       }
 

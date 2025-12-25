@@ -81,21 +81,14 @@ const router = createRouter({
     {
       path: '/assets',
       name: 'assets',
-      component: AssetView
+      component: AssetView,
+      meta: { requiresAuth: true }
     },
     {
       path: '/assets/create',
       name: 'asset-create',
       component: AssetCreateView,
-      beforeEnter: (to, from, next) => {
-        const token = localStorage.getItem('token')
-        if (!token) {
-          alert('로그인이 필요한 서비스입니다.')
-          next({ name: 'login' })
-        } else {
-          next()
-        }
-      }
+      meta: { requiresAuth: true }
     },
 
     // 유튜브 관련
@@ -118,6 +111,7 @@ const router = createRouter({
       path: '/later',
       name: 'later-videos',
       component: LaterView,
+      meta: { requiresAuth: true }
     },
 
     // 예적금 관련
@@ -155,7 +149,8 @@ const router = createRouter({
     {
       path: '/quiz',
       name: 'quiz',
-      component: QuizView
+      component: QuizView,
+      meta: { requiresAuth: true }
     },
 
     // 게시판 관련
@@ -190,24 +185,33 @@ const router = createRouter({
       path: '/profile',
       name: 'profile',
       component: ProfileView,
-      beforeEnter: (to, from, next) => {
-        const token = localStorage.getItem('token')
-        if (!token) {
-          alert("로그인이 필요한 서비스입니다.")
-          next({ name: 'login' })
-        } else {
-          next()
-        }
-      }
+      meta: { requiresAuth: true }
     },
 
     // 금전운 관련
     {
       path: '/luck',
       name: 'luck',
-      component: () => import('@/views/Luck/LuckView.vue')
+      component: () => import('@/views/Luck/LuckView.vue'),
+      meta: { requiresAuth: true }
     },
   ],
+})
+
+// 전역 네비게이션 가드
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token')
+
+  // 인증이 필요한 페이지인데 토큰이 없으면
+  if (to.matched.some(record => record.meta.requiresAuth) && !token) {
+    alert('로그인이 필요한 서비스입니다.')
+    next({
+      name: 'login',
+      query: { redirect: to.fullPath }
+    })
+  } else {
+    next()
+  }
 })
 
 export default router

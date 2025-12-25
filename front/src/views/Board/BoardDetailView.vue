@@ -81,7 +81,7 @@
 
         <div v-else class="login-required-comment">
           <p>댓글을 작성하려면 로그인이 필요합니다.</p>
-          <button class="login-link-btn" @click="$router.push('/login')">
+          <button class="login-link-btn" @click="goToLogin">
             로그인하기
           </button>
         </div>
@@ -185,6 +185,10 @@ const formatDate = (dateString) => {
 
 const goBack = () => {
   router.push({ name: 'board-list', params: { type: boardType.value } })
+}
+
+const goToLogin = () => {
+  router.push({ name: 'login', query: { redirect: route.fullPath } })
 }
 
 const editPost = () => {
