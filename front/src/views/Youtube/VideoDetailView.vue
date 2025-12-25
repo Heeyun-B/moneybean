@@ -58,6 +58,7 @@
 <script>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import YoutubeNavBar from '@/components/youtube/YoutubeNavBar.vue'
 import { getVideoDetails } from '@/api/youtube.js'
 
@@ -69,6 +70,7 @@ export default {
   setup() {
     const route = useRoute()
     const router = useRouter()
+    const authStore = useAuthStore()
     const videoId = ref(route.params.id)
     const videoInfo = ref({
       title: '',
@@ -82,10 +84,35 @@ export default {
     const savedVideos = ref([])
     const isDescriptionExpanded = ref(false)
 
+    // 사용자별 localStorage 키 생성
+    const getStorageKey = () => {
+      if (!authStore.isAuthenticated || !authStore.userNickname) {
+        return null
+      }
+      return `savedVideos_${authStore.userNickname}`
+    }
+
     const loadSavedVideos = () => {
-      const saved = localStorage.getItem('savedVideos')
+      // 로그인하지 않은 경우 데이터를 로드하지 않음
+      if (!authStore.isAuthenticated) {
+        savedVideos.value = []
+        return
+      }
+
+      const storageKey = getStorageKey()
+      if (!storageKey) {
+        savedVideos.value = []
+        return
+      }
+
+      const saved = localStorage.getItem(storageKey)
       if (saved) {
-        savedVideos.value = JSON.parse(saved)
+        try {
+          savedVideos.value = JSON.parse(saved)
+        } catch (e) {
+          console.error('저장된 영상 데이터 파싱 실패:', e)
+          savedVideos.value = []
+        }
       }
     }
 
@@ -125,6 +152,16 @@ export default {
     }
 
     const toggleSave = () => {
+      // 로그인하지 않은 경우 로그인 페이지로 이동
+      if (!authStore.isAuthenticated) {
+        alert('로그인이 필요한 기능입니다.')
+        router.push({ name: 'login' })
+        return
+      }
+
+      const storageKey = getStorageKey()
+      if (!storageKey) return
+
       if (isSaved.value) {
         savedVideos.value = savedVideos.value.filter(v => v.id !== videoId.value)
       } else {
@@ -135,7 +172,7 @@ export default {
           thumbnail: videoInfo.value.thumbnail
         })
       }
-      localStorage.setItem('savedVideos', JSON.stringify(savedVideos.value))
+      localStorage.setItem(storageKey, JSON.stringify(savedVideos.value))
     }
 
     onMounted(() => {

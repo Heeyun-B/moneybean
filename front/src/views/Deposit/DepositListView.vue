@@ -285,38 +285,69 @@ const mySavingProducts = computed(() => {
 
 // 데이터 가져오기
 const fetchData = async (forceUpdate = false) => {
-  if (isLoading.value) return; 
+  if (isLoading.value) return;
   isLoading.value = true;
 
   try {
     const isDeposit = activeTab.value === 'deposit';
-    
+
     if (!forceUpdate) {
-      if (isDeposit) await store.getDepositProducts();
-      else await store.getSavingProducts();
+      try {
+        if (isDeposit) {
+          await store.getDepositProducts();
+        } else {
+          await store.getSavingProducts();
+        }
+      } catch (err) {
+        console.warn('기존 데이터 로드 실패, 최신 데이터를 가져옵니다...', err);
+      }
     }
 
     const currentList = isDeposit ? store.depositProducts : store.savingProducts;
 
+    // 데이터가 없거나 강제 업데이트인 경우
     if (forceUpdate || !currentList || currentList.length === 0) {
       console.log(`[${activeTab.value}] 최신 데이터를 가져옵니다...`);
-      
-      if (isDeposit) {
-        await store.saveDepositProducts(); 
-        await store.getDepositProducts();  
-      } else {
-        await store.saveSavingProducts();  
-        await store.getSavingProducts();   
+
+      // 로그인된 사용자만 save API 호출 (외부 API 호출)
+      if (forceUpdate && authStore.token) {
+        try {
+          if (isDeposit) {
+            await store.saveDepositProducts();
+          } else {
+            await store.saveSavingProducts();
+          }
+        } catch (err) {
+          console.error('외부 API 데이터 저장 실패:', err);
+          // 저장 실패해도 기존 데이터 조회는 시도
+        }
+      }
+
+      // 데이터 조회 (비로그인 사용자도 가능)
+      try {
+        if (isDeposit) {
+          await store.getDepositProducts();
+        } else {
+          await store.getSavingProducts();
+        }
+      } catch (err) {
+        console.error('상품 목록 로드 실패:', err);
       }
     }
 
     // 로그인 상태면 가입 목록도 가져오기
     if (authStore.token) {
-      await store.getMySubscriptions();
-      await store.getMySavingSubscriptions();
+      try {
+        await store.getMySubscriptions();
+        await store.getMySavingSubscriptions();
+      } catch (err) {
+        console.warn('가입 목록 로드 실패:', err);
+        // 가입 목록 로드 실패해도 상품 목록은 표시
+      }
     }
   } catch (err) {
     console.error("데이터 로딩 실패:", err);
+    // 에러가 발생해도 빈 배열로 표시되도록 함
   } finally {
     isLoading.value = false;
   }

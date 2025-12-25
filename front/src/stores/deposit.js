@@ -21,63 +21,113 @@ export const useDepositStore = defineStore('deposit', () => {
 
   // [예금] 목록 조회
   const getDepositProducts = function (bankName = '') {
-    return axios({
+    const config = {
       method: 'get',
       url: `${API_URL}/deposit-products/`,
-      params: { bank: bankName },
-      headers: { Authorization: authStore.token ? `Token ${authStore.token}` : '' }
-    })
-      .then((res) => depositProducts.value = res.data)
-      .catch((err) => console.log(err))
+      params: bankName ? { bank: bankName } : {}
+    }
+
+    // 로그인 상태일 때만 Authorization 헤더 추가
+    if (authStore.token) {
+      config.headers = { Authorization: `Token ${authStore.token}` }
+    }
+
+    return axios(config)
+      .then((res) => {
+        depositProducts.value = res.data
+        return res.data
+      })
+      .catch((err) => {
+        console.error('예금 목록 로드 실패:', err.response?.data || err.message)
+        depositProducts.value = []
+        throw err
+      })
   }
 
   // [예금] DB 저장 (Scraping)
   const saveDepositProducts = function () {
-    return axios({
-      method: 'post',  // get → post
-      url: `${API_URL}/save-deposit-products/`,
-      headers: { Authorization: authStore.token ? `Token ${authStore.token}` : '' }
-    })
+    const config = {
+      method: 'post',
+      url: `${API_URL}/save-deposit-products/`
+    }
+
+    // 로그인 상태일 때만 Authorization 헤더 추가
+    if (authStore.token) {
+      config.headers = { Authorization: `Token ${authStore.token}` }
+    }
+
+    return axios(config)
   }
 
   // [적금] 목록 조회
   const getSavingProducts = function () {
-    return axios({
+    const config = {
       method: 'get',
-      url: `${API_URL}/saving-products/`,
-      headers: { Authorization: authStore.token ? `Token ${authStore.token}` : '' }
-    })
-      .then((res) => savingProducts.value = res.data)
-      .catch((err) => console.log('적금 목록 로드 실패:', err))
+      url: `${API_URL}/saving-products/`
+    }
+
+    // 로그인 상태일 때만 Authorization 헤더 추가
+    if (authStore.token) {
+      config.headers = { Authorization: `Token ${authStore.token}` }
+    }
+
+    return axios(config)
+      .then((res) => {
+        savingProducts.value = res.data
+        return res.data
+      })
+      .catch((err) => {
+        console.error('적금 목록 로드 실패:', err.response?.data || err.message)
+        savingProducts.value = []
+        throw err
+      })
   }
 
   // [적금] DB 저장 (Scraping)
   const saveSavingProducts = function () {
-    return axios({
-      method: 'post',  // get → post
-      url: `${API_URL}/save-saving-products/`,
-      headers: { Authorization: authStore.token ? `Token ${authStore.token}` : '' }
-    })
+    const config = {
+      method: 'post',
+      url: `${API_URL}/save-saving-products/`
+    }
+
+    // 로그인 상태일 때만 Authorization 헤더 추가
+    if (authStore.token) {
+      config.headers = { Authorization: `Token ${authStore.token}` }
+    }
+
+    return axios(config)
   }
 
   // [예금] 상세 조회
   const getDepositDetail = function (finPrdtCd) {
-    return axios({
+    const config = {
       method: 'get',
-      url: `${API_URL}/deposit-products/${finPrdtCd}/`,
-      headers: { Authorization: authStore.token ? `Token ${authStore.token}` : '' }
-    })
+      url: `${API_URL}/deposit-products/${finPrdtCd}/`
+    }
+
+    // 로그인 상태일 때만 Authorization 헤더 추가
+    if (authStore.token) {
+      config.headers = { Authorization: `Token ${authStore.token}` }
+    }
+
+    return axios(config)
       .then((res) => depositDetail.value = res.data)
       .catch((err) => console.log(err))
   }
 
   // [적금] 상세 조회
   const getSavingDetail = function (finPrdtCd) {
-    return axios({
+    const config = {
       method: 'get',
-      url: `${API_URL}/saving-products/${finPrdtCd}/`,
-      headers: { Authorization: authStore.token ? `Token ${authStore.token}` : '' }
-    })
+      url: `${API_URL}/saving-products/${finPrdtCd}/`
+    }
+
+    // 로그인 상태일 때만 Authorization 헤더 추가
+    if (authStore.token) {
+      config.headers = { Authorization: `Token ${authStore.token}` }
+    }
+
+    return axios(config)
       .then((res) => savingDetail.value = res.data)
       .catch((err) => console.log('적금 상세 로드 실패:', err))
   }
