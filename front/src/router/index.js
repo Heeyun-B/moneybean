@@ -86,7 +86,16 @@ const router = createRouter({
     {
       path: '/assets/create',
       name: 'asset-create',
-      component: AssetCreateView
+      component: AssetCreateView,
+      beforeEnter: (to, from, next) => {
+        const token = localStorage.getItem('token')
+        if (!token) {
+          alert('로그인이 필요한 서비스입니다.')
+          next({ name: 'login' })
+        } else {
+          next()
+        }
+      }
     },
 
     // 유튜브 관련
