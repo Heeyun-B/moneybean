@@ -60,11 +60,11 @@
       <div class="edit-inputs">
         <div class="input-group">
           <label class="input-label">닉네임</label>
-          <input type="text" v-model="editNickname" class="input-field" maxlength="20" />
+          <input type="text" v-model="editNickname" class="input-field" maxlength="20" placeholder="닉네임을 입력하세요" />
         </div>
         
         <div class="input-group">
-          <label class="input-label">이메일</label>
+          <label class="input-label">이메일 (선택)</label>
           <input type="email" v-model="editEmail" class="input-field" placeholder="example@email.com" />
         </div>
 
@@ -187,17 +187,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch, nextTick } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useAssetStore } from '@/stores/asset'
 import { useBoardStore } from '@/stores/board'
 import axios from 'axios'
 
-// 이미지 자산 Import (Vite 기준)
+// 이미지 자산 Import
 import defaultLogo from '@/assets/logo_bean.png'
-
-// 레벨 이미지 import
 import levelBeanImg from '@/assets/level_logos/level_bean.png'
 import levelSproutImg from '@/assets/level_logos/level_sprout.png'
 import levelBranchImg from '@/assets/level_logos/level_branch.png'
@@ -230,7 +228,7 @@ const selectedFile = ref(null)
 const previewUrl = ref(null)
 
 // --- 날짜 관련 계산 ---
-const years = Array.from({ length: 80 }, (_, i) => String(2025 - i))
+const years = Array.from({ length: 50 }, (_, i) => String(2025 - i))
 const months = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'))
 const days = computed(() => {
   const lastDay = new Date(parseInt(birthYear.value), parseInt(birthMonth.value), 0).getDate()
@@ -295,18 +293,46 @@ const getProfile = async () => {
       headers: { Authorization: `Token ${authStore.token}` }
     })
     profileData.value = res.data
+    console.log('📋 프로필 로드 완료')
     calculateLevel()
   } catch (err) {
-    console.error('프로필 로드 실패:', err)
+    console.error('❌ 프로필 로드 실패:', err)
   }
 }
 
 onMounted(async () => {
+  console.log('🚀 ProfileView 마운트')
   isLoading.value = true
-  await assetStore.getAssets()
-  await getProfile()
-  await fetchActivityData()
-  isLoading.value = false
+  
+  try {
+    // 1. 자산 데이터 먼저 로드
+    await assetStore.getAssets()
+    await assetStore.getCategories()
+    
+    console.log('💰 자산 데이터:', {
+      netWorth: assetStore.netWorth,
+      totalAssets: assetStore.totalAssets,
+      totalDebt: assetStore.totalDebt
+    })
+    
+    // 자산 로드 후 레벨 계산
+    calculateLevel()
+    
+    // 2. 프로필 로드
+    await getProfile()
+    
+    // 3. 게시판 데이터 로드 (백그라운드)
+    await fetchActivityData()
+    
+    // 최종 레벨 재계산
+    calculateLevel()
+    
+    console.log('✅ 초기화 완료')
+  } catch (error) {
+    console.error('❌ 초기화 오류:', error)
+  } finally {
+    isLoading.value = false
+  }
 })
 
 // --- 수정 핸들러 ---
@@ -327,7 +353,9 @@ const startEdit = () => {
   editEmail.value = profileData.value.email || ''
   if (profileData.value.birth_date) {
     const [y, m, d] = profileData.value.birth_date.split('-')
-    birthYear.value = y; birthMonth.value = m; birthDay.value = d
+    birthYear.value = y
+    birthMonth.value = m
+    birthDay.value = d
   }
   isEditing.value = true
 }
@@ -339,12 +367,19 @@ const cancelEdit = () => {
 }
 
 const handleUpdate = async () => {
-  if (!editNickname.value.trim()) return alert('닉네임을 입력해주세요.')
+  if (!editNickname.value.trim()) {
+    alert('닉네임을 입력해주세요.')
+    return
+  }
   
   isLoading.value = true
   const formData = new FormData()
   formData.append('nickname', editNickname.value)
-  formData.append('email', editEmail.value)
+  
+  if (editEmail.value && editEmail.value.trim() !== '') {
+    formData.append('email', editEmail.value.trim())
+  }
+  
   formData.append('birth_date', `${birthYear.value}-${birthMonth.value}-${birthDay.value}`)
   if (selectedFile.value) formData.append('profile_image', selectedFile.value)
 
@@ -359,9 +394,11 @@ const handleUpdate = async () => {
     cacheBuster.value = Date.now()
     await getProfile()
     isEditing.value = false
+    previewUrl.value = null
+    selectedFile.value = null
     alert('프로필이 성공적으로 수정되었습니다!')
   } catch (err) {
-    alert('수정 실패: ' + (err.response?.data?.message || '오류가 발생했습니다.'))
+    alert('수정 실패: ' + (err.response?.data?.message || err.response?.data?.error || '오류가 발생했습니다.'))
   } finally {
     isLoading.value = false
   }
@@ -369,14 +406,26 @@ const handleUpdate = async () => {
 
 // --- 유틸리티 ---
 const formatDate = (d) => d ? d.split('T')[0] : ''
+
 const formatBirthDate = (d) => {
   if (!d) return ''
   const date = new Date(d)
   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`
 }
 
-const goToPost = (type, id) => router.push({ name: 'board-detail', params: { type, id: id.toString() } })
-const goToProductDetail = (type, id) => router.push({ name: type === 'deposit' ? 'deposit-detail' : 'saving-detail', params: { id } })
+const goToPost = (type, id) => {
+  router.push({ 
+    name: 'board-detail', 
+    params: { type, id: id.toString() } 
+  })
+}
+
+const goToProductDetail = (type, id) => {
+  router.push({ 
+    name: type === 'deposit' ? 'deposit-detail' : 'saving-detail', 
+    params: { id } 
+  })
+}
 </script>
 
 <style scoped>
@@ -410,6 +459,12 @@ const goToProductDetail = (type, id) => router.push({ name: type === 'deposit' ?
   padding: 0 30px;
 }
 
+.card-level-display {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+}
+
 .inline-level-tag-top {
   display: flex;
   align-items: center;
@@ -421,11 +476,17 @@ const goToProductDetail = (type, id) => router.push({ name: type === 'deposit' ?
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-.inline-level-img-top { width: 22px; height: 22px; }
+.inline-level-img-top { 
+  width: 22px; 
+  height: 22px; 
+}
 
 /* 레벨별 색상 */
-.lv-1 { color: #6b7280; } .lv-2 { color: #059669; } .lv-3 { color: #2563eb; }
-.lv-4 { color: #9333ea; } .lv-5 { color: #d97706; }
+.lv-1 { color: #6b7280; }
+.lv-2 { color: #059669; }
+.lv-3 { color: #2563eb; }
+.lv-4 { color: #9333ea; }
+.lv-5 { color: #d97706; }
 
 /* 사용자 정보 영역 */
 .user-content {
@@ -463,14 +524,44 @@ const goToProductDetail = (type, id) => router.push({ name: type === 'deposit' ?
   cursor: pointer;
 }
 
-.camera-circle { font-size: 32px; color: white; }
+.camera-circle { 
+  font-size: 32px; 
+  color: white; 
+}
 
-.user-details { flex: 1; padding-top: 70px; }
-.user-nickname { font-size: 32px; font-weight: 800; margin: 0; }
-.user-info-section { margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; }
-.user-id { color: #888; font-size: 15px; margin-bottom: 8px; }
-.divider { margin: 0 10px; color: #eee; }
-.user-birth { color: #555; font-size: 15px; margin-bottom: 15px; }
+.user-details { 
+  flex: 1; 
+  padding-top: 70px; 
+}
+
+.user-nickname { 
+  font-size: 32px; 
+  font-weight: 800; 
+  margin: 0; 
+}
+
+.user-info-section { 
+  margin-top: 15px; 
+  border-top: 1px solid #eee; 
+  padding-top: 15px; 
+}
+
+.user-id { 
+  color: #888; 
+  font-size: 15px; 
+  margin-bottom: 8px; 
+}
+
+.divider { 
+  margin: 0 10px; 
+  color: #eee; 
+}
+
+.user-birth { 
+  color: #555; 
+  font-size: 15px; 
+  margin-bottom: 15px; 
+}
 
 /* 버튼 스타일 */
 .btn-toggle {
@@ -484,12 +575,40 @@ const goToProductDetail = (type, id) => router.push({ name: type === 'deposit' ?
   transition: 0.3s;
 }
 
-.btn-toggle:hover { background: #00a651; color: white; }
+.btn-toggle:hover { 
+  background: #00a651; 
+  color: white; 
+}
 
 /* 수정 폼 */
-.edit-form-card { padding: 30px; }
-.input-group { margin-bottom: 20px; }
-.input-label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 14px; }
+.edit-form-card { 
+  padding: 30px; 
+}
+
+.edit-form-header {
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.edit-form-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #1a1a1a;
+}
+
+.input-group { 
+  margin-bottom: 20px; 
+}
+
+.input-label { 
+  display: block; 
+  font-weight: 700; 
+  margin-bottom: 8px; 
+  font-size: 14px; 
+}
+
 .input-field, .picker-select {
   width: 100%;
   padding: 12px 15px;
@@ -498,16 +617,76 @@ const goToProductDetail = (type, id) => router.push({ name: type === 'deposit' ?
   font-family: inherit;
   transition: 0.2s;
 }
-.input-field:focus, .picker-select:focus { border-color: #00a651; outline: none; box-shadow: 0 0 0 3px rgba(0,166,81,0.1); }
-.picker-group { display: flex; gap: 10px; }
 
-.edit-actions-row { display: flex; gap: 10px; margin-top: 20px; }
-.btn-save { background: #00a651; color: white; border: none; flex: 2; padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; }
-.btn-cancel { background: #f3f4f6; color: #666; border: none; flex: 1; padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+.input-field:focus, .picker-select:focus { 
+  border-color: #00a651; 
+  outline: none; 
+  box-shadow: 0 0 0 3px rgba(0,166,81,0.1); 
+}
+
+.picker-group { 
+  display: flex; 
+  gap: 10px; 
+}
+
+.edit-actions-row { 
+  display: flex; 
+  gap: 10px; 
+  margin-top: 20px; 
+}
+
+.btn-save { 
+  background: #00a651; 
+  color: white; 
+  border: none; 
+  flex: 2; 
+  padding: 15px; 
+  border-radius: 12px; 
+  font-weight: 700; 
+  cursor: pointer; 
+  transition: 0.2s;
+}
+
+.btn-save:hover { 
+  background: #008f43; 
+  transform: translateY(-1px); 
+  box-shadow: 0 4px 12px rgba(0, 166, 81, 0.3); 
+}
+
+.btn-save:disabled { 
+  background: #ccc; 
+  cursor: not-allowed; 
+  transform: none; 
+  box-shadow: none; 
+}
+
+.btn-cancel { 
+  background: #f3f4f6; 
+  color: #666; 
+  border: none; 
+  flex: 1; 
+  padding: 15px; 
+  border-radius: 12px; 
+  font-weight: 700; 
+  cursor: pointer; 
+  transition: 0.2s;
+}
+
+.btn-cancel:hover { 
+  background: #e5e7eb; 
+  color: #333; 
+}
 
 /* 섹션 그리드 */
-.section-title { padding: 25px 30px 0; }
-.section-title h3 { font-size: 22px; font-weight: 800; margin: 0; }
+.section-title { 
+  padding: 25px 30px 0; 
+}
+
+.section-title h3 { 
+  font-size: 22px; 
+  font-weight: 800; 
+  margin: 0; 
+}
 
 .asset-grid, .community-grid {
   display: grid;
@@ -533,7 +712,13 @@ const goToProductDetail = (type, id) => router.push({ name: type === 'deposit' ?
   border-bottom: 2px solid #eee;
 }
 
-.count-tag { color: #00a651; background: #e6f6ee; padding: 4px 10px; border-radius: 10px; font-size: 13px; }
+.count-tag { 
+  color: #00a651; 
+  background: #e6f6ee; 
+  padding: 4px 10px; 
+  border-radius: 10px; 
+  font-size: 13px; 
+}
 
 /* 리스트 아이템 */
 .product-item, .post-mini-item {
@@ -545,20 +730,57 @@ const goToProductDetail = (type, id) => router.push({ name: type === 'deposit' ?
   transition: 0.2s;
 }
 
-.clickable { cursor: pointer; }
+.clickable { 
+  cursor: pointer; 
+}
+
 .clickable:hover {
   transform: translateY(-3px);
   border-color: #00a651;
   box-shadow: 0 6px 15px rgba(0,166,81,0.1);
 }
 
-.bank { font-size: 11px; color: #00a651; font-weight: 800; }
-.title { font-weight: 700; margin-top: 4px; font-size: 16px; }
-.info { font-size: 13px; color: #888; margin-top: 6px; }
+.bank { 
+  font-size: 11px; 
+  color: #00a651; 
+  font-weight: 800; 
+}
 
-.post-title { font-weight: 700; font-size: 15px; display: block; }
-.post-date, .post-author { font-size: 12px; color: #aaa; margin-top: 4px; }
-.post-meta { color: #ff6b6b; font-weight: 700; font-size: 13px; }
+.title { 
+  font-weight: 700; 
+  margin-top: 4px; 
+  font-size: 16px; 
+}
+
+.info { 
+  font-size: 13px; 
+  color: #888; 
+  margin-top: 6px; 
+}
+
+.post-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.post-title { 
+  font-weight: 700; 
+  font-size: 15px; 
+  display: block; 
+}
+
+.post-date, .post-author { 
+  font-size: 12px; 
+  color: #aaa; 
+  margin-top: 4px; 
+}
+
+.post-meta { 
+  color: #ff6b6b; 
+  font-weight: 700; 
+  font-size: 13px; 
+}
 
 .empty-box {
   padding: 40px;
@@ -571,10 +793,30 @@ const goToProductDetail = (type, id) => router.push({ name: type === 'deposit' ?
 
 /* 반응형 */
 @media (max-width: 768px) {
-  .asset-grid, .community-grid { grid-template-columns: 1fr; padding: 20px; }
-  .user-content { flex-direction: column; align-items: center; text-align: center; }
-  .user-details { padding-top: 20px; }
-  .card-level-display { position: static; margin-top: 10px; justify-content: center; display: flex; }
-  .picker-group { flex-direction: column; }
+  .asset-grid, .community-grid { 
+    grid-template-columns: 1fr; 
+    padding: 20px; 
+  }
+  
+  .user-content { 
+    flex-direction: column; 
+    align-items: center; 
+    text-align: center; 
+  }
+  
+  .user-details { 
+    padding-top: 20px; 
+  }
+  
+  .card-level-display { 
+    position: static; 
+    margin-top: 10px; 
+    justify-content: center; 
+    display: flex; 
+  }
+  
+  .picker-group { 
+    flex-direction: column; 
+  }
 }
 </style>
