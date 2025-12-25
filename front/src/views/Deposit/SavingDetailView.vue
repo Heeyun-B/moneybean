@@ -52,7 +52,7 @@
         </div>
       </section>
 
-      <div class="action-section">
+      <div class="action-section" v-if="authStore.isAuthenticated">
         <button v-if="isSubscribed" @click="handleUnsubscribe" class="unsubscribe-btn">
           이 상품 가입 해제하기
         </button>
@@ -108,12 +108,6 @@ onMounted(async () => {
 
 // 적금 가입하기
 const handleSubscribe = () => {
-  if (!authStore.token) {
-    alert('로그인이 필요한 서비스입니다.');
-    router.push('/login');
-    return;
-  }
-
   if (!confirm('이 적금 상품에 가입하시겠습니까?')) return;
 
   const finPrdtCd = savingDetail.value.product.fin_prdt_cd;

@@ -12,7 +12,13 @@
       <div class="info-box">
         <span class="bank-name">{{ product.kor_co_nm }}</span>
         <h3 class="product-name">{{ product.fin_prdt_nm }}</h3>
-        
+
+        <div class="product-meta">
+          <span class="meta-item" v-if="availableTerms">
+            📅 {{ availableTerms }}
+          </span>
+        </div>
+
         <div class="tags">
           <span class="tag" v-if="product.join_way">{{ product.join_way.split(',')[0] }}</span>
           <span class="tag highlight" v-if="product.join_way?.includes('스마트폰') || product.join_way?.includes('인터넷')">
@@ -70,6 +76,15 @@ const baseRate = computed(() => {
   if (!props.product.options?.length) return '-';
   const rates = props.product.options.map(o => o.intr_rate || 0);
   return Math.max(...rates).toFixed(2);
+});
+
+// 사용 가능한 저축 기간
+const availableTerms = computed(() => {
+  if (!props.product.options?.length) return null;
+  const terms = [...new Set(props.product.options.map(o => o.save_trm))].sort((a, b) => a - b);
+  if (terms.length === 0) return null;
+  if (terms.length === 1) return `${terms[0]}개월`;
+  return `${terms[0]}~${terms[terms.length - 1]}개월`;
 });
 </script>
 
@@ -132,6 +147,17 @@ const baseRate = computed(() => {
   font-weight: 600;
   color: #333;
   margin: 0;
+  margin-bottom: 6px;
+}
+
+.product-meta {
+  margin-bottom: 6px;
+}
+
+.meta-item {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
 }
 
 .tags {
