@@ -44,11 +44,11 @@
 
           <div class="report-list">
             <div v-for="(item, idx) in fortune.details" :key="idx" class="report-item">
-              <button class="report-header" @click="activeIdx = activeIdx === idx ? null : idx">
+              <button class="report-header" @click="toggleItem(idx)">
                 <span class="header-title">{{ item.title }}</span>
-                <span class="arrow">{{ activeIdx === idx ? '▲' : '▼' }}</span>
+                <span class="arrow">{{ openItems.includes(idx) ? '▲' : '▼' }}</span>
               </button>
-              <div v-show="activeIdx === idx" class="report-content">
+              <div v-show="openItems.includes(idx)" class="report-content">
                 <div v-if="item.title.includes('가이드')" class="guide-box">
                   {{ item.content }}
                 </div>
@@ -74,7 +74,7 @@ const loading = ref(true)
 const loadingMessage = ref('사용자 정보를 확인하고 있습니다...')
 const fortune = ref(null)
 const hasBirthDate = ref(false)
-const activeIdx = ref(0)
+const openItems = ref([0])
 
 // 날짜 선택기 데이터
 const birth = reactive({ year: '', month: '', day: '' })
@@ -117,6 +117,15 @@ const handleRegister = async () => {
   } catch (err) {
     alert('정보 저장에 실패했습니다.')
     loading.value = false
+  }
+}
+
+const toggleItem = (idx) => {
+  const index = openItems.value.indexOf(idx)
+  if (index > -1) {
+    openItems.value.splice(index, 1)
+  } else {
+    openItems.value.push(idx)
   }
 }
 

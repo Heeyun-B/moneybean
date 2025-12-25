@@ -46,26 +46,27 @@
 
         <div class="login-box profile-box" v-else>
           <div class="profile-content">
-            <div class="profile-img-wrapper" @click="router.push({ name: 'profile' })">
-              <img 
-                :src="store.profileImage || '/src/assets/logo_bean.png'" 
-                alt="프로필" 
-                class="profile-img"
-              >
-            </div>
-            <div class="welcome-text">
-              <h3 class="user-name">{{ store.userNickname }}님</h3>
-              <p class="greeting">오늘도 부자되세요! 🌱</p>
+            <div class="profile-header">
+              <div class="profile-img-wrapper" @click="router.push({ name: 'profile' })">
+                <img
+                  :src="store.profileImage || '/src/assets/logo_bean.png'"
+                  alt="프로필"
+                  class="profile-img"
+                >
+              </div>
+              <div class="welcome-text">
+                <h3 class="user-name">{{ store.userNickname }}님</h3>
+                <p class="greeting">오늘도 부자되세요! 🌱</p>
+              </div>
             </div>
             <div class="profile-actions">
               <button class="action-btn primary" @click="router.push({ name: 'assets' })">
-                내 자산 보러가기
+                <span class="btn-icon">💰</span>
+                <span class="btn-text">내 자산 관리</span>
               </button>
               <button class="action-btn secondary" @click="router.push({ name: 'profile' })">
-                마이페이지
-              </button>
-              <button class="action-btn logout-text-btn" @click="handleLogout">
-                로그아웃
+                <span class="btn-icon">👤</span>
+                <span class="btn-text">마이페이지</span>
               </button>
             </div>
           </div>
@@ -96,10 +97,9 @@
           <div class="trending-content">
             <div class="trending-badges">
               <span class="badge free">자유게시판</span>
-              <span class="badge new">NEW</span>
+              <span class="badge hot">🔥 HOT</span>
             </div>
             <h3 class="trending-title">{{ trendingPost.title }}</h3>
-            <p class="trending-desc">{{ getPreviewText(trendingPost.content) }}</p>
             <div class="trending-meta">
               <span class="author-info">🖊️ {{ trendingPost.author }}</span>
               <div class="reaction-info">
@@ -205,18 +205,21 @@ const handleBannerClick = () => {
 const recentNews = computed(() => boardStore.getPosts('news').slice(0, 5))
 const recentInfo = computed(() => boardStore.getPosts('info').slice(0, 5))
 
-// 자유게시판 데이터
+// 자유게시판 데이터 - 가장 많은 좋아요를 받은 글
 const trendingPost = computed(() => {
   const posts = boardStore.getPosts('free')
-  return posts.length > 0 ? posts[0] : null
-})
+  if (posts.length === 0) return null
 
-// 본문 미리보기 텍스트 처리
-const getPreviewText = (content) => {
-  if (!content) return ''
-  const text = content.replace(/<[^>]*>?/gm, '')
-  return text.length > 80 ? text.substring(0, 80) + '...' : text
-}
+  // 좋아요 수로 내림차순 정렬, 동일하면 최신순
+  const sortedPosts = [...posts].sort((a, b) => {
+    if (b.like_count !== a.like_count) {
+      return b.like_count - a.like_count
+    }
+    return new Date(b.created_at) - new Date(a.created_at)
+  })
+
+  return sortedPosts[0]
+})
 
 // 메서드
 const startSlide = () => {
@@ -237,11 +240,6 @@ const nextSlide = () => {
 const goToSlide = (index) => {
   currentSlide.value = index
   startSlide()
-}
-
-const handleLogout = () => {
-  store.logOut()
-  alert('로그아웃 되었습니다.')
 }
 
 const handlePickClick = (title) => {
@@ -282,7 +280,7 @@ onUnmounted(() => { stopSlide() })
   color: white; 
   padding: 0; 
   position: relative; 
-  height: 400px;
+  height: 330px;
   display: flex; 
   align-items: center; 
   justify-content: center;
@@ -307,10 +305,10 @@ onUnmounted(() => { stopSlide() })
 }
 
 /* 배너 이미지 - 확실히 둥글게 */
-.banner-full-image { 
-  width: 100%; 
-  height: 100%; 
-  object-fit: contain;
+.banner-full-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   object-position: center center;
 }
 
@@ -338,17 +336,17 @@ onUnmounted(() => { stopSlide() })
   border-radius: 10px; 
 }
 
-.login-box { 
-  background: white; 
-  border: 1px solid #eee; 
-  border-radius: 20px; 
-  padding: 30px; 
-  display: flex; 
-  flex-direction: column; 
-  justify-content: center; 
-  align-items: center; 
-  text-align: center; 
-  height: 400px;
+.login-box {
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 20px;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 330px;
 }
 
 .login-intro { width: 100%; margin-bottom: 25px; }
@@ -362,18 +360,118 @@ onUnmounted(() => { stopSlide() })
 .find-join span:hover { text-decoration: underline; color: #666; }
 .join-link { font-weight: 600; color: #00a651; }
 
-.profile-content { width: 100%; display: flex; flex-direction: column; align-items: center; }
-.profile-img-wrapper { margin-bottom: 15px; cursor: pointer; }
-.profile-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #f0f0f0; }
-.welcome-text { margin-bottom: 30px; }
-.user-name { font-size: 22px; color: #00a651; margin-bottom: 5px; font-weight: 700; }
-.greeting { color: #666; font-size: 14px; margin: 0; font-weight: 500; }
-.profile-actions { width: 100%; display: flex; flex-direction: column; gap: 10px; }
-.action-btn { width: 100%; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; border: none; font-size: 15px; }
-.action-btn.primary { background-color: #00a651; color: white; }
-.action-btn.primary:hover { background-color: #008e45; }
-.action-btn.secondary { background-color: #f5f5f5; color: #555; }
-.action-btn.secondary:hover { background-color: #e8e8e8; }
+.profile-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0;
+}
+
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding-top: 20px;
+}
+
+.profile-img-wrapper {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-img-wrapper:hover {
+  transform: translateY(-2px);
+}
+
+.profile-img {
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e8f5e9;
+  box-shadow: 0 2px 12px rgba(0, 166, 81, 0.15);
+}
+
+.welcome-text {
+  text-align: center;
+  line-height: 1.4;
+}
+
+.user-name {
+  font-size: 19px;
+  color: #00a651;
+  margin: 0 0 4px 0;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+.greeting {
+  color: #666;
+  font-size: 13px;
+  margin: 0;
+  font-weight: 400;
+}
+
+.profile-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 5px;
+}
+
+.action-btn {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.btn-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.btn-text {
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  font-size: 14px;
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, #00a651 0%, #008e45 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 166, 81, 0.2);
+}
+
+.action-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 166, 81, 0.3);
+}
+
+.action-btn.secondary {
+  background-color: #fff;
+  color: #555;
+  border: 2px solid #e8e8e8;
+}
+
+.action-btn.secondary:hover {
+  background-color: #f8f9fa;
+  border-color: #00a651;
+  color: #00a651;
+  transform: translateY(-2px);
+}
 
 .pick-section { margin-top: 60px; }
 .section-title-container { display: flex; align-items: center; margin-bottom: 20px; gap: 10px; position: relative; }

@@ -12,6 +12,10 @@ export const PRESS_NAME_MAP = {
   'efnews': '파이낸셜신문',
   'segyebiz': '세계비즈',
   'm-i': '매일일보',
+  'ajunews': '아주경제',
+  'cctimes': '충청타임즈',
+  'ikpnews': '한국농정',
+  'etoday': '이투데이',
 }
 
 /**

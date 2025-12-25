@@ -22,7 +22,14 @@
 
         <div class="post-meta">
           <div class="meta-left">
-            <span class="author">{{ post.author }}</span>
+            <div class="author-wrapper">
+              <img
+                :src="post.author_profile_image || '/src/assets/logo_bean.png'"
+                alt="프로필"
+                class="author-profile-img"
+              >
+              <span class="author">{{ post.author }}</span>
+            </div>
             <span class="date">작성 {{ formatDate(post.created_at) }}</span>
             <span v-if="post.updated_at && post.updated_at !== post.created_at" class="date updated">
               수정 {{ formatDate(post.updated_at) }}
@@ -86,11 +93,18 @@
             class="comment-item"
           >
             <div class="comment-header">
-              <div class="comment-author-wrapper">
-                <span class="comment-author">{{ comment.author }}</span>
-                <span v-if="post && comment.author === post.author" class="author-badge">작성자</span>
+              <div class="comment-author-info">
+                <div class="comment-author-wrapper">
+                  <img
+                    :src="comment.author_profile_image || '/src/assets/logo_bean.png'"
+                    alt="프로필"
+                    class="comment-profile-img"
+                  >
+                  <span class="comment-author">{{ comment.author }}</span>
+                  <span v-if="post && comment.author === post.author" class="author-badge">작성자</span>
+                </div>
+                <span class="comment-date">{{ formatDate(comment.created_at) }}</span>
               </div>
-              <span class="comment-date">{{ formatDate(comment.created_at) }}</span>
             </div>
             <p class="comment-content">{{ comment.content }}</p>
             <div class="comment-footer">
@@ -257,6 +271,21 @@ onMounted(() => {
 .notice-badge { background-color: #ff6b6b; color: white; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 4px; margin-right: 8px; vertical-align: middle; }
 .post-meta { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #999; }
 .meta-left, .meta-right { display: flex; gap: 12px; align-items: center; }
+
+.author-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.author-profile-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e8f5e9;
+}
+
 .author { font-weight: 600; color: #555; }
 .like-btn { background: white; border: 1px solid #ddd; padding: 6px 12px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 4px; }
 .like-btn:hover { background: #f8f8f8; border-color: #ff6b6b; }
@@ -280,7 +309,28 @@ onMounted(() => {
 .comment-item { background-color: white; padding: 20px; border-radius: 8px; border: 1px solid #eee; transition: border-color 0.2s; }
 .comment-item:hover { border-color: #ddd; }
 .comment-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px; align-items: center; }
-.comment-author-wrapper { display: flex; align-items: center; gap: 6px; }
+
+.comment-author-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.comment-author-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.comment-profile-img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e8f5e9;
+}
+
 .comment-author { font-weight: 600; color: #555; }
 .author-badge { background-color: #00a651; color: white; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
 .comment-date { color: #999; }

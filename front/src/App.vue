@@ -9,8 +9,19 @@
 </template>
 
 <script setup>
+import { watch } from 'vue'
 import { RouterView } from 'vue-router'
 import TheNavbar from '@/components/common/TheNavbar.vue'
+import { useAuthStore } from '@/stores/auth'
+import { useBoardStore } from '@/stores/board'
+
+const authStore = useAuthStore()
+const boardStore = useBoardStore()
+
+// 사용자가 변경되면 좋아요 정보 다시 로드
+watch(() => authStore.userNickname, () => {
+  boardStore.reloadLikedPosts()
+})
 </script>
 
 <style>

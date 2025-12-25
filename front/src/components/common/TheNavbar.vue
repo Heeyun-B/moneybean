@@ -106,14 +106,11 @@ import { useAuthStore } from '@/stores/auth'
 const router = useRouter()
 const authStore = useAuthStore()
 
-// 모바일 메뉴 상태
-const isMobileMenuOpen = ref(false)
-const openSubmenu = ref(null)
-
+// 'AI 진단·추천받기' 항목을 삭제했습니다.
 const menus = ref([
-  {
-    title: '내 자산 보기',
-    subs: ['내 자산 입력하기', '내 자산 한눈에 보기']
+  { 
+    title: '내 자산 보기', 
+    subs: ['내 자산 입력하기', '내 자산 한눈에 보기'] 
   },
   { title: '예·적금', subs: ['예적금 상품조회'] },
   { title: '현물 자산', subs: ['금 시세 조회', '은 시세 조회'] },
@@ -123,23 +120,6 @@ const menus = ref([
 
 const goHome = () => {
   router.push({ name: 'home' })
-}
-
-const toggleMobileMenu = () => {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value
-  if (!isMobileMenuOpen.value) {
-    openSubmenu.value = null
-  }
-}
-
-const toggleSubmenu = (title) => {
-  openSubmenu.value = openSubmenu.value === title ? null : title
-}
-
-const handleMobileClick = (callback) => {
-  callback()
-  isMobileMenuOpen.value = false
-  openSubmenu.value = null
 }
 
 const handleLogout = () => {
