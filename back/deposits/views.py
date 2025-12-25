@@ -2,7 +2,7 @@ import requests
 from django.conf import settings
 from django.db.models import Q
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from .models import (
@@ -39,10 +39,12 @@ def safe_float(value, default=-1):
         return default
 
 @api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def save_deposit_products(request):
     """
     정기예금 상품 목록 및 옵션 목록 저장
     모든 금융권 데이터를 자동으로 저장
+    (로그인 필요)
     """
     api_key = settings.API_KEY
     
@@ -157,9 +159,10 @@ def save_deposit_products(request):
     )
 
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def deposit_products(request):
     """
-    전체 정기예금 상품 목록 출력
+    전체 정기예금 상품 목록 출력 (비로그인 사용자 접근 가능)
     - 은행별 필터 기능 제공
     - 기간별 필터 (save_trm)
     - 금액별 필터 (min_amount)
@@ -221,9 +224,10 @@ def deposit_products(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def deposit_product_detail(request, fin_prdt_cd):
     """
-    특정 정기예금 상품의 상세 정보 출력
+    특정 정기예금 상품의 상세 정보 출력 (비로그인 사용자 접근 가능)
     상품 기본 정보 + 해당 상품의 모든 옵션 정보 반환
     """
     try:
@@ -319,10 +323,12 @@ SAVING_API_URL = "http://finlife.fss.or.kr/finlifeapi/savingProductsSearch.json"
 
 
 @api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def save_saving_products(request):
     """
     적금 상품 목록 및 옵션 목록 저장
     모든 금융권 데이터를 자동으로 저장
+    (로그인 필요)
     """
     api_key = settings.API_KEY
     
@@ -433,9 +439,10 @@ def save_saving_products(request):
     )
 
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def saving_products(request):
     """
-    전체 적금 상품 목록 출력
+    전체 적금 상품 목록 출력 (비로그인 사용자 접근 가능)
     - 은행별 필터 기능 제공
     - 기간별 필터 (save_trm)
     - 금액별 필터 (min_amount)
@@ -497,8 +504,9 @@ def saving_products(request):
 
 
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def saving_product_detail(request, fin_prdt_cd):
-    """특정 적금 상품의 상세 정보 출력"""
+    """특정 적금 상품의 상세 정보 출력 (비로그인 사용자 접근 가능)"""
     try:
         product = SavingProducts.objects.get(fin_prdt_cd=fin_prdt_cd)
         options = SavingOptions.objects.filter(product=product)
