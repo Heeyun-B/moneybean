@@ -52,8 +52,12 @@ import { useAuthStore } from '@/stores/auth'
 const router = useRouter()
 const authStore = useAuthStore()
 
+// 'AI 진단·추천받기' 항목을 삭제했습니다.
 const menus = ref([
-  { title: '내 자산 보기', subs: ['내 자산 입력하기', '내 자산 한눈에 보기', 'AI 진단·추천받기'] },
+  { 
+    title: '내 자산 보기', 
+    subs: ['내 자산 입력하기', '내 자산 한눈에 보기'] 
+  },
   { title: '예·적금', subs: ['예적금 상품조회'] },
   { title: '현물 자산', subs: ['금 시세 조회', '은 시세 조회'] },
   { title: '게시판', subs: ['자유게시판', '금융정보(꿀팁)', '금융기사', '좋아요한 글'] },
@@ -64,7 +68,6 @@ const goHome = () => {
   router.push({ name: 'home' })
 }
 
-// 로그아웃 함수 하나로 통합
 const handleLogout = () => {
   if (confirm('로그아웃 하시겠습니까?')) {
     authStore.logOut()
