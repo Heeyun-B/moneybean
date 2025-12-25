@@ -57,9 +57,16 @@
             </div>
           </div>
           <div class="post-info">
-            <span class="author" :class="{ 'news-press': boardType === 'news' }">
-              {{ boardType === 'news' && post.press ? post.press : post.author }}
-            </span>
+            <div class="author-wrapper">
+              <img
+                :src="post.author_profile_image || '/src/assets/logo_bean.png'"
+                alt="프로필"
+                class="author-profile-img"
+              >
+              <span class="author" :class="{ 'news-press': boardType === 'news' }">
+                {{ boardType === 'news' && post.press ? post.press : post.author }}
+              </span>
+            </div>
           </div>
           <div class="post-date">
             <span>{{ formatDate(post.created_at) }}</span>
@@ -456,6 +463,21 @@ onMounted(() => {
 
 .post-info {
   text-align: center;
+}
+
+.author-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.author-profile-img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e8f5e9;
 }
 
 .post-info .author {

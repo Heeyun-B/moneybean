@@ -144,17 +144,26 @@ export const useBoardStore = defineStore('board', () => {
           throw new Error('Invalid board type')
       }
 
-      const posts = response.data.map(post => ({
-        id: post.id,
-        title: post.title,
-        content: post.content,
-        author: post.username,
-        created_at: post.created_at,
-        comment_count: post.comment_count || 0,
-        like_count: post.like_count || 0,
-        is_notice: false,
-        content_preview: post.content.substring(0, 100) + (post.content.length > 100 ? '...' : '')
-      }))
+      const posts = response.data.map(post => {
+        let profileImg = post.user_profile_image || post.profile_image_url || null
+        // 상대 경로를 절대 경로로 변환
+        if (profileImg && !profileImg.startsWith('http')) {
+          profileImg = `${API_URL}${profileImg}`
+        }
+
+        return {
+          id: post.id,
+          title: post.title,
+          content: post.content,
+          author: post.username,
+          author_profile_image: profileImg,
+          created_at: post.created_at,
+          comment_count: post.comment_count || 0,
+          like_count: post.like_count || 0,
+          is_notice: false,
+          content_preview: post.content.substring(0, 100) + (post.content.length > 100 ? '...' : '')
+        }
+      })
 
       switch (boardType) {
         case 'free':
@@ -200,11 +209,17 @@ export const useBoardStore = defineStore('board', () => {
               Authorization: `Token ${authStore.token}`
             } : {}
           })
+          let authorImg = response.data.user_profile_image || response.data.profile_image_url || null
+          if (authorImg && !authorImg.startsWith('http')) {
+            authorImg = `${API_URL}${authorImg}`
+          }
+
           post = {
             id: response.data.id,
             title: response.data.title,
             content: response.data.content,
             author: response.data.username,
+            author_profile_image: authorImg,
             created_at: response.data.created_at,
             updated_at: response.data.updated_at,
             comment_count: response.data.comment_count || 0,
@@ -213,12 +228,19 @@ export const useBoardStore = defineStore('board', () => {
             is_notice: response.data.is_notice || false,
           }
           if (response.data.comments) {
-            comments.value[postId] = response.data.comments.map(comment => ({
-              id: comment.id,
-              content: comment.content,
-              author: comment.username,
-              created_at: comment.created_at
-            }))
+            comments.value[postId] = response.data.comments.map(comment => {
+              let commentImg = comment.user_profile_image || comment.profile_image_url || null
+              if (commentImg && !commentImg.startsWith('http')) {
+                commentImg = `${API_URL}${commentImg}`
+              }
+              return {
+                id: comment.id,
+                content: comment.content,
+                author: comment.username,
+                author_profile_image: commentImg,
+                created_at: comment.created_at
+              }
+            })
           }
           break
         case 'info':
@@ -228,11 +250,18 @@ export const useBoardStore = defineStore('board', () => {
               Authorization: `Token ${authStore.token}`
             } : {}
           })
+
+          let infoAuthorImg = response.data.user_profile_image || response.data.profile_image_url || null
+          if (infoAuthorImg && !infoAuthorImg.startsWith('http')) {
+            infoAuthorImg = `${API_URL}${infoAuthorImg}`
+          }
+
           post = {
             id: response.data.id,
             title: response.data.title,
             content: response.data.content,
             author: response.data.username,
+            author_profile_image: infoAuthorImg,
             created_at: response.data.created_at,
             updated_at: response.data.updated_at,
             comment_count: response.data.comment_count || 0,
@@ -241,12 +270,19 @@ export const useBoardStore = defineStore('board', () => {
             is_notice: response.data.is_notice || false,
           }
           if (response.data.comments) {
-            comments.value[postId] = response.data.comments.map(comment => ({
-              id: comment.id,
-              content: comment.content,
-              author: comment.username,
-              created_at: comment.created_at
-            }))
+            comments.value[postId] = response.data.comments.map(comment => {
+              let infoCommentImg = comment.user_profile_image || comment.profile_image_url || null
+              if (infoCommentImg && !infoCommentImg.startsWith('http')) {
+                infoCommentImg = `${API_URL}${infoCommentImg}`
+              }
+              return {
+                id: comment.id,
+                content: comment.content,
+                author: comment.username,
+                author_profile_image: infoCommentImg,
+                created_at: comment.created_at
+              }
+            })
           }
           break
         case 'news':
@@ -470,8 +506,15 @@ export const useBoardStore = defineStore('board', () => {
       if (!comments.value[postId]) {
         comments.value[postId] = []
       }
+
+      let newCommentImg = response.data.user_profile_image || response.data.profile_image_url || authStore.profileImage || null
+      if (newCommentImg && !newCommentImg.startsWith('http')) {
+        newCommentImg = `${API_URL}${newCommentImg}`
+      }
+
       const newComment = {
         id: response.data.id,
+        author_profile_image: newCommentImg,
         content: response.data.content,
         author: response.data.username,
         created_at: response.data.created_at

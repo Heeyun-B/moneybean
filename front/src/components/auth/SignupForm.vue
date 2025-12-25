@@ -203,9 +203,15 @@ const submitForm = async () => {
   
   try {
     await store.signUp(payload);
-    
+
+    // 회원가입 성공 후 자동 로그인
+    await store.logIn({
+      username: form.username,
+      password: form.password
+    });
+
     emit('success');
-    
+
   } catch (error) {
     console.error(error);
     const msg = error.response?.data ? JSON.stringify(error.response.data) : '입력을 확인해주세요.';
