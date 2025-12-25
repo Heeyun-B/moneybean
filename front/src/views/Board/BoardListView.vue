@@ -46,9 +46,10 @@
           v-for="post in displayedPosts"
           :key="post.id"
           class="post-item"
+          :class="{ 'news-layout': boardType === 'news' }"
           @click="goToDetail(post.id)"
         >
-          <div class="post-number">{{ post.id }}</div>
+          <div v-if="boardType !== 'news'" class="post-number">{{ post.id }}</div>
           <div class="post-main">
             <div class="post-title-area">
               <span v-if="post.is_notice" class="notice-badge">공지</span>
@@ -400,6 +401,10 @@ onMounted(() => {
   cursor: pointer;
   transition: all 0.2s;
   gap: 16px;
+}
+
+.post-item.news-layout {
+  grid-template-columns: 1fr 120px 140px 120px;
 }
 
 .post-item:last-child {
