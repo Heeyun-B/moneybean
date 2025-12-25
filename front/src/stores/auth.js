@@ -34,6 +34,10 @@ export const useAuthStore = defineStore('auth', () => {
       const newProfileImg = res.data.user?.profile_image_url || res.data.user?.profile_image || null
 
       if (newToken) {
+        // 로그인 전 이전 사용자 데이터 초기화
+        sessionStorage.removeItem('youtube_search_query')
+        sessionStorage.removeItem('youtube_search_videos')
+
         setToken(newToken, newNickname, newRole, newIsStaff, newProfileImg)
       }
       return res.data
@@ -43,21 +47,35 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const logOut = function () {
+    // 현재 사용자 정보 저장 (삭제용)
+    const currentNickname = userNickname.value
+
     token.value = null
     userNickname.value = null
     userRole.value = 'user'
     isStaff.value = false
     profileImage.value = null
-    
+
     localStorage.removeItem('token')
     localStorage.removeItem('nickname')
     localStorage.removeItem('userRole')
     localStorage.removeItem('isStaff')
     localStorage.removeItem('profileImage')
 
-    // 게시판 스토어 초기화 (추가)
+    // 게시판 스토어 초기화
     const boardStore = useBoardStore()
     boardStore.likedPosts = []
+
+    // YouTube 검색 기록 초기화 (sessionStorage)
+    sessionStorage.removeItem('youtube_search_query')
+    sessionStorage.removeItem('youtube_search_videos')
+
+    // YouTube 저장 영상 초기화 (localStorage - 사용자별)
+    if (currentNickname) {
+      localStorage.removeItem(`savedVideos_${currentNickname}`)
+    }
+    // 레거시 키도 삭제 (이전 버전 호환)
+    localStorage.removeItem('savedVideos')
   }
 
   const setToken = (newToken, newNickname, newRole = 'user', newIsStaff = false, newProfileImg) => {

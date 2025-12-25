@@ -150,6 +150,16 @@
       </section>
     </main>
 
+    <!-- 외부 리다이렉트 로딩 오버레이 -->
+    <Transition name="fade">
+      <div v-if="isRedirecting" class="redirect-overlay">
+        <div class="redirect-modal">
+          <div class="spinner"></div>
+          <p class="redirect-message">{{ loadingMessage }}</p>
+        </div>
+      </div>
+    </Transition>
+
     <footer class="main-footer">
       <div class="footer-content">
         <div class="footer-info">
@@ -178,6 +188,11 @@ const boardStore = useBoardStore()
 
 const currentSlide = ref(0)
 let slideInterval = null
+
+// 외부 리다이렉트 상태
+const isRedirecting = ref(false)
+const loadingMessage = ref('')
+let redirectTimer = null
 
 // 배너 이미지와 이동 페이지 지정
 const banners = [
@@ -249,11 +264,31 @@ const handlePickClick = (title) => {
     return
   }
   switch (title) {
-    case '예적금': router.push({ name: 'deposit-list' }); break
-    case '자산관리': router.push({ name: 'assets' }); break
-    case '투자': alert('준비 중인 서비스입니다.'); break
-    default: alert('준비 중인 서비스입니다.')
+    case '예적금':
+      router.push({ name: 'deposit-list' })
+      break
+    case '자산관리':
+      router.push({ name: 'assets' })
+      break
+    case '카드':
+      startExternalRedirect('https://card-lounge.toss.im/', '토스 카드 추천 서비스로 이동 중입니다...')
+      break
+    case '투자':
+      startExternalRedirect('https://www.tossinvest.com/', '토스 증권으로 이동 중입니다...')
+      break
+    default:
+      alert('준비 중인 서비스입니다.')
   }
+}
+
+// 외부 리다이렉트 시작
+const startExternalRedirect = (url, message) => {
+  isRedirecting.value = true
+  loadingMessage.value = message
+
+  redirectTimer = setTimeout(() => {
+    window.location.href = url
+  }, 1500)
 }
 
 // 라이프사이클 훅
@@ -264,7 +299,10 @@ onMounted(() => {
   boardStore.fetchPosts('free')
 })
 
-onUnmounted(() => { stopSlide() })
+onUnmounted(() => {
+  stopSlide()
+  if (redirectTimer) clearTimeout(redirectTimer)
+})
 </script>
 
 <style scoped>
@@ -528,11 +566,55 @@ onUnmounted(() => { stopSlide() })
 .empty-board { color: #999; text-align: center; pointer-events: none; }
 
 /* 페이드 애니메이션 */
-.fade-enter-active, .fade-leave-active { 
-  transition: opacity 0.5s ease; 
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s ease;
 }
-.fade-enter-from, .fade-leave-to { 
-  opacity: 0; 
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+
+/* 외부 리다이렉트 오버레이 */
+.redirect-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.redirect-modal {
+  background: white;
+  padding: 50px 60px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #00a651;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.redirect-message {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
 }
 
 /* 반응형 */
