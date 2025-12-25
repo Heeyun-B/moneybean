@@ -63,6 +63,13 @@ const error = ref('')
 
 // 세션스토리지에서 검색 상태 복원
 const restoreSearchState = () => {
+  const token = localStorage.getItem('token')
+  if (!token) {
+    searchQuery.value = ''
+    videos.value = []
+    return
+  }
+
   const savedQuery = sessionStorage.getItem('youtube_search_query')
   const savedVideos = sessionStorage.getItem('youtube_search_videos')
 
