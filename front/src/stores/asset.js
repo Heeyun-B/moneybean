@@ -69,8 +69,8 @@ export const useAssetStore = defineStore('asset', () => {
       const headers = getHeaders()
 
       const response = await axios.post(
-        `${API_URL}/api/ais/diagnosis/`, 
-        diagnosisData, 
+        `${API_URL}/api/ais/diagnosis/`,
+        diagnosisData,
         { headers }
       )
 
@@ -80,6 +80,26 @@ export const useAssetStore = defineStore('asset', () => {
     } catch (error) {
       console.error("AI 진단 실패:", error)
       throw error
+    }
+  }
+
+  // 5. [AI] 상품 추천 요청 Action
+  const getAiRecommendations = async (diagnosisData) => {
+    try {
+      const headers = getHeaders()
+
+      const response = await axios.post(
+        `${API_URL}/api/ais/recommend/`,
+        diagnosisData,
+        { headers }
+      )
+
+      // 백엔드에서 success, data 형태로 반환
+      return response.data
+
+    } catch (error) {
+      console.error("AI 상품 추천 실패:", error)
+      return { success: false, message: error.message }
     }
   }
 
@@ -101,11 +121,11 @@ export const useAssetStore = defineStore('asset', () => {
   const netWorth = computed(() => totalAssets.value - totalDebt.value)
   const isDataExists = computed(() => assets.value.length > 0)
 
-  return { 
+  return {
     assets, categories, financialInfo, isDataExists,
     getAssets, getCategories, addAsset, updateAsset, deleteAsset, getFinancialInfo, saveFinancialInfo,
     cashAssets, investAssets, debtAssets,
     totalCash, totalInvest, totalDebt, totalAssets, netWorth,
-    getAiDiagnosis
+    getAiDiagnosis, getAiRecommendations
   }
 })

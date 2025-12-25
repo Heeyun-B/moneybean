@@ -93,28 +93,118 @@
           </button>
         </div>
 
-        <div v-if="aiSections.length > 0" class="ai-result-card">
+        <div v-if="aiSections.length > 0 || aiRecommendations" class="ai-result-card">
+          <!-- 자산 진단 섹션 -->
           <div v-for="(section, index) in aiSections" :key="index">
-            
+
             <div v-if="section.is_main" class="main-title-section">
               <h1>{{ section.title }}</h1>
               <p v-if="section.content" class="main-content">{{ section.content }}</p>
             </div>
-            
+
             <div v-else class="report-section">
-              <button 
-                @click="toggleReportSection(index)" 
+              <button
+                @click="toggleReportSection(index)"
                 class="report-section-header"
               >
                 <span class="section-title">{{ section.title }}</span>
                 <span class="toggle-icon">{{ isReportOpen[index] ? '▲' : '▼' }}</span>
               </button>
-              
+
               <div v-show="isReportOpen[index]" class="report-section-content">
                 <p style="white-space: pre-line">{{ section.content }}</p>
               </div>
             </div>
 
+          </div>
+
+          <!-- 상품 추천 섹션 -->
+          <div v-if="aiRecommendations" class="recommendations-section">
+            <div class="recommendation-header">
+              <h2>🎯 맞춤 금융 상품 추천</h2>
+            </div>
+
+            <!-- 포트폴리오 분석 -->
+            <div class="portfolio-analysis-card">
+              <h3>📊 포트폴리오 분석</h3>
+              <div class="analysis-grid">
+                <div class="analysis-item">
+                  <span class="analysis-label">💵 현금 비율</span>
+                  <p class="analysis-text">{{ aiRecommendations.portfolio_analysis.cash_ratio_assessment }}</p>
+                </div>
+                <div class="analysis-item">
+                  <span class="analysis-label">📈 투자 비율</span>
+                  <p class="analysis-text">{{ aiRecommendations.portfolio_analysis.investment_ratio_assessment }}</p>
+                </div>
+                <div class="analysis-item">
+                  <span class="analysis-label">💳 부채 상황</span>
+                  <p class="analysis-text">{{ aiRecommendations.portfolio_analysis.debt_assessment }}</p>
+                </div>
+                <div class="analysis-item">
+                  <span class="analysis-label">💧 유동성</span>
+                  <p class="analysis-text">{{ aiRecommendations.portfolio_analysis.liquidity_assessment }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 추천 상품 리스트 -->
+            <div v-if="aiRecommendations.recommended_products && aiRecommendations.recommended_products.length > 0" class="products-list-card">
+              <h3>✨ 추천 상품</h3>
+              <div class="products-grid">
+                <div
+                  v-for="product in aiRecommendations.recommended_products"
+                  :key="product.product_code"
+                  class="product-card"
+                  @click="goToProduct(product.product_code, product.product_type)"
+                >
+                  <div class="product-header">
+                    <div class="product-priority-badge" :class="`priority-${product.priority}`">
+                      {{ product.priority === 1 ? '최우선' : product.priority === 2 ? '추천' : '고려' }}
+                    </div>
+                    <div class="product-type-badge" :class="product.product_type">
+                      {{ product.product_type === 'deposit' ? '예금' : '적금' }}
+                    </div>
+                  </div>
+                  <div class="product-info">
+                    <p class="product-bank">{{ product.bank_name }}</p>
+                    <h4 class="product-name">{{ product.product_name }}</h4>
+                    <div class="product-rate">
+                      <span class="rate-label">최고 금리</span>
+                      <span class="rate-value">{{ product.max_rate }}%</span>
+                    </div>
+                  </div>
+                  <div class="product-reason">
+                    <p>{{ product.reason }}</p>
+                  </div>
+                  <div class="product-action">
+                    <span class="action-text">상세보기 →</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 추천 상품이 없을 때 -->
+            <div v-else class="no-products-card">
+              <div class="no-products-icon">💡</div>
+              <p class="no-products-text">{{ aiRecommendations.investment_strategy }}</p>
+            </div>
+
+            <!-- 투자 전략 -->
+            <div class="strategy-card">
+              <h3>💡 투자 전략</h3>
+              <p class="strategy-text">{{ aiRecommendations.investment_strategy }}</p>
+            </div>
+
+            <!-- 실행 항목 -->
+            <div class="action-items-card">
+              <h3>✅ 실행 항목</h3>
+              <ul class="action-items-list">
+                <li v-for="(item, idx) in aiRecommendations.action_items" :key="idx" class="action-item">
+                  <span class="action-bullet">{{ idx + 1 }}</span>
+                  <span class="action-text">{{ item }}</span>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -230,11 +320,15 @@ const goToCreatePage = () => {
   router.push({ name: 'asset-create' })
 }
 
+// AI 상품 추천 데이터
+const aiRecommendations = ref(null)
+
 const handleAiDiagnosis = async () => {
-  if (!confirm('AI 진단을 시작하시겠습니까? (약 3초 소요)')) return
+  if (!confirm('AI 진단 및 상품 추천을 시작하시겠습니까? (약 5초 소요)')) return
 
   isAiLoading.value = true
   aiSections.value = []
+  aiRecommendations.value = null
 
   const payload = {
     totalAssets: store.totalAssets,
@@ -244,19 +338,34 @@ const handleAiDiagnosis = async () => {
     netWorth: store.netWorth,
     income: store.financialInfo.income,
     expense: store.financialInfo.expense,
-    sections: assetSections.value 
+    sections: assetSections.value
   }
 
   try {
-    const result = await store.getAiDiagnosis(payload)
-    // 백엔드에서 sections 배열을 받음
-    aiSections.value = result  // 변경: aiReport → aiSections
+    // 자산 진단과 상품 추천을 병렬로 실행
+    const [diagnosisResult, recommendResult] = await Promise.all([
+      store.getAiDiagnosis(payload),
+      store.getAiRecommendations(payload)
+    ])
+
+    // 자산 진단 결과
+    aiSections.value = diagnosisResult
+
+    // 상품 추천 결과
+    if (recommendResult && recommendResult.success) {
+      aiRecommendations.value = recommendResult.data
+    }
   } catch (error) {
     console.error(error)
     alert('AI 서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.')
   } finally {
     isAiLoading.value = false
   }
+}
+
+const goToProduct = (productCode, productType) => {
+  const routeName = productType === 'deposit' ? 'deposit-detail' : 'saving-detail'
+  router.push({ name: routeName, params: { id: productCode } })
 }
 
 const toggleReportSection = (index) => {
@@ -693,6 +802,344 @@ h1 { text-align: center; margin-bottom: 40px; font-size: 26px; font-weight: 800;
   50% { transform: translateY(-10px); filter: drop-shadow(0 10px 15px rgba(0, 166, 81, 0.4)) brightness(1.2); }
 }
 
+/* --- 상품 추천 섹션 스타일 --- */
+.recommendations-section {
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 3px solid #f0f0f0;
+}
+
+.recommendation-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.recommendation-header h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #00a651;
+  margin: 0;
+}
+
+/* 포트폴리오 분석 카드 */
+.portfolio-analysis-card {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 25px;
+  border: 1px solid #bae6fd;
+}
+
+.portfolio-analysis-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0369a1;
+  margin: 0 0 20px 0;
+}
+
+.analysis-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.analysis-item {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.analysis-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0369a1;
+  margin-bottom: 8px;
+}
+
+.analysis-text {
+  font-size: 14px;
+  color: #444;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* 추천 상품 리스트 */
+.products-list-card {
+  margin-bottom: 25px;
+}
+
+.products-list-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 20px 0;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.product-card {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 16px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.product-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #00a651 0%, #008e45 100%);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover {
+  border-color: #00a651;
+  box-shadow: 0 8px 24px rgba(0, 166, 81, 0.15);
+  transform: translateY(-4px);
+}
+
+.product-card:hover::before {
+  transform: scaleX(1);
+}
+
+.product-header {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.product-priority-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+}
+
+.product-priority-badge.priority-1 {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+.product-priority-badge.priority-2 {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+.product-priority-badge.priority-3 {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.product-type-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid;
+}
+
+.product-type-badge.deposit {
+  background: #e0f2fe;
+  color: #0369a1;
+  border-color: #bae6fd;
+}
+
+.product-type-badge.saving {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+.product-info {
+  margin-bottom: 15px;
+}
+
+.product-bank {
+  font-size: 13px;
+  color: #666;
+  margin: 0 0 5px 0;
+  font-weight: 600;
+}
+
+.product-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #222;
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+}
+
+.product-rate {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-radius: 8px;
+  border: 1px solid #bbf7d0;
+}
+
+.rate-label {
+  font-size: 12px;
+  color: #15803d;
+  font-weight: 600;
+}
+
+.rate-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: #15803d;
+  margin-left: auto;
+}
+
+.product-reason {
+  margin-bottom: 15px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border-left: 3px solid #00a651;
+}
+
+.product-reason p {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.product-action {
+  text-align: right;
+}
+
+.action-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #00a651;
+  transition: all 0.2s;
+}
+
+.product-card:hover .action-text {
+  transform: translateX(4px);
+  display: inline-block;
+}
+
+/* 추천 상품이 없을 때 */
+.no-products-card {
+  background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%);
+  border: 2px solid #fde047;
+  border-radius: 16px;
+  padding: 40px 30px;
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.no-products-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+
+.no-products-text {
+  font-size: 15px;
+  color: #854d0e;
+  line-height: 1.8;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* 투자 전략 카드 */
+.strategy-card {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 25px;
+  border: 1px solid #bbf7d0;
+}
+
+.strategy-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #15803d;
+  margin: 0 0 15px 0;
+}
+
+.strategy-text {
+  font-size: 15px;
+  color: #444;
+  line-height: 1.8;
+  margin: 0;
+}
+
+/* 실행 항목 카드 */
+.action-items-card {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 16px;
+  padding: 25px;
+}
+
+.action-items-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 20px 0;
+}
+
+.action-items-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.action-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.action-item:last-child {
+  border-bottom: none;
+}
+
+.action-bullet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #00a651 0%, #008e45 100%);
+  color: white;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 166, 81, 0.3);
+}
+
+.action-item .action-text {
+  font-size: 15px;
+  color: #444;
+  line-height: 1.6;
+  flex: 1;
+}
+
 /* --- Empty State & Mobile --- */
 .empty-state { text-align: center; padding: 60px 20px; background: #f9f9f9; border-radius: 20px; }
 .mascot-img { width: 100px; margin-bottom: 20px; }
@@ -705,5 +1152,7 @@ h1 { text-align: center; margin-bottom: 40px; font-size: 26px; font-weight: 800;
   .center-logo { left: 50%; }
   .ai-banner { flex-direction: column; text-align: center; gap: 15px; }
   .ai-btn { width: 100%; }
+  .analysis-grid { grid-template-columns: 1fr; }
+  .products-grid { grid-template-columns: 1fr; }
 }
 </style>

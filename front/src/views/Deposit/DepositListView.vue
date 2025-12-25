@@ -71,47 +71,100 @@
 
     <!-- 예금/적금 탭일 때 -->
     <template v-else>
+      <!-- 검색 영역 -->
+      <div class="search-section">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input
+            v-model="searchKeyword"
+            type="text"
+            placeholder="상품명 또는 은행명으로 검색"
+            class="search-input"
+          />
+          <button v-if="searchKeyword" @click="searchKeyword = ''" class="clear-btn">✕</button>
+        </div>
+      </div>
+
+      <!-- 필터 영역 -->
       <div class="filter-section">
-        <div class="filter-group">
-          <label>저축 기간</label>
-          <select v-model="selectedTerm" class="term-select">
-            <option :value="0">전체 기간</option>
-            <option :value="6">6개월</option>
-            <option :value="12">12개월</option>
-            <option :value="24">24개월</option>
-            <option :value="36">36개월</option>
-          </select>
+        <div class="filter-row">
+          <div class="filter-group">
+            <label>저축 기간</label>
+            <select v-model="selectedTerm" class="filter-select">
+              <option :value="0">전체 기간</option>
+              <option :value="6">6개월</option>
+              <option :value="12">12개월</option>
+              <option :value="24">24개월</option>
+              <option :value="36">36개월</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label>은행 선택</label>
+            <select v-model="selectedBank" class="filter-select">
+              <option value="">전체 은행</option>
+              <option v-for="bank in availableBanks" :key="bank" :value="bank">
+                {{ bank }}
+              </option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label>정렬 기준</label>
+            <select v-model="sortBy" class="filter-select">
+              <option value="rate_desc">금리 높은순</option>
+              <option value="rate_asc">금리 낮은순</option>
+              <option value="name_asc">상품명순</option>
+              <option value="bank_asc">은행명순</option>
+            </select>
+          </div>
+
+          <button
+            class="refresh-btn"
+            @click="refreshData"
+            :disabled="isLoading"
+            title="최신 금리 정보 가져오기"
+          >
+            🔄
+          </button>
         </div>
 
-        <button 
-          class="filter-chip" 
-          :class="{ active: isFirstSectorOnly }"
-          @click="isFirstSectorOnly = !isFirstSectorOnly"
-        >
-          1금융권
-        </button>
+        <div class="filter-chips">
+          <button
+            class="filter-chip"
+            :class="{ active: isFirstSectorOnly }"
+            @click="isFirstSectorOnly = !isFirstSectorOnly"
+          >
+            <span class="chip-icon">🏦</span>
+            1금융권만
+          </button>
 
-        <button 
-          class="filter-chip" 
-          :class="{ active: isNonFaceToFace }"
-          @click="isNonFaceToFace = !isNonFaceToFace"
-        >
-          방문없이 가입
-        </button>
+          <button
+            class="filter-chip"
+            :class="{ active: isNonFaceToFace }"
+            @click="isNonFaceToFace = !isNonFaceToFace"
+          >
+            <span class="chip-icon">📱</span>
+            비대면 가입
+          </button>
 
-        <button 
-          class="refresh-btn" 
-          @click="refreshData" 
-          :disabled="isLoading"
-          title="최신 금리 정보 가져오기"
-        >
-          🔄
-        </button>
+          <button
+            v-if="hasActiveFilters"
+            class="filter-chip reset"
+            @click="resetFilters"
+          >
+            <span class="chip-icon">🔄</span>
+            필터 초기화
+          </button>
+        </div>
       </div>
 
       <div class="list-header">
         <span class="count-text">
           총 <strong>{{ filteredProducts.length }}</strong>개 상품
+        </span>
+        <span v-if="hasActiveFilters" class="filter-active-text">
+          (필터 적용 중)
         </span>
       </div>
 
@@ -172,8 +225,12 @@ const authStore = useAuthStore();
 const activeTab = ref('deposit');
 const isLoading = ref(false);
 
-const selectedTerm = ref(12);
-const isFirstSectorOnly = ref(true);
+// 필터 및 정렬 상태
+const searchKeyword = ref('');
+const selectedTerm = ref(0);
+const selectedBank = ref('');
+const sortBy = ref('rate_desc');
+const isFirstSectorOnly = ref(false);
 const isNonFaceToFace = ref(false);
 
 // 1금융권 은행 목록 (정확한 매칭을 위해 수정)
@@ -309,34 +366,101 @@ const isProductSubscribed = (finPrdtCd) => {
   }
 };
 
+// 사용 가능한 은행 목록 (1금융권만)
+const availableBanks = computed(() => {
+  const products = activeTab.value === 'deposit'
+    ? (store.depositProducts || [])
+    : (store.savingProducts || []);
+
+  const banks = new Set(
+    products
+      .map(p => p.kor_co_nm)
+      .filter(bank => firstSectorBanks.includes(bank))
+  );
+
+  return Array.from(banks).sort();
+});
+
+// 필터가 활성화되어 있는지 확인
+const hasActiveFilters = computed(() => {
+  return searchKeyword.value !== '' ||
+    selectedTerm.value !== 0 ||
+    selectedBank.value !== '' ||
+    isFirstSectorOnly.value ||
+    isNonFaceToFace.value;
+});
+
+// 필터 초기화
+const resetFilters = () => {
+  searchKeyword.value = '';
+  selectedTerm.value = 0;
+  selectedBank.value = '';
+  sortBy.value = 'rate_desc';
+  isFirstSectorOnly.value = false;
+  isNonFaceToFace.value = false;
+};
+
 // 필터링 및 정렬
 const filteredProducts = computed(() => {
-  let products = activeTab.value === 'deposit' 
-    ? (store.depositProducts || []) 
+  let products = activeTab.value === 'deposit'
+    ? (store.depositProducts || [])
     : (store.savingProducts || []);
-  
-  // 1금융권 필터 (정확한 매칭)
+
+  // 검색 필터
+  if (searchKeyword.value.trim()) {
+    const keyword = searchKeyword.value.trim().toLowerCase();
+    products = products.filter(p =>
+      p.fin_prdt_nm?.toLowerCase().includes(keyword) ||
+      p.kor_co_nm?.toLowerCase().includes(keyword)
+    );
+  }
+
+  // 은행 선택 필터
+  if (selectedBank.value) {
+    products = products.filter(p => p.kor_co_nm === selectedBank.value);
+  }
+
+  // 1금융권 필터
   if (isFirstSectorOnly.value) {
     products = products.filter(p => firstSectorBanks.includes(p.kor_co_nm));
   }
-  
+
+  // 비대면 가입 필터
   if (isNonFaceToFace.value) {
-    products = products.filter(p => 
+    products = products.filter(p =>
       p.join_way && (p.join_way.includes('인터넷') || p.join_way.includes('스마트폰'))
     );
   }
 
+  // 저축 기간 필터
   if (selectedTerm.value !== 0) {
     products = products.filter(p => {
       return p.options && p.options.some(opt => opt.save_trm == selectedTerm.value);
     });
   }
-  
-  // 금리 높은 순 정렬
+
+  // 정렬
   return products.slice().sort((a, b) => {
-     const maxRateA = Math.max(...(a.options?.map(o => o.intr_rate2) || [0]));
-     const maxRateB = Math.max(...(b.options?.map(o => o.intr_rate2) || [0]));
-     return maxRateB - maxRateA; 
+    switch (sortBy.value) {
+      case 'rate_desc':
+        const maxRateA = Math.max(...(a.options?.map(o => o.intr_rate2) || [0]));
+        const maxRateB = Math.max(...(b.options?.map(o => o.intr_rate2) || [0]));
+        return maxRateB - maxRateA;
+
+      case 'rate_asc':
+        const minRateA = Math.max(...(a.options?.map(o => o.intr_rate2) || [0]));
+        const minRateB = Math.max(...(b.options?.map(o => o.intr_rate2) || [0]));
+        return minRateA - minRateB;
+
+      case 'name_asc':
+        return (a.fin_prdt_nm || '').localeCompare(b.fin_prdt_nm || '', 'ko');
+
+      case 'bank_asc':
+        return (a.kor_co_nm || '').localeCompare(b.kor_co_nm || '', 'ko');
+
+      default:
+        return 0;
+    }
   });
 });
 
@@ -348,69 +472,364 @@ const goToDetail = (id, type = null) => {
 </script>
 
 <style scoped>
-.main-content { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
-.page-title { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
-.page-subtitle { color: #666; font-size: 14px; margin-bottom: 30px; }
+.main-content { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+.page-title { font-size: 28px; font-weight: 700; margin-bottom: 8px; color: #222; }
+.page-subtitle { color: #666; font-size: 15px; margin-bottom: 30px; }
 
-.tab-menu { display: flex; gap: 20px; border-bottom: 1px solid #eee; margin-bottom: 25px; }
-.tab-btn { background: none; border: none; padding: 10px 4px; font-size: 18px; font-weight: 600; color: #aaa; cursor: pointer; position: relative; }
-.tab-btn.active { color: #333; }
-.tab-btn.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 3px; background-color: #00a651; }
+.tab-menu { display: flex; gap: 20px; border-bottom: 2px solid #f0f0f0; margin-bottom: 30px; }
+.tab-btn { background: none; border: none; padding: 12px 6px; font-size: 17px; font-weight: 600; color: #999; cursor: pointer; position: relative; transition: color 0.2s; }
+.tab-btn:hover { color: #555; }
+.tab-btn.active { color: #00a651; }
+.tab-btn.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 3px; background-color: #00a651; border-radius: 3px 3px 0 0; }
 
 .tab-btn.my-products { display: flex; align-items: center; gap: 6px; }
-.my-count { 
-  background-color: #00a651; 
-  color: white; 
-  font-size: 12px; 
-  padding: 2px 8px; 
-  border-radius: 10px; 
+.my-count {
+  background-color: #00a651;
+  color: white;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 700;
 }
 
-.filter-section { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 20px; padding: 15px; background-color: #f9fbfb; border-radius: 12px; }
-.filter-group { display: flex; align-items: center; gap: 8px; margin-right: 10px; }
-.filter-group label { font-size: 13px; font-weight: 600; color: #333; }
-.term-select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; cursor: pointer; outline: none; }
-.term-select:focus { border-color: #00a651; }
-.filter-chip { background: white; border: 1px solid #ddd; padding: 8px 14px; border-radius: 20px; font-size: 13px; color: #555; cursor: pointer; transition: all 0.2s; }
-.filter-chip.active { background-color: #e5faf0; border-color: #00a651; color: #00a651; font-weight: 600; }
-
-.refresh-btn { 
-  margin-left: auto; 
-  background: none; 
-  border: 1px solid #ddd; 
-  border-radius: 50%; 
-  width: 32px; 
-  height: 32px; 
-  cursor: pointer; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  transition: all 0.1s ease;
+/* 검색 영역 */
+.search-section { margin-bottom: 20px; }
+.search-box {
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 12px 16px;
+  transition: all 0.2s;
 }
-.refresh-btn:hover { background-color: #f0f0f0; border-color: #ccc; }
-.refresh-btn:active { transform: scale(0.92); background-color: #e0e0e0; }
+.search-box:focus-within {
+  border-color: #00a651;
+  box-shadow: 0 0 0 3px rgba(0, 166, 81, 0.1);
+}
+.search-icon {
+  font-size: 18px;
+  margin-right: 10px;
+  color: #999;
+}
+.search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  color: #333;
+}
+.search-input::placeholder {
+  color: #aaa;
+}
+.clear-btn {
+  background: #f0f0f0;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  color: #666;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.clear-btn:hover {
+  background: #e0e0e0;
+  color: #333;
+}
 
-.list-header { display: flex; justify-content: flex-end; margin-bottom: 10px; }
-.count-text { font-size: 13px; color: #888; }
-.loading-state, .empty-state { text-align: center; padding: 60px 0; color: #888; }
+/* 필터 영역 */
+.filter-section {
+  background: linear-gradient(135deg, #f8fafb 0%, #f0f4f7 100%);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
 
-.refresh-link { color: #00a651; font-weight: 600; cursor: pointer; text-decoration: underline; margin: 0 4px; }
-.refresh-link:hover { color: #008541; }
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+  align-items: center;
+}
 
-.skeleton-container { display: flex; flex-direction: column; }
-.skeleton-item { display: flex; justify-content: space-between; align-items: center; padding: 24px 10px; border-bottom: 1px solid #f0f0f0; }
-.sk-left { display: flex; align-items: center; gap: 16px; flex: 1; }
-.sk-info { display: flex; flex-direction: column; justify-content: center; }
-.sk-right { display: flex; flex-direction: column; align-items: flex-end; }
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
-/* 내 가입상품 탭 스타일 */
-.my-products-section { margin-top: 20px; }
-.my-section { margin-bottom: 40px; }
-.section-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #00a651; }
-.empty-my { text-align: center; padding: 40px; color: #888; background: #f9f9f9; border-radius: 12px; }
+.filter-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 
-.login-required { text-align: center; padding: 80px 20px; }
-.login-required p { color: #666; margin-bottom: 20px; }
-.login-btn { background: #00a651; color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 16px; font-weight: 600; cursor: pointer; }
-.login-btn:hover { background: #008541; }
+.filter-select {
+  padding: 10px 14px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+  background: white;
+  color: #333;
+  font-weight: 500;
+  transition: all 0.2s;
+  min-width: 140px;
+}
+
+.filter-select:hover {
+  border-color: #bbb;
+}
+
+.filter-select:focus {
+  border-color: #00a651;
+  box-shadow: 0 0 0 3px rgba(0, 166, 81, 0.1);
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-chip {
+  background: white;
+  border: 2px solid #e0e0e0;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filter-chip:hover {
+  border-color: #00a651;
+  background: #f8fdf9;
+}
+
+.filter-chip.active {
+  background: linear-gradient(135deg, #00a651 0%, #008e45 100%);
+  border-color: #00a651;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 166, 81, 0.3);
+}
+
+.filter-chip.reset {
+  background: #fff3e0;
+  border-color: #ffb74d;
+  color: #f57c00;
+}
+
+.filter-chip.reset:hover {
+  background: #ffe0b2;
+  border-color: #ffa726;
+}
+
+.chip-icon {
+  font-size: 14px;
+}
+
+.refresh-btn {
+  margin-left: auto;
+  background: white;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  font-size: 16px;
+}
+
+.refresh-btn:hover {
+  background: #f8f8f8;
+  border-color: #00a651;
+  transform: rotate(90deg);
+}
+
+.refresh-btn:active {
+  transform: rotate(90deg) scale(0.9);
+}
+
+.refresh-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 목록 헤더 */
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 0 4px;
+}
+
+.count-text {
+  font-size: 14px;
+  color: #666;
+}
+
+.count-text strong {
+  color: #00a651;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.filter-active-text {
+  font-size: 12px;
+  color: #00a651;
+  font-weight: 600;
+  background: #e5faf0;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.loading-state, .empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: #999;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.refresh-link {
+  color: #00a651;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  margin: 0 4px;
+}
+
+.refresh-link:hover {
+  color: #008541;
+}
+
+.skeleton-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.skeleton-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.sk-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.sk-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.sk-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+/* 내 가입상품 탭 */
+.my-products-section {
+  margin-top: 20px;
+}
+
+.my-section {
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #00a651;
+}
+
+.empty-my {
+  text-align: center;
+  padding: 40px;
+  color: #888;
+  background: #f9f9f9;
+  border-radius: 12px;
+}
+
+.login-required {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.login-required p {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.login-btn {
+  background: #00a651;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.login-btn:hover {
+  background: #008541;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 166, 81, 0.3);
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-group {
+    width: 100%;
+  }
+
+  .filter-select {
+    width: 100%;
+  }
+
+  .refresh-btn {
+    margin-left: 0;
+    align-self: flex-end;
+  }
+
+  .filter-chips {
+    justify-content: center;
+  }
+}
 </style>
