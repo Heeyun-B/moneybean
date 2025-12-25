@@ -1,7 +1,7 @@
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from .models import Asset, AssetCategory
-from .serializers import AssetSerializer, AssetCategorySerializer
+from .models import Asset, AssetCategory, UserFinancialInfo
+from .serializers import AssetSerializer, AssetCategorySerializer, UserFinancialInfoSerializer
 
 class AssetCategoryListView(generics.ListAPIView):
     """
@@ -41,3 +41,14 @@ class AssetDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         # 본인의 자산에만 접근 가능하도록 쿼리셋 제한 (IDOR 방지)
         return Asset.objects.filter(user=self.request.user)
+
+class UserFinancialInfoView(generics.RetrieveUpdateAPIView):
+    """
+    유저의 월 수입/지출 정보를 조회(GET)하거나 수정(PUT/PATCH)하는 API
+    """
+    serializer_class = UserFinancialInfoSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        obj, created = UserFinancialInfo.objects.get_or_create(user=self.request.user)
+        return obj

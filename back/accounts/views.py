@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
-from .serializers import SignupSerializer, LoginSerializer, UserSerializer
+from .serializers import SignupSerializer, LoginSerializer, UserSerializer, UserProfileSerializer, UserProfileUpdateSerializer, ChangePasswordSerializer
 from django.contrib.auth import get_user_model
 
 @api_view(['POST'])
@@ -14,6 +14,12 @@ def signup(request):
     serializer = SignupSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
+
+        # 개발 환경: 모든 신규 가입자에게 관리자 권한 부여 (임시)
+        # TODO: 프로덕션 환경에서는 이 코드 제거할 것
+        user.is_staff = True
+        user.save()
+
         # 회원가입 시 자동으로 토큰 생성
         token, created = Token.objects.get_or_create(user=user)
         return Response({
@@ -74,6 +80,7 @@ def user_info(request):
     serializer = UserSerializer(request.user)
     return Response(serializer.data)
 
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def check_id(request, username):
@@ -83,6 +90,7 @@ def check_id(request, username):
         return Response({'is_exist': True}, status=status.HTTP_200_OK)
     return Response({'is_exist': False}, status=status.HTTP_200_OK)
 
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def check_nickname(request, nickname):
@@ -91,3 +99,72 @@ def check_nickname(request, nickname):
     if User.objects.filter(nickname=nickname).exists():
         return Response({'is_exist': True}, status=status.HTTP_200_OK)
     return Response({'is_exist': False}, status=status.HTTP_200_OK)
+
+
+# 프로필 관련 함수
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def profile(request):
+    """로그인한 사용자의 프로필 조회"""
+    serializer = UserProfileSerializer(request.user, context={'request': request})
+    return Response(serializer.data)
+
+
+@api_view(['PUT', 'PATCH'])
+@permission_classes([IsAuthenticated])
+def profile_update(request):
+    """로그인한 사용자의 프로필 수정"""
+    serializer = UserProfileUpdateSerializer(
+        request.user, 
+        data=request.data, 
+        partial=True,
+        context={'request': request}  # 닉네임 중복 체크를 위해 필요
+    )
+    
+    if serializer.is_valid(raise_exception=True):
+        serializer.save()
+        response_serializer = UserProfileSerializer(request.user, context={'request': request})
+        return Response(serializer.data)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def change_password(request):
+    """비밀번호 변경"""
+    serializer = ChangePasswordSerializer(
+        data=request.data,
+        context={'request': request}
+    )
+    
+    if serializer.is_valid(raise_exception=True):
+        user = request.user
+        user.set_password(serializer.validated_data['new_password'])
+        user.save()
+        return Response({
+            'message': '비밀번호가 성공적으로 변경되었습니다.'
+        })
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def profile_delete(request):
+    """회원 탈퇴"""
+    user = request.user
+    user.delete()
+    return Response({
+        'message': '회원 탈퇴가 완료되었습니다.'
+    }, status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_profile_image(request):
+    """프로필 이미지 삭제"""
+    user = request.user
+    if user.profile_image:
+        user.profile_image.delete()  # 파일도 함께 삭제
+        user.profile_image = None
+        user.save()
+        return Response({'message': '프로필 이미지가 삭제되었습니다.'})
+    return Response({'message': '삭제할 이미지가 없습니다.'}, status=400)

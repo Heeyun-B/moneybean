@@ -1,0 +1,1158 @@
+<template>
+  <div class="asset-container">
+    <h1>💰 내 자산 관리</h1>
+
+    <div v-if="!isLoading && !store.isDataExists" class="empty-state">
+      <div class="mascot-wrapper">
+        <img src="@/assets/logo_bean.png" alt="머니빈" class="mascot-img">
+      </div>
+      <p class="empty-msg">아직 등록된 자산이 없네요!</p>
+      <p class="sub-msg">내 자산을 입력하면 한눈에 볼 수 있어요.</p>
+      <button @click="goToCreatePage" class="primary-btn">내 자산 입력하러 가기</button>
+    </div>
+
+    
+
+    <div v-else-if="isLoading" class="skeleton-dashboard">
+      <div class="summary-row">
+        <SkeletonLoader height="120px" radius="16px" />
+        <SkeletonLoader height="120px" radius="16px" />
+        <SkeletonLoader height="120px" radius="16px" />
+      </div>
+      <div class="chart-section">
+        <div class="skeleton-card"><SkeletonLoader height="300px" radius="16px" /></div>
+        <div class="skeleton-card"><SkeletonLoader height="300px" radius="16px" /></div>
+      </div>
+      <SkeletonLoader height="80px" radius="16px" style="margin-bottom: 40px;" />
+      <div class="skeleton-list">
+        <SkeletonLoader height="40px" width="200px" style="margin-bottom: 20px;" />
+        <SkeletonLoader v-for="n in 3" :key="n" height="60px" radius="8px" style="margin-bottom: 10px;" />
+      </div>
+    </div>
+
+    <div v-else class="dashboard">
+      <div class="level-status-card">
+        <div class="character-box">
+          <img :src="getImageUrl(currentLevel.img)" :alt="currentLevel.name" class="level-img">
+        </div>
+        <div class="level-info">
+          <p class="level-msg">
+            현재 <strong>{{ currentLevel.name }}</strong> 단계입니다. <br>
+            자산을 모아 다음 단계로 성장시켜 보세요!</p>
+        </div>
+      </div>
+
+      <div class="summary-row">
+        <div class="summary-card net-worth-card">
+          <h3>순자산 (자산 - 부채)</h3>
+          <p class="amount highlight">{{ store.netWorth.toLocaleString() }}원</p>
+        </div>
+        
+        <div class="summary-card clickable-card" @click="scrollToSection('cash')">
+          <h3>총 자산 <span>(▼ 목록 보기)</span></h3>
+          <p class="amount asset-color">{{ store.totalAssets.toLocaleString() }}원</p>
+        </div>
+
+        <div class="summary-card clickable-card" @click="scrollToSection('debt')">
+          <h3>총 부채 <span>(▼ 목록 보기)</span></h3>
+          <p class="amount debt-color">{{ store.totalDebt.toLocaleString() }}원</p>
+        </div>
+      </div>
+
+      <div class="chart-section">
+        <div class="chart-card">
+          <h3>자산 포트폴리오</h3>
+          <div class="doughnut-wrapper">
+            <div class="center-logo">
+              <img 
+                :src="getImageUrl(currentLevel.img)" 
+                :alt="currentLevel.name" 
+                class="floating-level-img"
+              >
+            </div>
+            <Doughnut v-if="doughnutData" :data="doughnutData" :options="doughnutOptions" />
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <h3>자산/부채 현황</h3>
+          <div class="bar-wrapper">
+            <Bar v-if="barData" :data="barData" :options="barOptions" />
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-section">
+        <div class="ai-banner">
+          <div class="ai-text">
+            <h4>🤖 AI 금융 비서에게 진단받기</h4>
+            <p>내 자산 포트폴리오를 분석하고 맞춤형 조언을 받아보세요.</p>
+          </div>
+          <button class="ai-btn" @click="handleAiDiagnosis" :disabled="isAiLoading">
+            {{ isAiLoading ? '분석 중입니다... ⏳' : '진단 시작하기 🚀' }}
+          </button>
+        </div>
+
+        <div v-if="aiSections.length > 0 || aiRecommendations" class="ai-result-card">
+          <!-- 자산 진단 섹션 -->
+          <div v-for="(section, index) in aiSections" :key="index">
+
+            <div v-if="section.is_main" class="main-title-section">
+              <h1>{{ section.title }}</h1>
+              <p v-if="section.content" class="main-content">{{ section.content }}</p>
+            </div>
+
+            <div v-else class="report-section">
+              <button
+                @click="toggleReportSection(index)"
+                class="report-section-header"
+              >
+                <span class="section-title">{{ section.title }}</span>
+                <span class="toggle-icon">{{ isReportOpen[index] ? '▲' : '▼' }}</span>
+              </button>
+
+              <div v-show="isReportOpen[index]" class="report-section-content">
+                <p style="white-space: pre-line">{{ section.content }}</p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 상품 추천 섹션 -->
+          <div v-if="aiRecommendations" class="recommendations-section">
+            <div class="recommendation-header">
+              <h2>🎯 맞춤 금융 상품 추천</h2>
+            </div>
+
+            <!-- 포트폴리오 분석 -->
+            <div class="portfolio-analysis-card">
+              <h3>📊 포트폴리오 분석</h3>
+              <div class="analysis-grid">
+                <div class="analysis-item">
+                  <span class="analysis-label">💵 현금 비율</span>
+                  <p class="analysis-text">{{ aiRecommendations.portfolio_analysis.cash_ratio_assessment }}</p>
+                </div>
+                <div class="analysis-item">
+                  <span class="analysis-label">📈 투자 비율</span>
+                  <p class="analysis-text">{{ aiRecommendations.portfolio_analysis.investment_ratio_assessment }}</p>
+                </div>
+                <div class="analysis-item">
+                  <span class="analysis-label">💳 부채 상황</span>
+                  <p class="analysis-text">{{ aiRecommendations.portfolio_analysis.debt_assessment }}</p>
+                </div>
+                <div class="analysis-item">
+                  <span class="analysis-label">💧 유동성</span>
+                  <p class="analysis-text">{{ aiRecommendations.portfolio_analysis.liquidity_assessment }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 추천 상품 리스트 -->
+            <div v-if="aiRecommendations.recommended_products && aiRecommendations.recommended_products.length > 0" class="products-list-card">
+              <h3>✨ 추천 상품</h3>
+              <div class="products-grid">
+                <div
+                  v-for="product in aiRecommendations.recommended_products"
+                  :key="product.product_code"
+                  class="product-card"
+                  @click="goToProduct(product.product_code, product.product_type)"
+                >
+                  <div class="product-header">
+                    <div class="product-priority-badge" :class="`priority-${product.priority}`">
+                      {{ product.priority === 1 ? '최우선' : product.priority === 2 ? '추천' : '고려' }}
+                    </div>
+                    <div class="product-type-badge" :class="product.product_type">
+                      {{ product.product_type === 'deposit' ? '예금' : '적금' }}
+                    </div>
+                  </div>
+                  <div class="product-info">
+                    <p class="product-bank">{{ product.bank_name }}</p>
+                    <h4 class="product-name">{{ product.product_name }}</h4>
+                    <div class="product-rate">
+                      <span class="rate-label">최고 금리</span>
+                      <span class="rate-value">{{ product.max_rate }}%</span>
+                    </div>
+                  </div>
+                  <div class="product-reason">
+                    <p>{{ product.reason }}</p>
+                  </div>
+                  <div class="product-action">
+                    <span class="action-text">상세보기 →</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 추천 상품이 없을 때 -->
+            <div v-else class="no-products-card">
+              <div class="no-products-icon">💡</div>
+              <p class="no-products-text">{{ aiRecommendations.investment_strategy }}</p>
+            </div>
+
+            <!-- 투자 전략 -->
+            <div class="strategy-card">
+              <h3>💡 투자 전략</h3>
+              <p class="strategy-text">{{ aiRecommendations.investment_strategy }}</p>
+            </div>
+
+            <!-- 실행 항목 -->
+            <div class="action-items-card">
+              <h3>✅ 실행 항목</h3>
+              <ul class="action-items-list">
+                <li v-for="(item, idx) in aiRecommendations.action_items" :key="idx" class="action-item">
+                  <span class="action-bullet">{{ idx + 1 }}</span>
+                  <span class="action-text">{{ item }}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="list-section">
+        <div class="list-header-row">
+          <h3>상세 자산 목록</h3>
+          <div class="header-action-btns">
+            <button @click="router.push({ name: 'exchange', query: { asset: 'gold' } })" class="exchange-btn">
+              🪙 금/은 시세 확인
+            </button>
+            <button @click="goToCreatePage" class="edit-btn">목록 편집</button>
+          </div>
+        </div>
+
+        <div class="hierarchical-list">
+          <div 
+            v-for="section in assetSections" 
+            :key="section.key" 
+            :id="`section-${section.key}`" 
+            class="major-section"
+          >
+            <div class="major-header" :class="section.key">
+              <span class="major-title">{{ section.label }}</span>
+              <span class="major-total">{{ section.total.toLocaleString() }}원</span>
+            </div>
+
+            <div v-for="group in section.groups" :key="group.categoryId" class="sub-group">
+              <div class="sub-header">
+                <span class="sub-title">📂 {{ group.categoryName }}</span>
+                <span class="sub-total">합계: {{ group.totalValue.toLocaleString() }}원</span>
+              </div>
+              <ul class="item-list">
+                <li v-for="asset in group.items" :key="asset.id" class="asset-item">
+                  <span class="asset-name">{{ asset.name }}</span>
+                  <span class="asset-value">{{ Number(asset.current_value).toLocaleString() }}원</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div v-if="section.groups.length === 0" class="empty-section-msg">
+              등록된 {{ section.label }}이 없습니다.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { onMounted, computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAssetStore } from '@/stores/asset'
+import SkeletonLoader from '@/components/common/SkeletonLoader.vue'
+
+// 차트 라이브러리 설정
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
+import { Doughnut, Bar } from 'vue-chartjs'
+import MarkdownIt from 'markdown-it'
+
+ChartJS.register(ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
+
+const store = useAssetStore()
+const router = useRouter()
+const md = new MarkdownIt()
+
+const getLevelInfo = (balance) => {
+  if (balance >= 100000000) return { name: "돈나무", img: "level_money_tree.png" };
+  if (balance >= 80000000) return { name: "나무", img: "level_tree.png" };
+  if (balance >= 50000000) return { name: "가지", img: "level_branch.png" };
+  if (balance >= 10000000) return { name: "새싹", img: "level_sprout.png" };
+  return { name: "콩", img: "level_bean.png" };
+};
+
+const currentLevel = computed(() => getLevelInfo(store.netWorth));
+
+const getImageUrl = (name) => {
+  return new URL(`../../assets/level_logos/${name}`, import.meta.url).href;
+};
+
+// UI 상태 관리
+const isLoading = ref(true)     // 초기 데이터 로딩 상태
+const isAiLoading = ref(false)  // AI 진단 로딩 상태
+const aiSections = ref([])  // sections 배열로 변경
+const isReportOpen = ref({})  // 섹션별 토글 상태
+
+onMounted(async () => {
+  isLoading.value = true
+  
+  try {
+    // 병렬로 데이터 로드
+    const [result] = await Promise.all([
+      store.getAssets(),
+      store.getCategories(),
+      // UX를 위해 최소 0.6초간 스켈레톤 노출 (너무 빨리 깜빡이는 것 방지)
+      new Promise(resolve => setTimeout(resolve, 600))
+    ])
+    
+    if (result === 'NO_TOKEN' || result === 'AUTH_ERROR') {
+      alert('로그인이 필요한 서비스입니다.')
+      router.push({ name: 'login' })
+    }
+  } catch (e) {
+    console.error(e)
+  } finally {
+    isLoading.value = false
+  }
+})
+
+const goToCreatePage = () => {
+  router.push({ name: 'asset-create' })
+}
+
+// AI 상품 추천 데이터
+const aiRecommendations = ref(null)
+
+const handleAiDiagnosis = async () => {
+  if (!confirm('AI 진단 및 상품 추천을 시작하시겠습니까? (약 5초 소요)')) return
+
+  isAiLoading.value = true
+  aiSections.value = []
+  aiRecommendations.value = null
+
+  const payload = {
+    totalAssets: store.totalAssets,
+    totalCash: store.totalCash,
+    totalInvest: store.totalInvest,
+    totalDebt: store.totalDebt,
+    netWorth: store.netWorth,
+    income: store.financialInfo.income,
+    expense: store.financialInfo.expense,
+    sections: assetSections.value
+  }
+
+  try {
+    // 자산 진단과 상품 추천을 병렬로 실행
+    const [diagnosisResult, recommendResult] = await Promise.all([
+      store.getAiDiagnosis(payload),
+      store.getAiRecommendations(payload)
+    ])
+
+    // 자산 진단 결과
+    aiSections.value = diagnosisResult
+
+    // 상품 추천 결과
+    if (recommendResult && recommendResult.success) {
+      aiRecommendations.value = recommendResult.data
+    }
+  } catch (error) {
+    console.error(error)
+    alert('AI 서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.')
+  } finally {
+    isAiLoading.value = false
+  }
+}
+
+const goToProduct = (productCode, productType) => {
+  const routeName = productType === 'deposit' ? 'deposit-detail' : 'saving-detail'
+  router.push({ name: routeName, params: { id: productCode } })
+}
+
+const toggleReportSection = (index) => {
+  isReportOpen.value[index] = !isReportOpen.value[index]
+}
+
+const scrollToSection = (key) => {
+  const element = document.getElementById(`section-${key}`)
+  if (element) {
+    const yOffset = -80
+    const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset
+    window.scrollTo({ top: y, behavior: 'smooth' })
+  }
+}
+
+// --- 차트 및 리스트 데이터
+const groupAssets = (assets) => {
+  if (!assets || assets.length === 0) return []
+  const groups = {}
+  assets.forEach(asset => {
+    const catId = asset.category
+    if (!groups[catId]) {
+      const catName = store.categories.find(c => c.id === catId)?.name || '기타'
+      groups[catId] = { categoryId: catId, categoryName: catName, totalValue: 0, items: [] }
+    }
+    groups[catId].items.push(asset)
+    groups[catId].totalValue += Number(asset.current_value)
+  })
+  return Object.values(groups)
+}
+
+const assetSections = computed(() => [
+  { key: 'cash', label: '현금성 자산', total: store.totalCash, groups: groupAssets(store.cashAssets) },
+  { key: 'invest', label: '투자 자산', total: store.totalInvest, groups: groupAssets(store.investAssets) },
+  { key: 'debt', label: '부채', total: store.totalDebt, groups: groupAssets(store.debtAssets) }
+])
+
+const doughnutData = computed(() => {
+  if (!store.totalAssets) return null
+  return {
+    labels: ['현금성 자산', '투자 자산'],
+    datasets: [{
+      backgroundColor: ['#00a651', '#2979FF'], 
+      data: [store.totalCash, store.totalInvest],
+      borderWidth: 0,
+      hoverOffset: 10
+    }]
+  }
+})
+
+const doughnutOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  cutout: '70%',
+  layout: {
+    padding: 20
+  },
+  plugins: {
+    legend: {
+      position: 'bottom',
+      labels: {
+        padding: 20,
+        usePointStyle: true,
+        font: { family: "'Pretendard', sans-serif", size: 12 }
+      }
+    },
+    tooltip: {
+      enabled: true,
+      backgroundColor: 'rgba(0, 0, 0, 0.9)',
+      titleFont: { size: 14, weight: 'bold' },
+      bodyFont: { size: 13 },
+      padding: 15,
+      cornerRadius: 10,
+      displayColors: false,
+      
+      callbacks: {
+        // 1. 제목: 섹션 이름 + 총액 + 퍼센트
+        title: (tooltipItems) => {
+          const item = tooltipItems[0]
+          const total = item.dataset.data.reduce((a, b) => a + b, 0)
+          const value = item.raw
+          const percentage = ((value / total) * 100).toFixed(1) + '%'
+          return `${item.label} : ${percentage}`
+        },
+        // 2. 내용: 해당 섹션의 상세 자산 목록 나열
+        label: (context) => {
+          return ` 총액: ${Number(context.raw).toLocaleString()}원`
+        },
+        afterBody: (tooltipItems) => {
+          const index = tooltipItems[0].dataIndex
+          // 0번 인덱스면 현금성 자산, 1번이면 투자 자산
+          const targetAssets = index === 0 ? store.cashAssets : store.investAssets
+          
+          if (!targetAssets || targetAssets.length === 0) return []
+
+          // 자산 목록을 금액 순으로 정렬해서 상위 5개만 보여주거나 전체 보여주기
+          const sortedList = [...targetAssets].sort((a, b) => b.current_value - a.current_value)
+          
+          const lines = ['----------------']
+          
+          sortedList.forEach(asset => {
+             lines.push(`• ${asset.name}: ${Number(asset.current_value).toLocaleString()}원`)
+          })
+          
+          return lines
+        }
+      }
+    }
+  },
+  animation: { animateScale: true, animateRotate: true }
+}
+
+const barData = computed(() => ({
+  labels: ['총 자산', '총 부채', '순자산'],
+  datasets: [{
+    label: '금액',
+    data: [store.totalAssets, store.totalDebt, store.netWorth],
+    backgroundColor: ['#00a651', '#FF8A65', '#42A5F5'],
+    borderRadius: 6,
+    barThickness: 50
+  }]
+}))
+
+const barOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { legend: { display: false } },
+  scales: {
+    y: { beginAtZero: true, grid: { color: '#f5f5f5' } },
+    x: { grid: { display: false } }
+  }
+}
+</script>
+
+<style scoped>
+/* --- 기본 레이아웃 및 폰트 --- */
+.asset-container { max-width: 900px; margin: 0 auto; padding: 40px 20px; color: #333; }
+h1 { text-align: center; margin-bottom: 40px; font-size: 26px; font-weight: 800; }
+
+/* --- 스켈레톤 레이아웃 --- */
+.skeleton-dashboard { animation: fadeIn 0.5s ease; }
+.skeleton-card { background: #fff; padding: 20px; border-radius: 16px; border: 1px solid #f0f0f0; }
+
+/* --- 레벨 상태 카드 (중앙 정렬 버전) --- */
+.level-status-card { 
+  background: white; 
+  border-radius: 16px; 
+  padding: 30px 25px; 
+  margin-bottom: 25px;
+  display: flex; 
+  flex-direction: column;
+  align-items: center; 
+  justify-content: center; 
+  gap: 15px; 
+  border: 1px solid #f0f0f0; 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03); 
+}
+
+.character-box { 
+  width: 100px; height: 100px;
+  background: #f9f9f9; 
+  border-radius: 50%; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  flex-shrink: 0; 
+  border: 2px solid #e8f5e9; 
+  overflow: hidden; 
+  box-shadow: 0 0 15px rgba(0, 166, 81, 0.2);
+  animation: pulse-green 2s infinite; 
+}
+
+.level-img { width: 70px; height: 70px; object-fit: contain; }
+
+.level-info { 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center;
+  gap: 8px; 
+}
+
+.level-msg { 
+  font-size: 16px;
+  color: #555; 
+  margin: 0; 
+  text-align: center; 
+  line-height: 1.6;
+}
+.level-msg strong { color: #00a651; font-weight: 800; }
+
+/* --- Summary Cards --- */
+.summary-row { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 20px; margin-bottom: 40px; }
+.summary-card {
+  background: white; padding: 25px; border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.04); border: 1px solid #f0f0f0;
+  display: flex; flex-direction: column; justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.clickable-card { cursor: pointer; }
+.clickable-card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+.clickable-card h3 span { font-size: 11px; color: #999; margin-left: 5px; font-weight: normal; }
+
+.net-worth-card {
+  background: linear-gradient(135deg, #00a651 0%, #008e45 100%);
+  color: white; border: none; box-shadow: 0 8px 20px rgba(0, 166, 81, 0.25);
+}
+.summary-card h3 { margin: 0 0 8px 0; font-size: 14px; opacity: 0.8; font-weight: normal; }
+.net-worth-card h3 { opacity: 0.95; color: #E0F2F1; }
+.amount { font-size: 22px; font-weight: 800; margin: 0; }
+.amount.highlight { font-size: 30px; }
+.amount.asset-color { color: #00a651; }
+.amount.debt-color { color: #FF7043; }
+
+/* --- Charts & 도넛 캐릭터 확대 --- */
+.chart-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+.chart-card {
+  background: white; padding: 25px; border-radius: 16px;
+  border: 1px solid #f0f0f0; box-shadow: 0 4px 15px rgba(0,0,0,0.03); text-align: center;
+}
+.doughnut-wrapper { position: relative; height: 320px; width: 100%; display: flex; justify-content: center; align-items: center; }
+.bar-wrapper { position: relative; height: 240px; }
+
+.center-logo {
+  position: absolute; 
+  top: 45%; 
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 140px; height: 140px;
+  display: flex; align-items: center; justify-content: center; 
+  pointer-events: none; 
+  z-index: 0;
+}
+
+.floating-level-img { 
+  width: 100px; height: 100px;
+  object-fit: contain; 
+  animation: float-and-glow 3s ease-in-out infinite;
+}
+
+/* --- AI Section --- */
+.ai-section { margin-bottom: 40px; }
+.ai-banner {
+  background: linear-gradient(95deg, #E3F2FD 0%, #BBDEFB 100%);
+  border-radius: 16px; padding: 25px 30px;
+  display: flex; justify-content: space-between; align-items: center;
+  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.15); border: 1px solid #BBDEFB;
+}
+.ai-text h4 { margin: 0 0 5px 0; font-size: 18px; color: #1565C0; }
+.ai-text p { margin: 0; font-size: 14px; color: #555; }
+.ai-btn {
+  background-color: #1976D2; color: white; padding: 12px 24px;
+  border: none; border-radius: 8px; font-weight: bold; cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s; box-shadow: 0 4px 10px rgba(25, 118, 210, 0.2);
+}
+.ai-btn:hover:not(:disabled) { background-color: #1565C0; transform: translateY(-2px); }
+.ai-btn:disabled { background-color: #90CAF9; cursor: not-allowed; }
+
+/* --- AI 리포트 결과 카드 --- */
+.ai-result-card {
+  margin-top: 20px; 
+  background: #fff; 
+  border: 1px solid #e0e0e0;
+  border-radius: 16px; 
+  padding: 30px; 
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
+  text-align: left;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* AI 리포트 메인 제목 */
+.main-title-section {
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #00a651;
+}
+
+.main-title-section h1 {
+  font-size: 24px;
+  color: #00a651;
+  margin: 0 0 10px 0;
+  font-weight: 800;
+}
+
+.main-content {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* AI 리포트 토글 섹션 */
+.report-section {
+  margin-bottom: 12px;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.report-section:hover {
+  border-color: #d0d0d0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.report-section-header {
+  width: 100%;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #f0f1f3 100%);
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+  font-family: 'Pretendard', sans-serif;
+}
+
+.report-section-header:hover {
+  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+}
+
+.toggle-icon {
+  font-size: 14px;
+  color: #666;
+  transition: transform 0.2s ease;
+}
+
+.report-section-content {
+  padding: 20px;
+  background: white;
+  line-height: 1.8;
+  font-size: 15px;
+  color: #444;
+  animation: slideDown 0.3s ease;
+}
+
+.close-report {
+  margin-top: 20px; 
+  background: #f5f5f5; 
+  border: none; 
+  padding: 10px 20px;
+  border-radius: 8px; 
+  cursor: pointer; 
+  font-weight: bold; 
+  color: #666; 
+  width: 100%;
+  transition: background 0.2s ease;
+}
+.close-report:hover { 
+  background: #e0e0e0; 
+}
+
+/* 일반 섹션 (토글 없는 섹션) */
+.plain-section {
+  margin-bottom: 20px;
+  padding: 15px 20px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border-left: 4px solid #00a651;
+}
+
+.plain-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 10px 0;
+}
+
+.plain-content {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.8;
+  margin: 0;
+}
+
+/* --- List Section --- */
+.list-section { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+.list-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+.header-action-btns { display: flex; gap: 10px; }
+.exchange-btn { background: #fff; border: 1px solid #D4AF37; padding: 6px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; color: #B8860B; font-weight: bold; transition: 0.2s; }
+.exchange-btn:hover { background: #FFFDE7; transform: translateY(-1px); }
+.edit-btn { background: white; border: 1px solid #ddd; padding: 6px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; color: #555; }
+.edit-btn:hover { background: #f5f5f5; color: #111; }
+
+.major-section { margin-bottom: 40px; scroll-margin-top: 20px; }
+.major-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 2px solid #333; margin-bottom: 15px; }
+.major-header.cash { border-bottom-color: #00a651; color: #00695C; }
+.major-header.invest { border-bottom-color: #2979FF; color: #1565C0; }
+.major-header.debt { border-bottom-color: #FF8A65; color: #D84315; }
+.major-title { font-size: 18px; font-weight: 800; }
+.major-total { font-size: 18px; font-weight: bold; }
+
+.sub-group { margin-bottom: 20px; padding-left: 10px; }
+.sub-header { display: flex; justify-content: space-between; align-items: center; background-color: #f9f9f9; padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; }
+.sub-title { font-size: 14px; font-weight: 600; color: #444; }
+.asset-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid #f0f0f0; font-size: 15px; }
+.asset-value { font-weight: bold; color: #333; }
+.empty-section-msg { color: #999; font-size: 13px; padding: 10px; text-align: center; background: #fafafa; border-radius: 8px; }
+
+/* --- 애니메이션 정의 --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-green {
+  0% { box-shadow: 0 0 0 0 rgba(0, 166, 81, 0.4); }
+  70% { box-shadow: 0 0 0 15px rgba(0, 166, 81, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 166, 81, 0); }
+}
+
+@keyframes float-and-glow {
+  0%, 100% { transform: translateY(0px); filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)) brightness(1); }
+  50% { transform: translateY(-10px); filter: drop-shadow(0 10px 15px rgba(0, 166, 81, 0.4)) brightness(1.2); }
+}
+
+/* --- 상품 추천 섹션 스타일 --- */
+.recommendations-section {
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 3px solid #f0f0f0;
+}
+
+.recommendation-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.recommendation-header h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #00a651;
+  margin: 0;
+}
+
+/* 포트폴리오 분석 카드 */
+.portfolio-analysis-card {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 25px;
+  border: 1px solid #bae6fd;
+}
+
+.portfolio-analysis-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0369a1;
+  margin: 0 0 20px 0;
+}
+
+.analysis-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.analysis-item {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.analysis-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0369a1;
+  margin-bottom: 8px;
+}
+
+.analysis-text {
+  font-size: 14px;
+  color: #444;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* 추천 상품 리스트 */
+.products-list-card {
+  margin-bottom: 25px;
+}
+
+.products-list-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 20px 0;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.product-card {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 16px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.product-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #00a651 0%, #008e45 100%);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover {
+  border-color: #00a651;
+  box-shadow: 0 8px 24px rgba(0, 166, 81, 0.15);
+  transform: translateY(-4px);
+}
+
+.product-card:hover::before {
+  transform: scaleX(1);
+}
+
+.product-header {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.product-priority-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+}
+
+.product-priority-badge.priority-1 {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+.product-priority-badge.priority-2 {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+.product-priority-badge.priority-3 {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.product-type-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid;
+}
+
+.product-type-badge.deposit {
+  background: #e0f2fe;
+  color: #0369a1;
+  border-color: #bae6fd;
+}
+
+.product-type-badge.saving {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+.product-info {
+  margin-bottom: 15px;
+}
+
+.product-bank {
+  font-size: 13px;
+  color: #666;
+  margin: 0 0 5px 0;
+  font-weight: 600;
+}
+
+.product-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #222;
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+}
+
+.product-rate {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-radius: 8px;
+  border: 1px solid #bbf7d0;
+}
+
+.rate-label {
+  font-size: 12px;
+  color: #15803d;
+  font-weight: 600;
+}
+
+.rate-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: #15803d;
+  margin-left: auto;
+}
+
+.product-reason {
+  margin-bottom: 15px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border-left: 3px solid #00a651;
+}
+
+.product-reason p {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.product-action {
+  text-align: right;
+}
+
+.action-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #00a651;
+  transition: all 0.2s;
+}
+
+.product-card:hover .action-text {
+  transform: translateX(4px);
+  display: inline-block;
+}
+
+/* 추천 상품이 없을 때 */
+.no-products-card {
+  background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%);
+  border: 2px solid #fde047;
+  border-radius: 16px;
+  padding: 40px 30px;
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.no-products-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+
+.no-products-text {
+  font-size: 15px;
+  color: #854d0e;
+  line-height: 1.8;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* 투자 전략 카드 */
+.strategy-card {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 25px;
+  border: 1px solid #bbf7d0;
+}
+
+.strategy-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #15803d;
+  margin: 0 0 15px 0;
+}
+
+.strategy-text {
+  font-size: 15px;
+  color: #444;
+  line-height: 1.8;
+  margin: 0;
+}
+
+/* 실행 항목 카드 */
+.action-items-card {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 16px;
+  padding: 25px;
+}
+
+.action-items-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 20px 0;
+}
+
+.action-items-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.action-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.action-item:last-child {
+  border-bottom: none;
+}
+
+.action-bullet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #00a651 0%, #008e45 100%);
+  color: white;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 166, 81, 0.3);
+}
+
+.action-item .action-text {
+  font-size: 15px;
+  color: #444;
+  line-height: 1.6;
+  flex: 1;
+}
+
+/* --- Empty State & Mobile --- */
+.empty-state { text-align: center; padding: 60px 20px; background: #f9f9f9; border-radius: 20px; }
+.mascot-img { width: 100px; margin-bottom: 20px; }
+.primary-btn { background-color: #00a651; color: white; padding: 12px 30px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+
+:deep(canvas) { z-index: 10; }
+
+@media (max-width: 768px) {
+  .summary-row, .chart-section { grid-template-columns: 1fr; }
+  .center-logo { left: 50%; }
+  .ai-banner { flex-direction: column; text-align: center; gap: 15px; }
+  .ai-btn { width: 100%; }
+  .analysis-grid { grid-template-columns: 1fr; }
+  .products-grid { grid-template-columns: 1fr; }
+}
+</style>
