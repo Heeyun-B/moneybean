@@ -63,13 +63,14 @@ class DepositSubscriptionSerializer(serializers.ModelSerializer):
     bank_name = serializers.CharField(source='product.kor_co_nm', read_only=True)
     product_code = serializers.CharField(source='product.fin_prdt_cd', read_only=True)
     interest_rate = serializers.FloatField(source='selected_option.intr_rate', read_only=True)
+    max_interest_rate = serializers.FloatField(source='selected_option.intr_rate2', read_only=True)
     save_term = serializers.IntegerField(source='selected_option.save_trm', read_only=True)
     
     class Meta:
         from deposits.models import DepositSubscription
         model = DepositSubscription
         fields = ('id', 'product_code', 'product_name', 'bank_name', 
-                  'interest_rate', 'save_term', 'subscribed_at')
+                  'interest_rate', 'max_interest_rate', 'save_term', 'subscribed_at')
 
 
 class SavingSubscriptionSerializer(serializers.ModelSerializer):

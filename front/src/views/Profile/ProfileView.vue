@@ -91,6 +91,18 @@
       </div>
     </div>
 
+    <section class="chart-section" v-if="!isEditing && profileData">
+      <div class="section-title"><h3>📊 금리 비교 현황</h3></div>
+      <div class="chart-wrapper">
+        <Bar 
+          v-if="chartData && chartData.datasets[0].data.length > 0"
+          :data="chartData" 
+          :options="chartOptions" 
+        />
+        <div v-else class="empty-box">가입된 상품이 없어 그래프를 표시할 수 없습니다.</div>
+      </div>
+    </section>
+
     <section class="asset-section" v-if="!isEditing">
       <div class="section-title"><h3>🏦 나의 가입 상품</h3></div>
       <div class="asset-grid">
@@ -201,6 +213,94 @@ import levelSproutImg from '@/assets/level_logos/level_sprout.png'
 import levelBranchImg from '@/assets/level_logos/level_branch.png'
 import levelTreeImg from '@/assets/level_logos/level_tree.png'
 import levelMoneyTreeImg from '@/assets/level_logos/level_money_tree.png'
+
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  CategoryScale,
+  LinearScale
+} from 'chart.js'
+import { Bar } from 'vue-chartjs'
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
+
+// --- 차트 데이터 가공 ---
+const chartData = computed(() => {
+  if (!profileData.value) return null
+  
+  const deposits = profileData.value.deposit_subscriptions || []
+  const savings = profileData.value.saving_subscriptions || []
+  const combined = [...deposits, ...savings]
+  
+  if (combined.length === 0) return null
+
+  // 1. 평균 금리 계산
+  const avgRate = combined.reduce((acc, cur) => acc + cur.interest_rate, 0) / combined.length
+  // 백엔드에서 max_interest_rate(intr_rate2)를 보내준다고 가정
+  const avgMaxRate = combined.reduce((acc, cur) => acc + (cur.max_interest_rate || cur.interest_rate), 0) / combined.length
+
+  // 2. 라벨 구성 (상품명들 + 전체 평균)
+  const labels = [...combined.map(item => item.product_name), '전체 평균']
+
+  return {
+    labels: labels,
+    datasets: [
+      {
+        label: '저축 금리',
+        data: [...combined.map(item => item.interest_rate), avgRate.toFixed(2)],
+        // 모든 저축 금리는 연한 초록색으로 통일 (마지막 평균막대만 살짝 흐리게)
+        backgroundColor: labels.map((label, index) => 
+          index === labels.length - 1 ? 'rgba(126, 217, 87, 0.6)' : '#7ed957'
+        ),
+        borderRadius: 8,
+      },
+      {
+        label: '최고 우대 금리',
+        data: [...combined.map(item => item.max_interest_rate || item.interest_rate), avgMaxRate.toFixed(2)],
+        // 모든 최고 금리는 진한 초록색으로 통일 (마지막 평균막대만 살짝 흐리게)
+        backgroundColor: labels.map((label, index) => 
+          index === labels.length - 1 ? 'rgba(0, 166, 81, 0.6)' : '#00a651'
+        ),
+        borderRadius: 8,
+      }
+    ]
+  }
+})
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { 
+      display: true, 
+      position: 'top',
+      labels: {
+        usePointStyle: true,
+        padding: 20
+      }
+    },
+    tooltip: {
+      mode: 'index',
+      intersect: false,
+      callbacks: {
+        label: (context) => ` ${context.dataset.label}: ${context.parsed.y}%`
+      }
+    }
+  },
+  scales: {
+    y: { 
+      beginAtZero: true, 
+      ticks: { callback: (val) => val + '%' },
+      grid: { color: '#f0f0f0' }
+    },
+    x: { 
+      grid: { display: false } 
+    }
+  }
+}
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -818,5 +918,19 @@ const goToProductDetail = (type, id) => {
   .picker-group { 
     flex-direction: column; 
   }
+}
+
+.chart-section {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f0f0f0;
+  margin-bottom: 30px;
+  padding-bottom: 30px;
+}
+
+.chart-wrapper {
+  padding: 20px 30px;
+  height: 300px; /* 높이 고정 */
 }
 </style>
