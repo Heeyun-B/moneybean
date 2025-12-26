@@ -129,8 +129,8 @@
 
 | Name | Content                                                      |
 | ---- | ------------------------------------------------------------ |
-|      | - Vue 3 Composition API의 ref, computed, watch 활용법<br />- Pinia를 이용한 전역 상태 관리 (auth, board 스토어)<br />- Vue Router의 네비게이션 가드와 리다이렉트 처리<br />- localStorage와 sessionStorage를 활용한 클라이언트 데이터 관리<br />- 사용자별 데이터 격리 (username 기반 키 생성)<br />- YouTube API 연동 및 비디오 검색 기능 구현<br />- 외부 서비스로의 안전한 리다이렉트 처리<br />- Git을 활용한 협업 및 브랜치 관리 |
-|      | - Django REST Framework Serializer 작성<br />- Token 기반 인증/인가 구현<br />- 이미지 파일 업로드 및 미디어 파일 처리<br />- 외부 API 연동 (금융감독원, YouTube 등)<br />- CORS 설정 및 프론트-백엔드 통신<br />- 효율적인 데이터베이스 쿼리 작성<br />- 게시판 권한 관리 (작성자, 관리자, 일반 사용자)<br />- RESTful API 설계 원칙 적용 |
+|Front      | - Vue 3 Composition API의 ref, computed, watch 활용법<br />- Pinia를 이용한 전역 상태 관리 (auth, board 스토어)<br />- Vue Router의 네비게이션 가드와 리다이렉트 처리<br />- localStorage와 sessionStorage를 활용한 클라이언트 데이터 관리<br />- 사용자별 데이터 격리 (username 기반 키 생성)<br />- YouTube API 연동 및 비디오 검색 기능 구현<br />- 외부 서비스로의 안전한 리다이렉트 처리<br />- Git을 활용한 협업 및 브랜치 관리 |
+|Back      | - Django REST Framework Serializer 작성<br />- Token 기반 인증/인가 구현<br />- 이미지 파일 업로드 및 미디어 파일 처리<br />- 외부 API 연동 (금융감독원, YouTube 등)<br />- CORS 설정 및 프론트-백엔드 통신<br />- 효율적인 데이터베이스 쿼리 작성<br />- 게시판 권한 관리 (작성자, 관리자, 일반 사용자)<br />- RESTful API 설계 원칙 적용 |
 
 
 
