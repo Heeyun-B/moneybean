@@ -67,7 +67,7 @@
 
 ### 🛠 Tech Stack
 
-![Tech Stack](./docs/images/TechStack.png)
+![Tech Stack](./팀별%20설계/service_architecture.png)
 
 **Frontend**
 - Vue.js 3 (Composition API)
@@ -93,7 +93,7 @@
 
 ### 🏗 데이터베이스 모델링(ERD)
 
-![ERD](./docs/images/erd.png)
+![ERD](./팀별%20설계/erd.png)
 
 **주요 모델**
 - User (사용자)
@@ -107,7 +107,7 @@
 
 ### 🏔 컴포넌트 구조
 
-![Component Structure](./docs/images/component.png)
+![Component Structure](./팀별%20설계/component_tree.png)
 
 **주요 컴포넌트**
 - HomeView: 메인 페이지
@@ -122,7 +122,7 @@
 
 ### 🎮 서비스 플로우 차트
 
-![Service Flow Chart](./docs/images/flow.png)
+![Service Flow Chart](./팀별%20설계/page_flow.png)
 
 
 ### 💎 배웠던 점
@@ -296,22 +296,22 @@ UX 최적화: 전역 라우터 가드를 통한 리다이렉트 처리, 로딩 �
 ### 📸 주요 화면
 
 #### 메인 페이지
-![메인 페이지](./docs/images/main-page.png)
+![메인 페이지](./실행%20결과%20캡쳐본/F01.png)
 
 #### AI 자산 분석 및 추천
-![AI 자산 분석](./docs/images/ai-analysis.png)
+![AI 자산 분석](./실행%20결과%20캡쳐본/add_ai.png)
 
 #### 금융 뉴스 게시판
-![금융 뉴스 게시판](./docs/images/news-board.png)
+![금융 뉴스 게시판](./실행%20결과%20캡쳐본/F07_detail.png)
 
 #### 자산 관리 페이지
-![자산 관리](./docs/images/asset-management.png)
+![자산 관리](./실행%20결과%20캡쳐본/F09.png)
 
 #### YouTube 검색 페이지
-![YouTube 검색](./docs/images/youtube-search.png)
+![YouTube 검색](./실행%20결과%20캡쳐본/F05_1.png)
 
 #### 예적금 상품 목록
-![예적금 상품 목록](./docs/images/deposit-list.png)
+![예적금 상품 목록](./실행%20결과%20캡쳐본/F03_1&2.png)
 
 
 
