@@ -136,17 +136,17 @@
 
 ### 🔥 이슈 관리
 
-| No.  | Name | Content                                                      | Solve    | follow-up                                                    |
-| ---- | ---- | ------------------------------------------------------------ | -------- | ------------------------------------------------------------ |
-| 1    |      | **API 키 보안 문제**<br />1. apikey.js 파일이 Git 히스토리에 노출됨<br />2. YouTube API 키가 public repository에 커밋됨<br />⇒ 원인: .gitignore 설정 전에 파일을 커밋함 | 해결완료 | git filter-branch를 사용하여 Git 히스토리에서 민감한 파일 완전 제거<br />환경변수(.env) 사용으로 전환 |
-| 2    |      | **로그아웃 후 YouTube 검색 기록 UI 잔존**<br />1. 로그아웃 후에도 검색창에 이전 검색어가 남아있음<br />2. 검색 결과도 화면에 표시됨<br />⇒ 원인: sessionStorage 삭제는 됐으나 컴포넌트 state는 초기화되지 않음 | 해결완료 | SearchView의 restoreSearchState 함수에서 토큰 체크 추가<br />로그아웃 상태에서는 searchQuery와 videos를 빈 값으로 초기화 |
-| 3    |      | **전역 라우터 가드 및 리다이렉트 구현**<br />1. 보호된 페이지마다 개별 beforeEnter 가드 작성으로 코드 중복<br />2. 로그인 후 원래 가려던 페이지로 돌아가지 않음<br />3. 게시판 상세 페이지에서 로그인 버튼 클릭 시 메인으로 이동 | 해결완료 | router.beforeEach 전역 가드 구현<br />meta: { requiresAuth: true } 활용<br />to.fullPath를 redirect 쿼리 파라미터로 전달<br />LoginView에서 redirectPath 처리 |
-| 4    |      | **뉴스 게시판 UI 개선**<br />1. 뉴스 게시판에서 게시글 번호(Index) 컬럼이 불필요함<br />2. 뉴스는 시간순 정렬이 중요하지 번호는 의미 없음<br />⇒ 원인: 모든 게시판이 동일한 레이아웃을 사용 | 해결완료 | v-if="boardType !== 'news'" 조건부 렌더링<br />news-layout 클래스 추가하여 grid-template-columns 조정 |
-| 5    |      | **나중에 볼 영상 데이터 격리 문제**<br />1. 여러 사용자가 같은 localStorage 키를 사용하여 데이터 충돌<br />2. 로그아웃 후에도 이전 사용자 데이터가 남아있음 | 해결완료 | username 기반 키 생성 (savedVideos_${username})<br />로그아웃 시 현재 사용자의 키만 삭제<br />로그인하지 않은 상태에서는 데이터 로드하지 않음 |
-| 6    |      | **외부 서비스 리다이렉트 UX**<br />1. 토스 카드/투자 서비스로 이동 시 갑작스러운 전환<br />2. 사용자에게 어디로 이동하는지 알려주지 않음<br />3. 3초 카운트다운이 너무 길게 느껴짐 | 해결완료 | 1.5초 로딩 오버레이 구현<br />서비스별 메시지 분리 ("토스 카드 추천 서비스로 이동 중입니다...", "토스 증권으로 이동 중입니다...")<br />카운트다운 제거하고 로딩 메시지만 표시 |
-| 7    |      | **게시판 댓글 권한 관리**<br />1. 비로그인 사용자에게도 댓글 작성 UI가 보임<br />2. 작성 시도 시 에러 발생 | 해결완료 | v-if="authStore.isAuthenticated" 조건부 렌더링<br />비로그인 시 "로그인이 필요합니다" 안내 및 로그인 버튼 표시 |
-| 8    |      | **YouTube 검색 기록 세션 관리**<br />1. 검색 후 다른 페이지 갔다가 돌아오면 검색 기록이 사라짐<br />2. 비디오 상세 페이지에서 뒤로가기 시 검색 결과 초기화됨 | 해결완료 | sessionStorage에 검색 쿼리와 결과 저장<br />onMounted에서 restoreSearchState 호출<br />onBeforeUnmount와 페이지 이동 시 saveSearchState 호출 |
-| 9    |      | **Git 파일명 대소문자 구분 이슈**<br />1. 한 브랜치에서 LogInView.vue, 다른 브랜치에서 LoginView.vue 사용<br />2. Windows OS는 대소문자를 구분하지 않아 문제가 없었으나, GitLab(Linux 기반)에서는 두 파일을 별개로 인식<br />3. VS Code에서 동기화 오류 및 병합 충돌 발생<br />⇒ 원인: Windows의 대소문자 무시 정책과 Linux의 대소문자 구분 정책의 차이 | 해결완료 | 팀 전체 파일명 규칙 통일 (LoginView.vue로 표준화)<br />git mv를 사용하여 대소문자 변경 사항을 Git 인덱스에 반영<br />원격 저장소와 로컬 저장소 동기화 완료 |
+| No.  | Content                                                      | Solve    | follow-up                                                    |
+| ---- | ------------------------------------------------------------ | -------- | ------------------------------------------------------------ |
+| 1    | **API 키 보안 문제**<br />1. apikey.js 파일이 Git 히스토리에 노출됨<br />2. YouTube API 키가 public repository에 커밋됨<br />⇒ 원인: .gitignore 설정 전에 파일을 커밋함 | 해결완료 | git filter-branch를 사용하여 Git 히스토리에서 민감한 파일 완전 제거<br />환경변수(.env) 사용으로 전환 |
+| 2    | **로그아웃 후 YouTube 검색 기록 UI 잔존**<br />1. 로그아웃 후에도 검색창에 이전 검색어가 남아있음<br />2. 검색 결과도 화면에 표시됨<br />⇒ 원인: sessionStorage 삭제는 됐으나 컴포넌트 state는 초기화되지 않음 | 해결완료 | SearchView의 restoreSearchState 함수에서 토큰 체크 추가<br />로그아웃 상태에서는 searchQuery와 videos를 빈 값으로 초기화 |
+| 3    | **전역 라우터 가드 및 리다이렉트 구현**<br />1. 보호된 페이지마다 개별 beforeEnter 가드 작성으로 코드 중복<br />2. 로그인 후 원래 가려던 페이지로 돌아가지 않음<br />3. 게시판 상세 페이지에서 로그인 버튼 클릭 시 메인으로 이동 | 해결완료 | router.beforeEach 전역 가드 구현<br />meta: { requiresAuth: true } 활용<br />to.fullPath를 redirect 쿼리 파라미터로 전달<br />LoginView에서 redirectPath 처리 |
+| 4    | **뉴스 게시판 UI 개선**<br />1. 뉴스 게시판에서 게시글 번호(Index) 컬럼이 불필요함<br />2. 뉴스는 시간순 정렬이 중요하지 번호는 의미 없음<br />⇒ 원인: 모든 게시판이 동일한 레이아웃을 사용 | 해결완료 | v-if="boardType !== 'news'" 조건부 렌더링<br />news-layout 클래스 추가하여 grid-template-columns 조정 |
+| 5    | **나중에 볼 영상 데이터 격리 문제**<br />1. 여러 사용자가 같은 localStorage 키를 사용하여 데이터 충돌<br />2. 로그아웃 후에도 이전 사용자 데이터가 남아있음 | 해결완료 | username 기반 키 생성 (savedVideos_${username})<br />로그아웃 시 현재 사용자의 키만 삭제<br />로그인하지 않은 상태에서는 데이터 로드하지 않음 |
+| 6    | **외부 서비스 리다이렉트 UX**<br />1. 토스 카드/투자 서비스로 이동 시 갑작스러운 전환<br />2. 사용자에게 어디로 이동하는지 알려주지 않음<br />3. 3초 카운트다운이 너무 길게 느껴짐 | 해결완료 | 1.5초 로딩 오버레이 구현<br />서비스별 메시지 분리 ("토스 카드 추천 서비스로 이동 중입니다...", "토스 증권으로 이동 중입니다...")<br />카운트다운 제거하고 로딩 메시지만 표시 |
+| 7    | **게시판 댓글 권한 관리**<br />1. 비로그인 사용자에게도 댓글 작성 UI가 보임<br />2. 작성 시도 시 에러 발생 | 해결완료 | v-if="authStore.isAuthenticated" 조건부 렌더링<br />비로그인 시 "로그인이 필요합니다" 안내 및 로그인 버튼 표시 |
+| 8    | **YouTube 검색 기록 세션 관리**<br />1. 검색 후 다른 페이지 갔다가 돌아오면 검색 기록이 사라짐<br />2. 비디오 상세 페이지에서 뒤로가기 시 검색 결과 초기화됨 | 해결완료 | sessionStorage에 검색 쿼리와 결과 저장<br />onMounted에서 restoreSearchState 호출<br />onBeforeUnmount와 페이지 이동 시 saveSearchState 호출 |
+| 9    | **Git 파일명 대소문자 구분 이슈**<br />1. 한 브랜치에서 LogInView.vue, 다른 브랜치에서 LoginView.vue 사용<br />2. Windows OS는 대소문자를 구분하지 않아 문제가 없었으나, GitLab(Linux 기반)에서는 두 파일을 별개로 인식<br />3. VS Code에서 동기화 오류 및 병합 충돌 발생<br />⇒ 원인: Windows의 대소문자 무시 정책과 Linux의 대소문자 구분 정책의 차이 | 해결완료 | 팀 전체 파일명 규칙 통일 (LoginView.vue로 표준화)<br />git mv를 사용하여 대소문자 변경 사항을 Git 인덱스에 반영<br />원격 저장소와 로컬 저장소 동기화 완료 |
 
 
 
